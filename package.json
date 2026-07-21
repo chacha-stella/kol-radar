@@ -1,0 +1,17 @@
+{
+  "name": "kol-radar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KOL dashboard with scheduled Aliyun Enterprise Mail scanning",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js"
+  },
+  "dependencies": {
+    "imapflow": "^1.0.181"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
