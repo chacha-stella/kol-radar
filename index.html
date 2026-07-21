@@ -1,0 +1,723 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KOL Radar - 红人合作管理台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f5f7;
+      --surface: rgba(255,255,255,.82);
+      --surface-solid: #fff;
+      --surface-2: #f0f1f3;
+      --text: #1d1d1f;
+      --text-2: #6e6e73;
+      --line: rgba(29,29,31,.09);
+      --blue: #0071e3;
+      --blue-soft: rgba(0,113,227,.09);
+      --green: #1f9d63;
+      --orange: #e88713;
+      --red: #df4949;
+      --purple: #7557d7;
+      --shadow: 0 1px 2px rgba(0,0,0,.03), 0 18px 50px rgba(0,0,0,.055);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 78% -10%, rgba(0,113,227,.09), transparent 28%),
+        var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 236px minmax(0,1fr); }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 24px 16px 18px;
+      border-right: 1px solid var(--line);
+      background: rgba(248,248,250,.72);
+      backdrop-filter: saturate(180%) blur(26px);
+      -webkit-backdrop-filter: saturate(180%) blur(26px);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 10px 25px; }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(145deg,#55adff,#0071e3 67%,#0061c5);
+      box-shadow: inset 0 1px rgba(255,255,255,.55), 0 8px 18px rgba(0,113,227,.24);
+    }
+    .brand-mark svg { width: 19px; height: 19px; }
+    .brand-title { font-size: 16px; font-weight: 600; letter-spacing: -.025em; }
+    .brand-sub { margin-top: 2px; color: var(--text-2); font-size: 11px; }
+    .nav-label { padding: 0 12px 8px; color: var(--text-2); font-size: 11px; }
+    .nav { display: grid; gap: 5px; }
+    .nav-button {
+      width: 100%;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-align: left;
+      cursor: pointer;
+      transition: background .16s ease, color .16s ease, transform .16s ease;
+    }
+    .nav-button:hover { background: rgba(0,0,0,.035); }
+    .nav-button.is-active { color: var(--blue); background: var(--blue-soft); }
+    .nav-button svg { width: 18px; height: 18px; flex: 0 0 18px; }
+    .nav-button span { font-size: 13px; font-weight: 500; }
+    .sidebar-bottom { margin-top: auto; }
+    .sync-card { padding: 14px; border-top: 1px solid var(--line); }
+    .sync-line { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(31,157,99,.11); }
+    .sync-detail { margin-top: 7px; color: var(--text-2); font-size: 11px; line-height: 1.5; }
+    .main { min-width: 0; padding: 38px 42px 56px; }
+    .page { display: none; max-width: 1440px; margin: 0 auto; animation: pageIn .22s ease both; }
+    .page.is-active { display: block; }
+    @keyframes pageIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .page-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 25px; }
+    .page-kicker { color: var(--blue); font-size: 12px; font-weight: 600; margin-bottom: 7px; }
+    h1 { margin: 0; font-size: clamp(28px,3vw,38px); line-height: 1.1; letter-spacing: -.045em; font-weight: 600; }
+    h2 { margin: 0; font-size: 18px; letter-spacing: -.025em; font-weight: 600; }
+    h3 { margin: 0; font-size: 14px; font-weight: 600; }
+    .page-description { margin: 9px 0 0; color: var(--text-2); font-size: 13px; line-height: 1.6; }
+    .header-actions, .toolbar, .inline-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+    .btn {
+      min-height: 39px;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+      background: rgba(255,255,255,.78);
+      box-shadow: 0 1px 2px rgba(0,0,0,.035);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 17px rgba(0,0,0,.07); }
+    .btn-primary { color: #fff; border-color: var(--blue); background: var(--blue); box-shadow: 0 8px 19px rgba(0,113,227,.2); }
+    .btn-primary:hover { background: #0068d1; }
+    .btn-quiet { border-color: transparent; background: transparent; color: var(--blue); box-shadow: none; }
+    .btn:disabled { cursor: wait; opacity: .58; transform: none; }
+    .btn svg { width: 16px; height: 16px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; margin-bottom: 20px; }
+    .metric { padding: 21px 22px; min-height: 132px; display: flex; flex-direction: column; justify-content: space-between; }
+    .metric-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--text-2); font-size: 12px; }
+    .metric-icon { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; color: var(--blue); background: var(--blue-soft); }
+    .metric-icon svg { width: 16px; height: 16px; }
+    .metric-value { font-size: 29px; font-weight: 600; letter-spacing: -.045em; }
+    .metric-foot { color: var(--text-2); font-size: 11px; }
+    .metric-foot strong { color: var(--green); font-weight: 500; }
+    .home-grid { display: grid; grid-template-columns: minmax(0,1.65fr) minmax(320px,.75fr); gap: 20px; margin-bottom: 20px; }
+    .report-card, .action-card, .section-card { padding: 26px; }
+    .card-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; font-size: 11px; white-space: nowrap; background: var(--surface-2); color: var(--text-2); }
+    .badge-blue { color: var(--blue); background: var(--blue-soft); }
+    .badge-green { color: var(--green); background: rgba(31,157,99,.1); }
+    .badge-orange { color: var(--orange); background: rgba(232,135,19,.11); }
+    .badge-red { color: var(--red); background: rgba(223,73,73,.1); }
+    .badge-purple { color: var(--purple); background: rgba(117,87,215,.1); }
+    .report-copy { margin: 0; font-size: 15px; line-height: 1.8; color: #38383c; }
+    .report-copy strong { color: var(--text); }
+    .focus-list { margin: 23px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+    .focus-item { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .avatar { width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center; border-radius: 50%; background: linear-gradient(145deg,#e3f1ff,#ece7ff); font-size: 11px; font-weight: 600; }
+    .focus-main { min-width: 0; flex: 1; }
+    .focus-name { font-size: 13px; font-weight: 600; }
+    .focus-note { margin-top: 3px; color: var(--text-2); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .focus-score { font-size: 19px; font-weight: 600; letter-spacing: -.03em; }
+    .action-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 19px; }
+    .action-item { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; }
+    .action-index { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--blue); background: var(--blue-soft); font-size: 11px; font-weight: 600; }
+    .action-title { font-size: 13px; font-weight: 600; }
+    .action-detail { margin-top: 4px; color: var(--text-2); font-size: 11px; line-height: 1.55; }
+    .table-card { overflow: hidden; }
+    .table-card-head { padding: 23px 25px 17px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .table-wrap { width: 100%; overflow-x: auto; border-top: 1px solid var(--line); }
+    table { width: 100%; min-width: 980px; border-collapse: collapse; }
+    th, td { padding: 14px 13px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; font-size: 12px; }
+    th { color: var(--text-2); font-weight: 500; background: rgba(0,0,0,.018); white-space: nowrap; }
+    th:first-child, td:first-child { padding-left: 25px; }
+    th:last-child, td:last-child { padding-right: 25px; }
+    tbody tr { transition: background .14s ease; }
+    tbody tr:hover { background: rgba(0,113,227,.025); }
+    .person { display: flex; align-items: center; gap: 10px; min-width: 190px; }
+    .person-name { font-weight: 600; }
+    .person-email { margin-top: 3px; color: var(--text-2); font-size: 11px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag { padding: 4px 8px; border-radius: 999px; font-size: 10px; white-space: nowrap; background: var(--surface-2); color: #4a4a50; }
+    .score { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .score-track { width: 55px; height: 5px; overflow: hidden; border-radius: 99px; background: var(--surface-2); }
+    .score-fill { height: 100%; border-radius: inherit; background: var(--blue); }
+    .muted { color: var(--text-2); }
+    .text-right { text-align: right; }
+    .nowrap { white-space: nowrap; }
+    .month-bar { display: flex; align-items: center; gap: 5px; margin-bottom: 18px; padding: 4px; width: fit-content; max-width: 100%; overflow-x: auto; border-radius: 13px; background: rgba(0,0,0,.045); }
+    .month-button { border: 0; border-radius: 10px; padding: 8px 13px; background: transparent; color: var(--text-2); white-space: nowrap; cursor: pointer; }
+    .month-button.is-active { color: var(--text); background: var(--surface-solid); box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+    .month-count { margin-left: 5px; color: var(--blue); font-size: 10px; }
+    .filters { padding: 0 25px 20px; display: grid; grid-template-columns: minmax(260px,1fr) 180px 180px; gap: 10px; }
+    .field { min-height: 42px; width: 100%; border: 1px solid transparent; border-radius: 12px; padding: 9px 12px; color: var(--text); background: var(--surface-2); outline: none; transition: box-shadow .16s ease, background .16s ease; }
+    .field:focus { background: var(--surface-solid); box-shadow: 0 0 0 1px var(--blue), 0 0 0 4px rgba(0,113,227,.11); }
+    .search-wrap { position: relative; }
+    .search-wrap svg { position: absolute; left: 12px; top: 13px; width: 16px; height: 16px; color: var(--text-2); }
+    .search-wrap .field { padding-left: 37px; }
+    .content-entry { display: grid; grid-template-columns: minmax(0,1fr) 190px auto; gap: 10px; align-items: center; }
+    .content-entry .field { min-width: 0; }
+    .content-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin-top: 20px; }
+    .content-month-card { margin-bottom: 20px; padding: 24px 25px 20px; }
+    .content-overview { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(300px,.75fr); gap: 24px; align-items: stretch; }
+    .weekly-kpis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+    .weekly-kpi { padding: 14px; border-radius: 15px; background: var(--surface-2); }
+    .weekly-kpi-label { color: var(--text-2); font-size: 10px; }
+    .weekly-kpi-value { margin-top: 6px; font-size: 20px; font-weight: 600; letter-spacing: -.035em; }
+    .weekly-kpi-note { margin-top: 3px; color: var(--text-2); font-size: 10px; }
+    .exposure-chart { min-height: 196px; padding: 10px 0 24px; display: flex; gap: 11px; align-items: flex-end; border-bottom: 1px solid var(--line); }
+    .exposure-column { flex: 1; min-width: 36px; height: 160px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 7px; }
+    .exposure-bars { width: min(40px,86%); display: flex; align-items: flex-end; gap: 3px; height: 128px; }
+    .exposure-bar { flex: 1; min-height: 3px; border-radius: 7px 7px 2px 2px; background: linear-gradient(#55adff,#0071e3); }
+    .exposure-bar.engagement { background: linear-gradient(#9b85ef,#7557d7); }
+    .exposure-label { color: var(--text-2); font-size: 10px; white-space: nowrap; }
+    .exposure-legend { display: flex; gap: 15px; color: var(--text-2); font-size: 10px; }
+    .legend-dot { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: var(--blue); }
+    .legend-dot.purple { background: var(--purple); }
+    .video-card { padding: 20px; }
+    .video-top { display: flex; align-items: flex-start; gap: 13px; }
+    .video-thumb { width: 104px; height: 74px; flex: 0 0 104px; border-radius: 15px; display: grid; place-items: center; color: #fff; background: linear-gradient(145deg,#3d72f2,#7b5ee1); box-shadow: inset 0 1px rgba(255,255,255,.3); }
+    .video-thumb svg { width: 24px; height: 24px; }
+    .video-info { min-width: 0; flex: 1; }
+    .video-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .video-meta { margin-top: 5px; color: var(--text-2); font-size: 11px; }
+    .video-url { margin-top: 8px; color: var(--blue); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .video-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .video-stat-label { color: var(--text-2); font-size: 10px; }
+    .video-stat-value { margin-top: 4px; font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
+    .evaluation { margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .evaluation-copy { color: var(--text-2); font-size: 11px; line-height: 1.5; }
+    .evaluation-score { width: 46px; height: 46px; flex: 0 0 46px; display: grid; place-items: center; border-radius: 50%; color: var(--green); background: rgba(31,157,99,.1); font-size: 15px; font-weight: 600; }
+    .integration-note { display: flex; align-items: center; gap: 9px; margin-top: 12px; color: var(--text-2); font-size: 11px; }
+    .integration-note svg { width: 15px; height: 15px; color: var(--orange); }
+    .sales-layout { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(300px,.6fr); gap: 20px; margin-bottom: 20px; }
+    .chart-card { padding: 25px; }
+    .bar-chart { height: 220px; display: flex; align-items: flex-end; gap: 14px; padding-top: 18px; border-bottom: 1px solid var(--line); }
+    .bar-column { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 8px; min-width: 30px; }
+    .bar-value { color: var(--text-2); font-size: 10px; }
+    .bar { width: min(34px,70%); min-height: 4px; border-radius: 9px 9px 3px 3px; background: linear-gradient(#56a8ff,#0071e3); transition: height .25s ease; }
+    .bar-label { margin-bottom: -23px; color: var(--text-2); font-size: 10px; }
+    .model-list { display: grid; gap: 14px; }
+    .model-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+    .model-name { font-size: 12px; font-weight: 600; }
+    .model-sales { color: var(--text-2); font-size: 11px; }
+    .model-track { grid-column: 1 / -1; height: 5px; border-radius: 99px; overflow: hidden; background: var(--surface-2); }
+    .model-fill { height: 100%; border-radius: inherit; background: var(--purple); }
+    .recommendation-top { display: grid; grid-template-columns: minmax(0,1fr) 270px; gap: 20px; margin-bottom: 20px; }
+    .brand-selector { padding: 5px; display: flex; gap: 4px; border-radius: 14px; background: var(--surface-2); }
+    .brand-button { flex: 1; min-height: 42px; border: 0; border-radius: 10px; background: transparent; color: var(--text-2); cursor: pointer; font-weight: 600; letter-spacing: -.01em; }
+    .brand-button.is-active { color: var(--text); background: var(--surface-solid); box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+    .recommendation-card { padding: 22px; }
+    .track-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin-top: 16px; }
+    .track { padding: 11px; border-radius: 13px; background: var(--surface-2); color: var(--text-2); font-size: 11px; line-height: 1.45; }
+    .track.is-active { color: var(--blue); background: var(--blue-soft); }
+    .recommendation-note { display: flex; align-items: flex-start; gap: 9px; margin-top: 15px; color: var(--text-2); font-size: 11px; line-height: 1.55; }
+    .recommendation-note svg { width: 15px; height: 15px; flex: 0 0 15px; color: var(--orange); }
+    .tier { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; color: var(--purple); background: rgba(117,87,215,.1); font-size: 10px; white-space: nowrap; }
+    .foot { padding: 14px 25px 18px; color: var(--text-2); font-size: 11px; display: flex; justify-content: space-between; gap: 15px; }
+    .empty { padding: 50px 20px; text-align: center; color: var(--text-2); }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 50; padding: 20px; display: none; align-items: center; justify-content: center; background: rgba(16,16,18,.22); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+    .modal-backdrop.is-open { display: flex; }
+    .modal { width: min(610px,100%); max-height: calc(100vh - 40px); overflow-y: auto; padding: 26px; border-radius: 28px; background: var(--surface-solid); box-shadow: 0 35px 100px rgba(0,0,0,.22); }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+    .modal-copy { margin: 10px 0 20px; color: var(--text-2); font-size: 12px; line-height: 1.6; }
+    .connection-list { display: grid; gap: 1px; background: var(--line); border-radius: 17px; overflow: hidden; }
+    .connection-row { padding: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; background: var(--surface-solid); }
+    .connection-name { font-size: 13px; font-weight: 600; }
+    .connection-desc { margin-top: 4px; color: var(--text-2); font-size: 11px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
+    .toast { position: fixed; z-index: 80; right: 24px; bottom: 24px; max-width: min(390px,calc(100vw - 32px)); padding: 13px 17px; border: 1px solid var(--line); border-radius: 15px; color: var(--text); background: rgba(255,255,255,.92); box-shadow: 0 20px 60px rgba(0,0,0,.17); backdrop-filter: blur(20px); transform: translateY(15px); opacity: 0; pointer-events: none; transition: .2s ease; font-size: 12px; }
+    .toast.is-visible { opacity: 1; transform: none; }
+    .mobile-nav { display: none; }
+    @media (max-width: 1100px) {
+      .metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .home-grid, .sales-layout { grid-template-columns: 1fr; }
+      .content-grid { grid-template-columns: 1fr; }
+      .content-overview, .recommendation-top { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 820px) {
+      .app { display: block; }
+      .sidebar { display: none; }
+      .main { padding: 26px 18px 92px; }
+      .mobile-nav { position: fixed; z-index: 40; left: 10px; right: 10px; bottom: 10px; height: 64px; padding: 6px; display: grid; grid-template-columns: repeat(4,1fr); border: 1px solid var(--line); border-radius: 19px; background: rgba(255,255,255,.86); box-shadow: 0 15px 50px rgba(0,0,0,.15); backdrop-filter: blur(22px); }
+      .mobile-nav .nav-button { min-height: 50px; justify-content: center; flex-direction: column; gap: 3px; padding: 4px; }
+      .mobile-nav .nav-button span { font-size: 9px; }
+      .page-header { flex-direction: column; }
+      .header-actions { width: 100%; }
+      .filters { grid-template-columns: 1fr 1fr; }
+      .filters .search-wrap { grid-column: 1 / -1; }
+      .content-entry { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .metrics { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .metric { min-height: 117px; padding: 17px; }
+      .metric-value { font-size: 24px; }
+      .report-card, .action-card, .section-card, .chart-card { padding: 20px; }
+      .filters { grid-template-columns: 1fr; padding: 0 18px 18px; }
+      .filters .search-wrap { grid-column: auto; }
+      .table-card-head { padding: 20px 18px 15px; align-items: flex-start; flex-direction: column; }
+      .video-top { align-items: center; }
+      .video-thumb { width: 78px; height: 66px; flex-basis: 78px; }
+      .video-stats { grid-template-columns: 1fr 1fr; }
+      .weekly-kpis { grid-template-columns: 1fr; }
+      .content-month-card { padding: 20px 18px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full { grid-column: auto; }
+      .foot { flex-direction: column; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --bg: #101114;
+        --surface: rgba(28,29,33,.82);
+        --surface-solid: #1c1d21;
+        --surface-2: #292a2f;
+        --text: #f5f5f7;
+        --text-2: #a1a1a7;
+        --line: rgba(255,255,255,.09);
+        --blue: #2997ff;
+        --blue-soft: rgba(41,151,255,.12);
+        --shadow: none;
+      }
+      body { background: radial-gradient(circle at 78% -10%,rgba(41,151,255,.11),transparent 28%),var(--bg); }
+      .sidebar { background: rgba(20,21,24,.75); }
+      .report-copy { color: #d3d3d7; }
+      .tag { color: #d7d7dc; }
+      .mobile-nav { background: rgba(28,29,33,.87); }
+      .toast { background: rgba(35,36,40,.94); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l1.6 5.1L19 10l-5.4 1.9L12 17l-1.6-5.1L5 10l5.4-1.9L12 3Z"/><path d="m18.5 15 .8 2.4 2.2.8-2.2.8-.8 2.3-.8-2.3-2.2-.8 2.2-.8.8-2.4Z"/></svg>
+        </div>
+        <div><div class="brand-title">KOL Radar</div><div class="brand-sub">Influencer Intelligence</div></div>
+      </div>
+      <div class="nav-label">工作台</div>
+      <nav class="nav" aria-label="主菜单">
+        <button class="nav-button is-active" type="button" data-page="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-8Z"/></svg><span>今日日报</span>
+        </button>
+        <button class="nav-button" type="button" data-page="collaborators">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg><span>合作红人库</span>
+        </button>
+        <button class="nav-button" type="button" data-page="content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3V9Z"/></svg><span>内容效果</span>
+        </button>
+        <button class="nav-button" type="button" data-page="sales">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/><path d="m3 7 6-4 6 6 6-5"/></svg><span>联盟销售</span>
+        </button>
+        <button class="nav-button" type="button" data-page="recommendations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg><span>红人推荐</span>
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sync-card">
+          <div class="sync-line"><span class="sync-dot"></span><span>日报任务运行中</span></div>
+          <div class="sync-detail">邮箱扫描：每日 08:30<br>下次同步：明天 08:30</div>
+          <button class="btn btn-quiet" id="settingsButton" type="button" style="margin-top:9px;padding-left:0">数据源设置</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="page is-active" id="page-home">
+        <div class="page-header">
+          <div><div class="page-kicker" id="todayDate"></div><h1>早上好，今日红人日报</h1><p class="page-description">邮件回复、合作推进和销售表现已经汇总完成。</p></div>
+          <div class="header-actions"><button class="btn" type="button" data-open-settings>数据源</button><button class="btn btn-primary" id="scanButton" type="button">扫描新邮件</button></div>
+        </div>
+        <div class="metrics">
+          <article class="card metric"><div class="metric-top"><span>新增回复</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v12H8l-4 4V5Z"/></svg></span></div><div class="metric-value">12</div><div class="metric-foot"><strong>+3</strong> 较昨日</div></article>
+          <article class="card metric"><div class="metric-top"><span>高意向红人</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg></span></div><div class="metric-value">3</div><div class="metric-foot">建议今日优先推进</div></article>
+          <article class="card metric"><div class="metric-top"><span>新增报价总额</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12l3 5-9 13L3 8l3-5Z"/><path d="M8 8h8M12 3v18"/></svg></span></div><div class="metric-value">¥67.5k</div><div class="metric-foot">从 4 封邮件自动提取</div></article>
+          <article class="card metric"><div class="metric-top"><span>近 7 日联盟销售</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span></div><div class="metric-value">¥86.4k</div><div class="metric-foot"><strong>+18.6%</strong> 环比上周</div></article>
+        </div>
+        <div class="home-grid">
+          <article class="card report-card">
+            <div class="card-head"><h2>AI 日报摘要</h2><span class="badge badge-blue">08:31 生成</span></div>
+            <p class="report-copy">今早共分析 <strong>28 封红人邮件</strong>，识别出 <strong>3 位高意向红人</strong>和 <strong>4 个新增报价</strong>。Mia Chen 已接受核心合作条件，Luna 的双平台报价仍有议价空间。近 7 日由红人内容带来的联盟销售中，<strong>AeroFit Pro 占比 46%</strong>，建议优先补充该型号的内容供给。</p>
+            <ul class="focus-list">
+              <li class="focus-item"><span class="avatar">MC</span><div class="focus-main"><div class="focus-name">Mia Chen</div><div class="focus-note">接受核心条款，等待正式合同与档期确认</div></div><span class="focus-score">94</span></li>
+              <li class="focus-item"><span class="avatar">LU</span><div class="focus-main"><div class="focus-name">Luna生活志</div><div class="focus-note">报价 ¥8,500，建议争取双平台打包价</div></div><span class="focus-score">89</span></li>
+              <li class="focus-item"><span class="avatar">KI</span><div class="focus-main"><div class="focus-name">Kiki Goes Global</div><div class="focus-note">需要补充产品卖点与内容交付时间线</div></div><span class="focus-score">86</span></li>
+            </ul>
+          </article>
+          <aside class="card action-card">
+            <div class="card-head"><h2>今日建议动作</h2><span class="badge badge-purple">AI 建议</span></div>
+            <ol class="action-list">
+              <li class="action-item"><span class="action-index">1</span><div><div class="action-title">锁定 Mia Chen 档期</div><div class="action-detail">意向度 94，今天发送合同能够缩短决策周期。</div></div></li>
+              <li class="action-item"><span class="action-index">2</span><div><div class="action-title">回复 Luna 的报价</div><div class="action-detail">提出两平台打包合作，并将预算控制在 ¥8,000。</div></div></li>
+              <li class="action-item"><span class="action-index">3</span><div><div class="action-title">处理 2 笔待付款</div><div class="action-detail">避免影响脚本交付及下周内容发布时间。</div></div></li>
+              <li class="action-item"><span class="action-index">4</span><div><div class="action-title">追加 AeroFit Pro 内容</div><div class="action-detail">该型号当前销售转化领先，适合扩大红人覆盖。</div></div></li>
+            </ol>
+          </aside>
+        </div>
+        <section class="card table-card">
+          <div class="table-card-head"><div><h2>最新邮件回复</h2><p class="page-description">按意向度与最新回复时间排序</p></div><button class="btn btn-quiet" type="button" data-go-page="collaborators">查看全部红人</button></div>
+          <div class="table-wrap"><table><thead><tr><th>红人 / 邮箱</th><th>平台</th><th>意向度</th><th>最新回复</th><th>报价</th><th>合作进度</th><th>今日动作</th></tr></thead><tbody id="replyRows"></tbody></table></div>
+        </section>
+      </section>
+
+      <section class="page" id="page-collaborators">
+        <div class="page-header">
+          <div><div class="page-kicker">COLLABORATOR CRM</div><h1>合作红人库</h1><p class="page-description">所有合作过的红人按合作月份归档。飞书初始名单统一归入 2026 年 6 月。</p></div>
+          <div class="header-actions"><input type="file" id="csvInput" accept=".csv,text/csv" hidden><button class="btn" id="importButton" type="button">导入飞书表格</button><button class="btn btn-primary" id="addCollaboratorButton" type="button">新增合作红人</button></div>
+        </div>
+        <div class="month-bar" id="monthBar" aria-label="合作月份"></div>
+        <section class="card table-card">
+          <div class="table-card-head"><div><h2 id="collabTitle">2026 年 6 月</h2><p class="page-description" id="collabSubtitle">飞书初始导入记录</p></div><span class="badge badge-blue" id="collabCount">0 位红人</span></div>
+          <div class="filters">
+            <div class="search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input class="field" id="collabSearch" type="search" placeholder="搜索红人、邮箱或型号"></div>
+            <select class="field" id="collabPlatform"><option value="all">全部平台</option></select>
+            <select class="field" id="collabModel"><option value="all">全部合作型号</option></select>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>红人 / 邮箱</th><th>平台</th><th>合作型号</th><th>合作月份</th><th>合作报价</th><th>合作进度</th><th>来源</th><th></th></tr></thead><tbody id="collabRows"></tbody></table></div>
+          <div class="foot"><span>后续新增记录会根据合作日期自动归入对应月份</span><span id="collabFoot"></span></div>
+        </section>
+      </section>
+
+      <section class="page" id="page-content">
+        <div class="page-header">
+          <div><div class="page-kicker">CONTENT INTELLIGENCE</div><h1>红人内容效果</h1><p class="page-description">收录红人发布链接，抓取观看、互动和内容反馈，并结合联盟销售评估实际效果。</p></div>
+          <div class="header-actions"><button class="btn" type="button" data-open-settings>平台 API 设置</button></div>
+        </div>
+        <section class="card content-month-card">
+          <div class="card-head"><div><h2>月度内容看板</h2><p class="page-description">按月份汇总每周曝光、互动与联盟归因销售</p></div><select class="field" id="contentMonth" style="width:145px"><option value="2026-07">2026 年 7 月</option><option value="2026-06">2026 年 6 月</option></select></div>
+          <div class="content-overview"><div><div class="exposure-legend"><span><i class="legend-dot"></i>曝光量</span><span><i class="legend-dot purple"></i>互动量</span></div><div class="exposure-chart" id="contentExposureChart" role="img" aria-label="按周展示曝光量和互动量"></div></div><div class="weekly-kpis"><div class="weekly-kpi"><div class="weekly-kpi-label">本月累计曝光</div><div class="weekly-kpi-value" id="monthExposure">0</div><div class="weekly-kpi-note" id="monthExposureNote"></div></div><div class="weekly-kpi"><div class="weekly-kpi-label">本月互动率</div><div class="weekly-kpi-value" id="monthEngagement">0%</div><div class="weekly-kpi-note">点赞、评论与收藏综合</div></div><div class="weekly-kpi"><div class="weekly-kpi-label">联盟归因销售</div><div class="weekly-kpi-value" id="monthSales">¥0</div><div class="weekly-kpi-note">内容发布后 30 日窗口</div></div></div></div>
+        </section>
+        <section class="card section-card">
+          <div class="card-head"><div><h2>收录新发布链接</h2><p class="page-description">支持 TikTok、YouTube、Instagram、小红书、抖音、Bilibili</p></div><span class="badge badge-orange">等待平台授权</span></div>
+          <div class="content-entry"><input class="field" id="contentUrl" type="url" placeholder="粘贴红人发布链接，例如 https://www.tiktok.com/..."><select class="field" id="contentModel"><option>AeroFit Pro</option><option>AeroFit Mini</option><option>Nova X1</option><option>Nova Lite</option></select><button class="btn btn-primary" id="analyzeButton" type="button">收录并分析</button></div>
+          <div class="integration-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg><span>当前页面展示演示分析结果；连接对应平台 API 后，会自动抓取真实数据并定时更新。</span></div>
+        </section>
+        <div class="content-grid" id="contentGrid"></div>
+      </section>
+
+      <section class="page" id="page-sales">
+        <div class="page-header">
+          <div><div class="page-kicker">AFFILIATE SALES</div><h1>联盟销售看板</h1><p class="page-description">实时记录红人归因订单、销售金额、销售型号和佣金表现。</p></div>
+          <div class="header-actions"><span class="badge badge-green"><span class="sync-dot"></span>实时同步演示</span><button class="btn" type="button" data-open-settings>接入联盟平台</button></div>
+        </div>
+        <div class="metrics">
+          <article class="card metric"><div class="metric-top"><span>近 30 日 GMV</span></div><div class="metric-value">¥286,420</div><div class="metric-foot"><strong>+21.4%</strong> 环比上期</div></article>
+          <article class="card metric"><div class="metric-top"><span>归因订单</span></div><div class="metric-value">418</div><div class="metric-foot">退款后有效订单</div></article>
+          <article class="card metric"><div class="metric-top"><span>平均转化率</span></div><div class="metric-value">4.82%</div><div class="metric-foot"><strong>+0.63%</strong> 环比上期</div></article>
+          <article class="card metric"><div class="metric-top"><span>预估佣金</span></div><div class="metric-value">¥31,526</div><div class="metric-foot">按当前联盟规则计算</div></article>
+        </div>
+        <div class="sales-layout">
+          <article class="card chart-card"><div class="card-head"><div><h2>近 7 日红人销售额</h2><p class="page-description">联盟归因 GMV</p></div><span class="badge badge-blue">¥86,420</span></div><div class="bar-chart" id="salesChart" role="img" aria-label="近七日销售额柱状图"></div></article>
+          <aside class="card chart-card"><div class="card-head"><div><h2>销售型号分布</h2><p class="page-description">近 30 日</p></div></div><div class="model-list" id="modelList"></div></aside>
+        </div>
+        <section class="card table-card"><div class="table-card-head"><div><h2>实时销售记录</h2><p class="page-description">按最新订单时间排序</p></div><span class="badge badge-green">刚刚更新</span></div><div class="table-wrap"><table><thead><tr><th>订单时间</th><th>红人</th><th>平台</th><th>销售型号</th><th>订单数</th><th>销售额</th><th>佣金</th><th>转化率</th></tr></thead><tbody id="salesRows"></tbody></table></div><div class="foot"><span>演示数据 · 接入联盟营销 API 后替换为实时订单</span><span>最近同步：刚刚</span></div></section>
+      </section>
+
+      <section class="page" id="page-recommendations">
+        <div class="page-header">
+          <div><div class="page-kicker">WEEKLY CREATOR SOURCING</div><h1>红人推荐</h1><p class="page-description">每周为每个品牌整理 30 位候选红人，覆盖精品小红人到大型 KOL。</p></div>
+          <div class="header-actions"><span class="badge badge-blue" id="recommendationWeek">2026 W30</span><button class="btn btn-primary" id="refreshRecommendations" type="button">刷新本周候选</button></div>
+        </div>
+        <div class="recommendation-top">
+          <section class="card recommendation-card"><div class="card-head"><div><h2>品牌与赛道</h2><p class="page-description">选择品牌查看本周候选池与匹配策略</p></div></div><div class="brand-selector"><button class="brand-button is-active" type="button" data-brand="dartsnut">dartsnut</button><button class="brand-button" type="button" data-brand="chessnut">chessnut</button></div><div class="track-grid" id="trackGrid"></div><div class="recommendation-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg><span>候选池按内容相关度、地域与语言匹配、近 30 日互动质量和账号量级筛选；连接社媒数据源后会替换为真实候选。</span></div></section>
+          <aside class="card recommendation-card"><div class="card-head"><h2>本周队列</h2><span class="badge badge-purple">每周更新</span></div><div class="weekly-kpis"><div class="weekly-kpi"><div class="weekly-kpi-label">候选红人</div><div class="weekly-kpi-value">30</div><div class="weekly-kpi-note">本周推荐数量</div></div><div class="weekly-kpi"><div class="weekly-kpi-label">精品 / 中腰部</div><div class="weekly-kpi-value">21</div><div class="weekly-kpi-note">高质量细分影响力</div></div><div class="weekly-kpi"><div class="weekly-kpi-label">大型 KOL</div><div class="weekly-kpi-value">9</div><div class="weekly-kpi-note">扩大内容覆盖</div></div></div></aside>
+        </div>
+        <section class="card table-card"><div class="table-card-head"><div><h2 id="recommendationTitle">dartsnut · 本周候选</h2><p class="page-description" id="recommendationSubtitle">30 位候选，覆盖 4 个重点赛道</p></div><span class="badge badge-green">下次更新：下周一</span></div><div class="filters"><div class="search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input class="field" id="recommendSearch" type="search" placeholder="搜索红人、平台或赛道"></div><select class="field" id="recommendTrack"><option value="all">全部赛道</option></select><select class="field" id="recommendTier"><option value="all">全部量级</option><option value="精品">精品</option><option value="中腰部">中腰部</option><option value="大型 KOL">大型 KOL</option></select></div><div class="table-wrap"><table><thead><tr><th>候选红人</th><th>平台</th><th>主赛道</th><th>量级</th><th>粉丝量</th><th>互动率</th><th>推荐理由</th><th></th></tr></thead><tbody id="recommendationRows"></tbody></table></div><div class="foot"><span>每周每个品牌固定输出 30 位候选</span><span id="recommendationCount"></span></div></section>
+      </section>
+    </main>
+
+    <nav class="mobile-nav" aria-label="移动端主菜单">
+      <button class="nav-button is-active" type="button" data-page="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-8Z"/></svg><span>日报</span></button>
+      <button class="nav-button" type="button" data-page="collaborators"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="4"/><path d="M16 21v-2a6 6 0 0 0-6-6H7a5 5 0 0 0-5 5v3M19 8v6M22 11h-6"/></svg><span>红人库</span></button>
+      <button class="nav-button" type="button" data-page="content"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3V9Z"/></svg><span>内容</span></button>
+      <button class="nav-button" type="button" data-page="sales"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg><span>销售</span></button>
+      <button class="nav-button" type="button" data-page="recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg><span>推荐</span></button>
+    </nav>
+
+    <div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal"><div class="modal-head"><h2 id="settingsTitle">数据源设置</h2><button class="btn btn-quiet" type="button" data-close-modal>关闭</button></div><p class="modal-copy">生产环境通过服务端保存授权信息。网页端不会保存邮箱密码、API 密钥或联盟平台密钥。</p><div class="connection-list">
+        <div class="connection-row"><div><div class="connection-name">阿里云企业邮箱</div><div class="connection-desc">IMAP 扫描回复，提取报价和意向度</div></div><span class="badge badge-green">流程已配置</span></div>
+        <div class="connection-row"><div><div class="connection-name">飞书多维表格</div><div class="connection-desc">已合作红人统一归档至 2026 年 6 月</div></div><span class="badge badge-blue">支持 CSV 导入</span></div>
+        <div class="connection-row"><div><div class="connection-name">内容平台 API</div><div class="connection-desc">抓取播放、互动、评论情绪和视频状态</div></div><span class="badge badge-orange">待授权</span></div>
+        <div class="connection-row"><div><div class="connection-name">联盟营销平台</div><div class="connection-desc">同步订单、销售额、型号、退款与佣金</div></div><span class="badge badge-orange">待授权</span></div>
+      </div></div>
+    </div>
+
+    <div class="modal-backdrop" id="collabModal" role="dialog" aria-modal="true" aria-labelledby="collabModalTitle">
+      <div class="modal"><div class="modal-head"><h2 id="collabModalTitle">新增合作红人</h2><button class="btn btn-quiet" type="button" data-close-modal>关闭</button></div><p class="modal-copy">系统会根据合作日期自动按月份归档。</p><div class="form-grid"><input class="field" id="newName" placeholder="红人名称"><input class="field" id="newEmail" type="email" placeholder="邮箱"><input class="field" id="newPlatform" placeholder="平台，例如 TikTok"><input class="field" id="newModel" placeholder="合作型号，例如 AeroFit Pro"><input class="field" id="newDate" type="date"><input class="field" id="newQuote" type="number" min="0" placeholder="合作报价"><select class="field full" id="newProgress"><option>初次合作</option><option>已达成合作意向</option><option>内容制作中</option><option>已发布</option></select></div><div class="modal-actions"><button class="btn" type="button" data-close-modal>取消</button><button class="btn btn-primary" id="saveCollaboratorButton" type="button">保存红人</button></div></div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script>
+    (() => {
+      const app = document.getElementById('app');
+      const $ = id => document.getElementById(id);
+      const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const money = value => '¥' + Number(value || 0).toLocaleString('zh-CN');
+      const initials = name => String(name).replace(/[^A-Za-z\u4e00-\u9fa5]/g,'').slice(0,2).toUpperCase();
+      const defaultCollaborators = [
+        {name:'Mia Chen',email:'mia.creator@gmail.com',platforms:['TikTok','Instagram'],models:['AeroFit Pro'],month:'2026-06',date:'2026-06-28',quote:18000,progress:'已达成合作意向',source:'飞书导入'},
+        {name:'Luna生活志',email:'luna@creator.cn',platforms:['小红书'],models:['AeroFit Mini'],month:'2026-06',date:'2026-06-25',quote:8500,progress:'内容制作中',source:'飞书导入'},
+        {name:'Kiki Goes Global',email:'hello@kikiglobal.co',platforms:['YouTube','TikTok'],models:['Nova X1'],month:'2026-06',date:'2026-06-23',quote:26000,progress:'已发布',source:'飞书导入'},
+        {name:'周末去哪儿',email:'weekend@rednote.cn',platforms:['小红书','抖音'],models:['AeroFit Pro'],month:'2026-06',date:'2026-06-19',quote:12000,progress:'已发布',source:'飞书导入'},
+        {name:'Nora Studio',email:'nora@studio.com',platforms:['Instagram'],models:['Nova Lite'],month:'2026-06',date:'2026-06-16',quote:6800,progress:'已发布',source:'飞书导入'},
+        {name:'科技阿远',email:'ayuan@techmedia.cn',platforms:['Bilibili','抖音'],models:['Nova X1','Nova Lite'],month:'2026-06',date:'2026-06-12',quote:15000,progress:'已发布',source:'飞书导入'},
+        {name:'Sophie Daily',email:'sophie@daily.uk',platforms:['YouTube','Instagram'],models:['AeroFit Pro'],month:'2026-06',date:'2026-06-08',quote:21000,progress:'已发布',source:'飞书导入'},
+        {name:'阿布测评',email:'abu@review.cn',platforms:['Bilibili'],models:['AeroFit Mini'],month:'2026-06',date:'2026-06-03',quote:9800,progress:'已发布',source:'飞书导入'}
+      ];
+      const replies = [
+        {name:'Mia Chen',email:'mia.creator@gmail.com',platform:'TikTok · Instagram',intent:94,reply:'今天 07:48',quote:18000,progress:'已达成合作意向',action:'确认档期并发送合同'},
+        {name:'Luna生活志',email:'luna@creator.cn',platform:'小红书',intent:89,reply:'昨天 21:16',quote:8500,progress:'正在报价',action:'争取双平台打包价'},
+        {name:'Kiki Goes Global',email:'hello@kikiglobal.co',platform:'YouTube · TikTok',intent:86,reply:'昨天 18:42',quote:26000,progress:'正在报价',action:'补充卖点与时间线'},
+        {name:'科技阿远',email:'ayuan@techmedia.cn',platform:'Bilibili · 抖音',intent:68,reply:'07-19 22:04',quote:15000,progress:'正在报价',action:'发送竞品案例'}
+      ];
+      const defaultContent = [
+        {id:1,name:'Kiki Goes Global',platform:'TikTok',model:'Nova X1',url:'https://www.tiktok.com/@kiki/video/demo1',date:'07-20',views:186000,likes:14200,comments:638,engagement:'8.1%',score:91,note:'播放与互动显著高于账号近 30 日均值，产品卖点露出完整。'},
+        {id:2,name:'周末去哪儿',platform:'小红书',model:'AeroFit Pro',url:'https://www.xiaohongshu.com/explore/demo2',date:'07-19',views:82400,likes:6900,comments:421,engagement:'8.9%',score:88,note:'收藏与评论质量较高，联盟点击转化表现领先。'},
+        {id:3,name:'科技阿远',platform:'Bilibili',model:'Nova X1',url:'https://www.bilibili.com/video/demo3',date:'07-18',views:126000,likes:8300,comments:705,engagement:'7.2%',score:84,note:'深度评测带来较长观看时长，但购买引导可进一步强化。'},
+        {id:4,name:'Nora Studio',platform:'Instagram',model:'Nova Lite',url:'https://www.instagram.com/reel/demo4',date:'07-17',views:59300,likes:4100,comments:182,engagement:'7.4%',score:78,note:'视觉质感优秀，互动稳定，当前销售归因仍在积累。'}
+      ];
+      const sales = [
+        {time:'今天 10:42',name:'Kiki Goes Global',platform:'TikTok',model:'Nova X1',orders:18,revenue:14382,commission:1582,conversion:'5.8%'},
+        {time:'今天 10:18',name:'周末去哪儿',platform:'小红书',model:'AeroFit Pro',orders:12,revenue:11268,commission:1239,conversion:'6.4%'},
+        {time:'今天 09:57',name:'Mia Chen',platform:'Instagram',model:'AeroFit Pro',orders:9,revenue:8451,commission:930,conversion:'4.9%'},
+        {time:'今天 09:31',name:'科技阿远',platform:'Bilibili',model:'Nova X1',orders:7,revenue:5593,commission:615,conversion:'3.8%'},
+        {time:'今天 08:54',name:'Nora Studio',platform:'Instagram',model:'Nova Lite',orders:5,revenue:2995,commission:329,conversion:'3.4%'}
+      ];
+      const chartData = [{d:'7/15',v:8900},{d:'7/16',v:10400},{d:'7/17',v:9800},{d:'7/18',v:12200},{d:'7/19',v:13600},{d:'7/20',v:14700},{d:'今天',v:16820}];
+      const modelData = [{name:'AeroFit Pro',sales:131900,pct:46},{name:'Nova X1',sales:84600,pct:30},{name:'AeroFit Mini',sales:42960,pct:15},{name:'Nova Lite',sales:26960,pct:9}];
+      const monthlyContent = {
+        '2026-07': {exposure:453700,engagement:'8.0%',sales:48620,weeks:[{label:'第 1 周',exposure:78600,interactions:6120},{label:'第 2 周',exposure:110900,interactions:8750},{label:'第 3 周',exposure:139700,interactions:10430},{label:'第 4 周',exposure:124500,interactions:9380}]},
+        '2026-06': {exposure:387200,engagement:'7.4%',sales:39280,weeks:[{label:'第 1 周',exposure:69200,interactions:4840},{label:'第 2 周',exposure:91100,interactions:6620},{label:'第 3 周',exposure:108600,interactions:7910},{label:'第 4 周',exposure:118300,interactions:9140}]}
+      };
+      const recommendationTracks = {
+        dartsnut:['AI 创意玩家 / 零代码创作者','派对 / 家庭娱乐群体','科技爱好者 / 树莓派极客','复古像素美学'],
+        chessnut:['国际象棋界','生活方式','教育 / 亲子益智','桌游与思维训练']
+      };
+      const prefixes = {dartsnut:['Pixel','Prompt','Play','Neo','Circuit','Arcade','Family','Maker','Code','Retro'],chessnut:['Chess','Knight','Board','Mind','Quiet','Checkmate','Daily','Tactic','Castle','Endgame']};
+      function buildRecommendations(brand) {
+        const names = brand === 'dartsnut' ? ['PixelPilot','Prompt & Play','Mina Makes','Retro Room','Circuit Dad','Family Game Lab','CodeWithKai','Joyful Living','Tiny Arcade','Weekend Widgets'] : ['Chessful Life','Knight Moves','Daily Endgame','The Chess Home','Mindful Board','Castle Stories','Tactic Theory','Quiet Sundays','Checkmate Kids','Board & Bloom'];
+        const platforms = brand === 'dartsnut' ? ['TikTok','YouTube','Instagram','TikTok','YouTube','Instagram'] : ['YouTube','Instagram','TikTok','YouTube','Instagram','TikTok'];
+        const tracks = recommendationTracks[brand];
+        return Array.from({length:30},(_,i) => {
+          const tier = i < 9 ? '大型 KOL' : i < 21 ? '中腰部' : '精品';
+          const followers = tier === '大型 KOL' ? (1.1 + i * .17).toFixed(1) + 'M' : tier === '中腰部' ? (120 + i * 18) + 'K' : (18 + i * 5) + 'K';
+          const track = tracks[i % tracks.length];
+          return {id:i+1,name:`${names[i % names.length]}${i >= 10 ? ' · ' + (i+1) : ''}`,email:`creator${i+1}@example.com`,platform:platforms[i % platforms.length],track,tier,followers,engagement:(3.8 + (i % 7) * .46).toFixed(1) + '%',reason:`近 30 日持续输出${track}相关内容，受众与 ${brand} 的内容方向匹配。`};
+        });
+      }
+      const recommendations = {dartsnut:buildRecommendations('dartsnut'),chessnut:buildRecommendations('chessnut')};
+      let collaborators = JSON.parse(localStorage.getItem('kolCollaborators') || 'null') || defaultCollaborators;
+      let contents = JSON.parse(localStorage.getItem('kolContents') || 'null') || defaultContent;
+      let activeMonth = '2026-06';
+      let activeRecommendationBrand = 'dartsnut';
+
+      function showToast(message) {
+        const toast = $('toast');
+        toast.textContent = message;
+        toast.classList.add('is-visible');
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove('is-visible'), 2800);
+      }
+
+      function showPage(page) {
+        document.querySelectorAll('.page').forEach(el => el.classList.toggle('is-active', el.id === 'page-' + page));
+        document.querySelectorAll('[data-page]').forEach(el => el.classList.toggle('is-active', el.dataset.page === page));
+      history.replaceState(null,'','#' + page);
+        window.scrollTo({top:0,behavior:'smooth'});
+      }
+
+      function openModal(id) { $(id).classList.add('is-open'); }
+      function closeModals() { document.querySelectorAll('.modal-backdrop').forEach(el => el.classList.remove('is-open')); }
+
+      function renderReplies() {
+        $('replyRows').innerHTML = replies.map(r => `<tr><td><div class="person"><span class="avatar">${safe(initials(r.name))}</span><div><div class="person-name">${safe(r.name)}</div><div class="person-email">${safe(r.email)}</div></div></div></td><td>${safe(r.platform)}</td><td><div class="score"><span>${r.intent}</span><span class="score-track"><span class="score-fill" style="width:${r.intent}%"></span></span></div></td><td class="nowrap">${r.reply}</td><td class="nowrap">${money(r.quote)}</td><td><span class="badge ${r.intent >= 85 ? 'badge-green' : 'badge-orange'}">${safe(r.progress)}</span></td><td>${safe(r.action)}</td></tr>`).join('');
+      }
+
+      function monthLabel(month) { const [year,m] = month.split('-'); return `${year} 年 ${Number(m)} 月`; }
+
+      function renderCollabFilters() {
+        const platforms = [...new Set(collaborators.flatMap(c => c.platforms))].sort();
+        const models = [...new Set(collaborators.flatMap(c => c.models))].sort();
+        const platformValue = $('collabPlatform').value;
+        const modelValue = $('collabModel').value;
+        $('collabPlatform').innerHTML = '<option value="all">全部平台</option>' + platforms.map(v => `<option>${safe(v)}</option>`).join('');
+        $('collabModel').innerHTML = '<option value="all">全部合作型号</option>' + models.map(v => `<option>${safe(v)}</option>`).join('');
+        if (platforms.includes(platformValue)) $('collabPlatform').value = platformValue;
+        if (models.includes(modelValue)) $('collabModel').value = modelValue;
+      }
+
+      function renderMonthBar() {
+        const months = [...new Set(['2026-07','2026-06',...collaborators.map(c => c.month)])].sort().reverse();
+        if (!months.includes(activeMonth)) activeMonth = months[0];
+        $('monthBar').innerHTML = months.map(month => `<button class="month-button ${month === activeMonth ? 'is-active' : ''}" type="button" data-month="${month}">${monthLabel(month)}<span class="month-count">${collaborators.filter(c => c.month === month).length}</span></button>`).join('');
+        $('monthBar').querySelectorAll('[data-month]').forEach(btn => btn.addEventListener('click', () => { activeMonth = btn.dataset.month; renderMonthBar(); renderCollaborators(); }));
+      }
+
+      function renderCollaborators() {
+        const term = $('collabSearch').value.trim().toLowerCase();
+        const platform = $('collabPlatform').value;
+        const model = $('collabModel').value;
+        const list = collaborators.filter(c => c.month === activeMonth && (platform === 'all' || c.platforms.includes(platform)) && (model === 'all' || c.models.includes(model)) && (!term || [c.name,c.email,...c.platforms,...c.models].join(' ').toLowerCase().includes(term))).sort((a,b) => b.date.localeCompare(a.date));
+        $('collabTitle').textContent = monthLabel(activeMonth);
+        $('collabSubtitle').textContent = activeMonth === '2026-06' ? '飞书初始导入记录' : '按合作日期自动归档';
+        $('collabCount').textContent = `${list.length} 位红人`;
+        $('collabFoot').textContent = `当前月份共 ${list.length} 条记录`;
+        $('collabRows').innerHTML = list.length ? list.map(c => `<tr><td><div class="person"><span class="avatar">${safe(initials(c.name))}</span><div><div class="person-name">${safe(c.name)}</div><div class="person-email">${safe(c.email)}</div></div></div></td><td><div class="tags">${c.platforms.map(v => `<span class="tag">${safe(v)}</span>`).join('')}</div></td><td><div class="tags">${c.models.map(v => `<span class="tag">${safe(v)}</span>`).join('')}</div></td><td class="nowrap">${monthLabel(c.month)}</td><td class="nowrap">${money(c.quote)}</td><td><span class="badge ${c.progress === '已发布' ? 'badge-green' : 'badge-blue'}">${safe(c.progress)}</span></td><td><span class="badge">${safe(c.source)}</span></td><td><button class="btn btn-quiet" type="button" data-collab-name="${safe(c.name)}">查看</button></td></tr>`).join('') : '<tr><td colspan="8"><div class="empty">这个月份还没有合作红人</div></td></tr>';
+        document.querySelectorAll('[data-collab-name]').forEach(btn => btn.addEventListener('click', () => showToast(`${btn.dataset.collabName} 的合作详情已准备好`)));
+      }
+
+      function parseCsv(text) {
+        const rows = text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(Boolean).map(line => {
+          const cells=[]; let value=''; let quoted=false;
+          for (let i=0;i<line.length;i++) { const ch=line[i]; if (ch==='"' && line[i+1]==='"') { value+='"'; i++; } else if (ch==='"') quoted=!quoted; else if (ch===',' && !quoted) { cells.push(value.trim()); value=''; } else value+=ch; }
+          cells.push(value.trim()); return cells;
+        });
+        if (rows.length < 2) return [];
+        const headers = rows[0].map(h => h.trim().toLowerCase());
+        const index = names => names.map(n => headers.indexOf(n)).find(i => i >= 0) ?? -1;
+        return rows.slice(1).map((r,i) => ({
+          name:r[index(['红人','昵称','name'])] || `导入红人 ${i+1}`,
+          email:r[index(['邮箱','email'])] || '',
+          platforms:(r[index(['平台','platform'])] || '未知平台').split(/[、/|]/).map(v=>v.trim()).filter(Boolean),
+          models:(r[index(['合作型号','型号','model'])] || '未填写型号').split(/[、/|]/).map(v=>v.trim()).filter(Boolean),
+          month:'2026-06',
+          date:'2026-06-30',
+          quote:Number((r[index(['合作报价','报价','quote'])] || '0').replace(/[^\d.]/g,'')) || 0,
+          progress:r[index(['合作进度','进度','progress'])] || '已发布',
+          source:'飞书导入'
+        })).filter(v => v.name || v.email);
+      }
+
+      function renderContent() {
+        $('contentGrid').innerHTML = contents.map(item => `<article class="card video-card"><div class="video-top"><div class="video-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7 8 5-8 5V7Z"/></svg></div><div class="video-info"><div class="inline-actions"><span class="badge badge-blue">${safe(item.platform)}</span><span class="badge">${safe(item.model)}</span></div><div class="video-name" style="margin-top:9px">${safe(item.name)}</div><div class="video-meta">发布于 ${safe(item.date)}</div><div class="video-url">${safe(item.url)}</div></div></div><div class="video-stats"><div><div class="video-stat-label">播放</div><div class="video-stat-value">${formatCount(item.views)}</div></div><div><div class="video-stat-label">点赞</div><div class="video-stat-value">${formatCount(item.likes)}</div></div><div><div class="video-stat-label">评论</div><div class="video-stat-value">${formatCount(item.comments)}</div></div><div><div class="video-stat-label">互动率</div><div class="video-stat-value">${item.engagement}</div></div></div><div class="evaluation"><div><h3>效果评估</h3><div class="evaluation-copy">${safe(item.note)}</div></div><div class="evaluation-score">${item.score}</div></div></article>`).join('');
+      }
+
+      function renderContentMonth() {
+        const selected = $('contentMonth').value;
+        const data = monthlyContent[selected];
+        const maxExposure = Math.max(...data.weeks.map(w => w.exposure));
+        const maxInteractions = Math.max(...data.weeks.map(w => w.interactions));
+        $('monthExposure').textContent = formatCount(data.exposure);
+        $('monthExposureNote').textContent = `${selected === '2026-07' ? '+17.2%' : '本月完整数据'} 较上月`;
+        $('monthEngagement').textContent = data.engagement;
+        $('monthSales').textContent = money(data.sales);
+        $('contentExposureChart').innerHTML = data.weeks.map(w => `<div class="exposure-column"><div class="exposure-bars"><span class="exposure-bar" style="height:${Math.round(w.exposure / maxExposure * 125)}px"></span><span class="exposure-bar engagement" style="height:${Math.round(w.interactions / maxInteractions * 105)}px"></span></div><span class="exposure-label">${w.label}</span></div>`).join('');
+      }
+
+      function renderRecommendationFilters() {
+        const tracks = recommendationTracks[activeRecommendationBrand];
+        const existing = $('recommendTrack').value;
+        $('recommendTrack').innerHTML = '<option value="all">全部赛道</option>' + tracks.map(track => `<option value="${safe(track)}">${safe(track)}</option>`).join('');
+        if (tracks.includes(existing)) $('recommendTrack').value = existing;
+      }
+
+      function renderRecommendations() {
+        const track = $('recommendTrack').value;
+        const tier = $('recommendTier').value;
+        const term = $('recommendSearch').value.trim().toLowerCase();
+        const brand = activeRecommendationBrand;
+        const list = recommendations[brand].filter(item => (track === 'all' || item.track === track) && (tier === 'all' || item.tier === tier) && (!term || [item.name,item.platform,item.track,item.tier].join(' ').toLowerCase().includes(term)));
+        const isDarts = brand === 'dartsnut';
+        $('recommendationTitle').textContent = `${brand} · 本周候选`;
+        $('recommendationSubtitle').textContent = `30 位候选，覆盖 ${isDarts ? '4 个重点赛道' : '国际象棋与生活方式内容方向'}`;
+        $('trackGrid').innerHTML = recommendationTracks[brand].map(trackName => `<div class="track ${track === trackName ? 'is-active' : ''}">${safe(trackName)}</div>`).join('');
+        $('recommendationCount').textContent = `当前显示 ${list.length} / 30 位候选`;
+        $('recommendationRows').innerHTML = list.length ? list.map(item => `<tr><td><div class="person"><span class="avatar">${safe(initials(item.name))}</span><div><div class="person-name">${safe(item.name)}</div><div class="person-email">${safe(item.email)}</div></div></div></td><td><span class="tag">${safe(item.platform)}</span></td><td>${safe(item.track)}</td><td><span class="tier">${safe(item.tier)}</span></td><td class="nowrap">${item.followers}</td><td><span class="badge badge-green">${item.engagement}</span></td><td>${safe(item.reason)}</td><td><button class="btn btn-quiet" type="button" data-recommend-name="${safe(item.name)}">加入候选池</button></td></tr>`).join('') : '<tr><td colspan="8"><div class="empty">没有符合当前筛选条件的候选红人</div></td></tr>';
+        document.querySelectorAll('[data-recommend-name]').forEach(btn => btn.addEventListener('click', () => showToast(`${btn.dataset.recommendName} 已加入 ${brand} 候选池`)));
+      }
+
+      function formatCount(value) { return value >= 10000 ? (value/10000).toFixed(value >= 100000 ? 1 : 2) + '万' : Number(value).toLocaleString('zh-CN'); }
+
+      function renderSales() {
+        const max = Math.max(...chartData.map(v => v.v));
+        $('salesChart').innerHTML = chartData.map(item => `<div class="bar-column"><span class="bar-value">${(item.v/1000).toFixed(1)}k</span><span class="bar" style="height:${Math.round(item.v/max*155)}px"></span><span class="bar-label">${item.d}</span></div>`).join('');
+        $('modelList').innerHTML = modelData.map(item => `<div class="model-row"><div><div class="model-name">${item.name}</div><div class="model-sales">${money(item.sales)}</div></div><span class="badge">${item.pct}%</span><div class="model-track"><div class="model-fill" style="width:${item.pct}%"></div></div></div>`).join('');
+        $('salesRows').innerHTML = sales.map(item => `<tr><td class="nowrap">${item.time}</td><td class="person-name">${safe(item.name)}</td><td>${safe(item.platform)}</td><td><span class="tag">${safe(item.model)}</span></td><td>${item.orders}</td><td>${money(item.revenue)}</td><td>${money(item.commission)}</td><td><span class="badge badge-green">${item.conversion}</span></td></tr>`).join('');
+      }
+
+      document.querySelectorAll('[data-page]').forEach(btn => btn.addEventListener('click', () => showPage(btn.dataset.page)));
+      document.querySelectorAll('[data-go-page]').forEach(btn => btn.addEventListener('click', () => showPage(btn.dataset.goPage)));
+      document.querySelectorAll('[data-open-settings]').forEach(btn => btn.addEventListener('click', () => openModal('settingsModal')));
+      $('settingsButton').addEventListener('click', () => openModal('settingsModal'));
+      document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', closeModals));
+      document.querySelectorAll('.modal-backdrop').forEach(modal => modal.addEventListener('click', event => { if (event.target === modal) closeModals(); }));
+      document.addEventListener('keydown', event => { if (event.key === 'Escape') closeModals(); });
+
+      $('scanButton').addEventListener('click', () => { const btn=$('scanButton'); btn.disabled=true; btn.textContent='正在分析邮件…'; setTimeout(() => { btn.disabled=false; btn.textContent='扫描新邮件'; showToast('扫描完成：发现 2 封新回复，并提取 1 个新增报价'); },1300); });
+      $('contentMonth').addEventListener('change', renderContentMonth);
+      document.querySelectorAll('[data-brand]').forEach(btn => btn.addEventListener('click', () => { activeRecommendationBrand = btn.dataset.brand; document.querySelectorAll('[data-brand]').forEach(button => button.classList.toggle('is-active', button.dataset.brand === activeRecommendationBrand)); renderRecommendationFilters(); renderRecommendations(); }));
+      ['recommendSearch','recommendTrack','recommendTier'].forEach(id => $(id).addEventListener(id === 'recommendSearch' ? 'input' : 'change', renderRecommendations));
+      $('refreshRecommendations').addEventListener('click', () => { const button = $('refreshRecommendations'); button.disabled = true; button.textContent = '正在更新…'; setTimeout(() => { button.disabled = false; button.textContent = '刷新本周候选'; showToast(`${activeRecommendationBrand} 本周 30 位候选已更新`); }, 1000); });
+      $('addCollaboratorButton').addEventListener('click', () => { $('newDate').value = new Date().toISOString().slice(0,10); openModal('collabModal'); });
+      $('saveCollaboratorButton').addEventListener('click', () => {
+        const name=$('newName').value.trim(); const email=$('newEmail').value.trim(); const date=$('newDate').value;
+        if (!name || !email || !date) { showToast('请填写红人名称、邮箱和合作日期'); return; }
+        const entry={name,email,platforms:[$('newPlatform').value.trim() || '未知平台'],models:[$('newModel').value.trim() || '未填写型号'],month:date.slice(0,7),date,quote:Number($('newQuote').value)||0,progress:$('newProgress').value,source:'手动新增'};
+        collaborators.push(entry); localStorage.setItem('kolCollaborators',JSON.stringify(collaborators)); activeMonth=entry.month; renderCollabFilters(); renderMonthBar(); renderCollaborators(); closeModals(); ['newName','newEmail','newPlatform','newModel','newQuote'].forEach(id => $(id).value=''); showToast(`已新增 ${name}，归档到 ${monthLabel(entry.month)}`);
+      });
+      $('importButton').addEventListener('click', () => $('csvInput').click());
+      $('csvInput').addEventListener('change', event => { const file=event.target.files[0]; if (!file) return; const reader=new FileReader(); reader.onload=() => { const imported=parseCsv(reader.result); imported.forEach(item => { const idx=collaborators.findIndex(v => v.email && v.email===item.email); if (idx>=0) collaborators[idx]={...collaborators[idx],...item}; else collaborators.push(item); }); localStorage.setItem('kolCollaborators',JSON.stringify(collaborators)); activeMonth='2026-06'; renderCollabFilters(); renderMonthBar(); renderCollaborators(); showToast(`已导入 ${imported.length} 位红人，统一归档至 2026 年 6 月`); }; reader.readAsText(file,'UTF-8'); event.target.value=''; });
+      ['collabSearch','collabPlatform','collabModel'].forEach(id => $(id).addEventListener(id==='collabSearch'?'input':'change',renderCollaborators));
+      $('analyzeButton').addEventListener('click', () => {
+        const url=$('contentUrl').value.trim(); if (!url) { showToast('请先粘贴红人发布链接'); return; }
+        const platform = url.includes('tiktok')?'TikTok':url.includes('youtube')||url.includes('youtu.be')?'YouTube':url.includes('instagram')?'Instagram':url.includes('xiaohongshu')?'小红书':url.includes('bilibili')?'Bilibili':url.includes('douyin')?'抖音':'待识别平台';
+        const item={id:Date.now(),name:'待匹配红人',platform,model:$('contentModel').value,url,date:'今天',views:0,likes:0,comments:0,engagement:'待抓取',score:'--',note:'链接已收录。完成对应平台 API 授权后，将自动抓取视频数据并生成效果评估。'};
+        contents.unshift(item); localStorage.setItem('kolContents',JSON.stringify(contents)); renderContent(); $('contentUrl').value=''; showToast('链接已收录，平台授权完成后会自动抓取并分析');
+      });
+
+      $('todayDate').textContent = new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'long'}).format(new Date());
+      renderReplies(); renderCollabFilters(); renderMonthBar(); renderCollaborators(); renderContent(); renderContentMonth(); renderRecommendationFilters(); renderRecommendations(); renderSales();
+      const initial = location.hash.replace('#','');
+      if (['home','collaborators','content','sales','recommendations'].includes(initial)) showPage(initial);
+    })();
+  </script>
+  <script src="digest-sync.js"></script>
+</body>
+</html>
+
