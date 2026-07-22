@@ -1,0 +1,49 @@
+{
+  "settings": {
+    "perQuery": 4,
+    "recentPosts": 6,
+    "maxPerBrand": 30
+  },
+  "brands": {
+    "dartsnut": {
+      "tracks": {
+        "AI 创意玩家 / 零代码创作者": [
+          "AI creative tools",
+          "no code creator"
+        ],
+        "派对 / 家庭娱乐群体": [
+          "family game night",
+          "party games"
+        ],
+        "科技爱好者 / 树莓派极客": [
+          "Raspberry Pi projects",
+          "maker technology"
+        ],
+        "复古像素美学": [
+          "retro gaming setup",
+          "pixel art creator"
+        ]
+      }
+    },
+    "chessnut": {
+      "tracks": {
+        "国际象棋界": [
+          "chess creator",
+          "chess lessons"
+        ],
+        "生活方式": [
+          "chess lifestyle",
+          "premium desk setup"
+        ],
+        "教育 / 亲子益智": [
+          "chess for kids",
+          "family learning games"
+        ],
+        "桌游与思维训练": [
+          "strategy board games",
+          "tabletop strategy"
+        ]
+      }
+    }
+  }
+}

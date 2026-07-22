@@ -1,0 +1,35 @@
+name: Daily mailbox scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 0 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dashboard
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install mail client
+        run: npm install --no-audit --no-fund
+      - name: Scan Aliyun Enterprise Mail
+        env:
+          MAIL_IMAP_HOST: imap.qiye.aliyun.com
+          MAIL_IMAP_PORT: 993
+          MAIL_IMAP_USER: ${{ secrets.MAIL_IMAP_USER }}
+          MAIL_IMAP_PASSWORD: ${{ secrets.MAIL_IMAP_PASSWORD }}
+        run: node scripts/scan-email.js
+      - name: Publish aggregate digest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/digest.json
+          git diff --cached --quiet || (git commit -m "chore: update daily email digest" && git push)
