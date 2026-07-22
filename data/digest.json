@@ -1,8 +1,8 @@
 {
-  "scannedAt": null,
-  "status": "waiting_for_first_scan",
-  "replyCount": 0,
-  "highIntentCount": 0,
+  "scannedAt": "2026-07-22T11:34:27.273Z",
+  "status": "success",
+  "replyCount": 20,
+  "highIntentCount": 1,
   "quoteTotal": 0,
-  "message": "尚未完成第一次自动扫描"
+  "message": "过去 24 小时分析 20 封邮件"
 }
