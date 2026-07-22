@@ -396,12 +396,12 @@
         <div class="metrics">
           <article class="card metric"><div class="metric-top"><span>新增回复</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v12H8l-4 4V5Z"/></svg></span></div><div class="metric-value">0</div><div class="metric-foot">等待邮箱首次扫描</div></article>
           <article class="card metric"><div class="metric-top"><span>高意向红人</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg></span></div><div class="metric-value">0</div><div class="metric-foot">等待邮箱首次扫描</div></article>
-          <article class="card metric"><div class="metric-top"><span>近 7 日联盟销售</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span></div><div class="metric-value">¥86.4k</div><div class="metric-foot"><strong>+18.6%</strong> 环比上周</div></article>
+          <article class="card metric"><div class="metric-top"><span>近 7 日联盟销售</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span></div><div class="metric-value">暂无</div><div class="metric-foot">等待联盟营销数据接入</div></article>
         </div>
         <div class="home-grid">
           <article class="card report-card">
             <div class="card-head"><h2>AI 日报摘要</h2><span class="badge badge-blue">08:31 生成</span></div>
-            <p class="report-copy">尚未读取到第一次邮箱扫描结果。GitHub Actions 成功运行后，这里会显示真实的回复数量和高意向统计。</p>
+            <p class="report-copy" id="digestSummary">尚未读取到真实邮箱扫描结果。完成 GitHub Actions 扫描后，这里只显示真实统计。</p>
             <div class="sync-detail muted" style="margin-top:18px">等待邮箱自动扫描</div>
           </article>
           <aside class="card action-card">
@@ -447,7 +447,7 @@
         <section class="card section-card">
           <div class="card-head"><div><h2>收录新发布链接</h2><p class="page-description">支持 TikTok、YouTube、Instagram、小红书、抖音、Bilibili</p></div><span class="badge badge-orange">等待平台授权</span></div>
           <div class="content-entry"><input class="field" id="contentUrl" type="url" placeholder="粘贴红人发布链接，例如 https://www.tiktok.com/..."><select class="field" id="contentModel"><option>AeroFit Pro</option><option>AeroFit Mini</option><option>Nova X1</option><option>Nova Lite</option></select><button class="btn btn-primary" id="analyzeButton" type="button">收录并分析</button></div>
-          <div class="integration-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg><span>当前页面展示演示分析结果；连接对应平台 API 后，会自动抓取真实数据并定时更新。</span></div>
+          <div class="integration-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg><span>只显示已成功抓取的真实内容数据。没有授权或抓取失败时显示“暂无真实数据”。</span></div>
         </section>
         <div class="content-grid" id="contentGrid"></div>
       </section>
@@ -455,19 +455,19 @@
       <section class="page" id="page-sales">
         <div class="page-header">
           <div><div class="page-kicker">AFFILIATE SALES</div><h1>联盟销售看板</h1><p class="page-description">实时记录红人归因订单、销售金额、销售型号和佣金表现。</p></div>
-          <div class="header-actions"><span class="badge badge-green"><span class="sync-dot"></span>实时同步演示</span><button class="btn" type="button" data-open-settings>接入联盟平台</button></div>
+          <div class="header-actions"><span class="badge badge-orange"><span class="sync-dot"></span>等待真实数据</span><button class="btn" type="button" data-open-settings>接入联盟平台</button></div>
         </div>
         <div class="metrics">
-          <article class="card metric"><div class="metric-top"><span>近 30 日 GMV</span></div><div class="metric-value">¥286,420</div><div class="metric-foot"><strong>+21.4%</strong> 环比上期</div></article>
-          <article class="card metric"><div class="metric-top"><span>归因订单</span></div><div class="metric-value">418</div><div class="metric-foot">退款后有效订单</div></article>
-          <article class="card metric"><div class="metric-top"><span>平均转化率</span></div><div class="metric-value">4.82%</div><div class="metric-foot"><strong>+0.63%</strong> 环比上期</div></article>
-          <article class="card metric"><div class="metric-top"><span>预估佣金</span></div><div class="metric-value">¥31,526</div><div class="metric-foot">按当前联盟规则计算</div></article>
+          <article class="card metric"><div class="metric-top"><span>近 30 日 GMV</span></div><div class="metric-value">暂无</div><div class="metric-foot">等待联盟平台授权</div></article>
+          <article class="card metric"><div class="metric-top"><span>归因订单</span></div><div class="metric-value">暂无</div><div class="metric-foot">暂无真实订单</div></article>
+          <article class="card metric"><div class="metric-top"><span>平均转化率</span></div><div class="metric-value">暂无</div><div class="metric-foot">暂无真实订单</div></article>
+          <article class="card metric"><div class="metric-top"><span>预估佣金</span></div><div class="metric-value">暂无</div><div class="metric-foot">等待联盟平台授权</div></article>
         </div>
         <div class="sales-layout">
-          <article class="card chart-card"><div class="card-head"><div><h2>近 7 日红人销售额</h2><p class="page-description">联盟归因 GMV</p></div><span class="badge badge-blue">¥86,420</span></div><div class="bar-chart" id="salesChart" role="img" aria-label="近七日销售额柱状图"></div></article>
+          <article class="card chart-card"><div class="card-head"><div><h2>近 7 日红人销售额</h2><p class="page-description">联盟归因 GMV</p></div><span class="badge badge-orange">暂无真实数据</span></div><div class="bar-chart" id="salesChart" role="img" aria-label="近七日销售额柱状图"></div></article>
           <aside class="card chart-card"><div class="card-head"><div><h2>销售型号分布</h2><p class="page-description">近 30 日</p></div></div><div class="model-list" id="modelList"></div></aside>
         </div>
-        <section class="card table-card"><div class="table-card-head"><div><h2>实时销售记录</h2><p class="page-description">按最新订单时间排序</p></div><span class="badge badge-green">刚刚更新</span></div><div class="table-wrap"><table><thead><tr><th>订单时间</th><th>红人</th><th>平台</th><th>销售型号</th><th>订单数</th><th>销售额</th><th>佣金</th><th>转化率</th></tr></thead><tbody id="salesRows"></tbody></table></div><div class="foot"><span>演示数据 · 接入联盟营销 API 后替换为实时订单</span><span>最近同步：刚刚</span></div></section>
+        <section class="card table-card"><div class="table-card-head"><div><h2>实时销售记录</h2><p class="page-description">按最新订单时间排序</p></div><span class="badge badge-orange">暂无真实数据</span></div><div class="table-wrap"><table><thead><tr><th>订单时间</th><th>红人</th><th>平台</th><th>销售型号</th><th>订单数</th><th>销售额</th><th>佣金</th><th>转化率</th></tr></thead><tbody id="salesRows"></tbody></table></div><div class="foot"><span>接入联盟营销平台后，这里会显示真实订单</span><span>最近同步：暂无</span></div></section>
       </section>
 
       <section class="page" id="page-recommendations">
@@ -520,25 +520,11 @@
       const initials = name => String(name).replace(/[^A-Za-z\u4e00-\u9fa5]/g,'').slice(0,2).toUpperCase();
       const defaultCollaborators = [];
       const replies = [];
-      const defaultContent = [
-        {id:1,name:'Kiki Goes Global',platform:'TikTok',model:'Nova X1',url:'https://www.tiktok.com/@kiki/video/demo1',date:'07-20',views:186000,likes:14200,comments:638,engagement:'8.1%',score:91,note:'播放与互动显著高于账号近 30 日均值，产品卖点露出完整。'},
-        {id:2,name:'周末去哪儿',platform:'小红书',model:'AeroFit Pro',url:'https://www.xiaohongshu.com/explore/demo2',date:'07-19',views:82400,likes:6900,comments:421,engagement:'8.9%',score:88,note:'收藏与评论质量较高，联盟点击转化表现领先。'},
-        {id:3,name:'科技阿远',platform:'Bilibili',model:'Nova X1',url:'https://www.bilibili.com/video/demo3',date:'07-18',views:126000,likes:8300,comments:705,engagement:'7.2%',score:84,note:'深度评测带来较长观看时长，但购买引导可进一步强化。'},
-        {id:4,name:'Nora Studio',platform:'Instagram',model:'Nova Lite',url:'https://www.instagram.com/reel/demo4',date:'07-17',views:59300,likes:4100,comments:182,engagement:'7.4%',score:78,note:'视觉质感优秀，互动稳定，当前销售归因仍在积累。'}
-      ];
-      const sales = [
-        {time:'今天 10:42',name:'Kiki Goes Global',platform:'TikTok',model:'Nova X1',orders:18,revenue:14382,commission:1582,conversion:'5.8%'},
-        {time:'今天 10:18',name:'周末去哪儿',platform:'小红书',model:'AeroFit Pro',orders:12,revenue:11268,commission:1239,conversion:'6.4%'},
-        {time:'今天 09:57',name:'Mia Chen',platform:'Instagram',model:'AeroFit Pro',orders:9,revenue:8451,commission:930,conversion:'4.9%'},
-        {time:'今天 09:31',name:'科技阿远',platform:'Bilibili',model:'Nova X1',orders:7,revenue:5593,commission:615,conversion:'3.8%'},
-        {time:'今天 08:54',name:'Nora Studio',platform:'Instagram',model:'Nova Lite',orders:5,revenue:2995,commission:329,conversion:'3.4%'}
-      ];
-      const chartData = [{d:'7/15',v:8900},{d:'7/16',v:10400},{d:'7/17',v:9800},{d:'7/18',v:12200},{d:'7/19',v:13600},{d:'7/20',v:14700},{d:'今天',v:16820}];
-      const modelData = [{name:'AeroFit Pro',sales:131900,pct:46},{name:'Nova X1',sales:84600,pct:30},{name:'AeroFit Mini',sales:42960,pct:15},{name:'Nova Lite',sales:26960,pct:9}];
-      const monthlyContent = {
-        '2026-07': {exposure:453700,engagement:'8.0%',sales:48620,weeks:[{label:'第 1 周',exposure:78600,interactions:6120},{label:'第 2 周',exposure:110900,interactions:8750},{label:'第 3 周',exposure:139700,interactions:10430},{label:'第 4 周',exposure:124500,interactions:9380}]},
-        '2026-06': {exposure:387200,engagement:'7.4%',sales:39280,weeks:[{label:'第 1 周',exposure:69200,interactions:4840},{label:'第 2 周',exposure:91100,interactions:6620},{label:'第 3 周',exposure:108600,interactions:7910},{label:'第 4 周',exposure:118300,interactions:9140}]}
-      };
+      // Do not ship fabricated creator, content, sales, or exposure figures.
+      const sales = [];
+      const chartData = [];
+      const modelData = [];
+      const monthlyContent = {};
       const recommendationTracks = {
         dartsnut:['AI 创意玩家 / 零代码创作者','派对 / 家庭娱乐群体','科技爱好者 / 树莓派极客','复古像素美学'],
         chessnut:['国际象棋界','生活方式','教育 / 亲子益智','桌游与思维训练']
@@ -546,7 +532,9 @@
       let recommendations = {dartsnut:[],chessnut:[]};
       let recommendationMeta = {week:'等待首次采集',platformStatus:{}};
       let collaborators = JSON.parse(localStorage.getItem('kolCollaborators') || 'null') || defaultCollaborators;
-      let contents = JSON.parse(localStorage.getItem('kolContents') || 'null') || defaultContent;
+      const savedContents = JSON.parse(localStorage.getItem('kolContents') || '[]');
+      const demoContentNames = new Set(['Kiki Goes Global','周末去哪儿','科技阿远','Nora Studio']);
+      let contents = Array.isArray(savedContents) ? savedContents.filter(item => item && !demoContentNames.has(item.name) && !String(item.url || '').includes('/demo')) : [];
       let activeMonth = '2026-06';
       let activeRecommendationBrand = 'dartsnut';
 
@@ -628,12 +616,20 @@
       }
 
       function renderContent() {
-        $('contentGrid').innerHTML = contents.map(item => `<article class="card video-card"><div class="video-top"><div class="video-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7 8 5-8 5V7Z"/></svg></div><div class="video-info"><div class="inline-actions"><span class="badge badge-blue">${safe(item.platform)}</span><span class="badge">${safe(item.model)}</span></div><div class="video-name" style="margin-top:9px">${safe(item.name)}</div><div class="video-meta">发布于 ${safe(item.date)}</div><div class="video-url">${safe(item.url)}</div></div></div><div class="video-stats"><div><div class="video-stat-label">播放</div><div class="video-stat-value">${formatCount(item.views)}</div></div><div><div class="video-stat-label">点赞</div><div class="video-stat-value">${formatCount(item.likes)}</div></div><div><div class="video-stat-label">评论</div><div class="video-stat-value">${formatCount(item.comments)}</div></div><div><div class="video-stat-label">互动率</div><div class="video-stat-value">${item.engagement}</div></div></div><div class="evaluation"><div><h3>效果评估</h3><div class="evaluation-copy">${safe(item.note)}</div></div><div class="evaluation-score">${item.score}</div></div></article>`).join('');
+        $('contentGrid').innerHTML = contents.length ? contents.map(item => `<article class="card video-card"><div class="video-top"><div class="video-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7 8 5-8 5V7Z"/></svg></div><div class="video-info"><div class="inline-actions"><span class="badge badge-blue">${safe(item.platform)}</span><span class="badge">${safe(item.model)}</span></div><div class="video-name" style="margin-top:9px">${safe(item.name)}</div><div class="video-meta">发布于 ${safe(item.date)}</div><div class="video-url">${safe(item.url)}</div></div></div><div class="video-stats"><div><div class="video-stat-label">播放</div><div class="video-stat-value">${formatCount(item.views)}</div></div><div><div class="video-stat-label">点赞</div><div class="video-stat-value">${formatCount(item.likes)}</div></div><div><div class="video-stat-label">评论</div><div class="video-stat-value">${formatCount(item.comments)}</div></div><div><div class="video-stat-label">互动率</div><div class="video-stat-value">${safe(item.engagement || '待抓取')}</div></div></div><div class="evaluation"><div><h3>效果评估</h3><div class="evaluation-copy">${safe(item.note || '暂无真实分析')}</div></div><div class="evaluation-score">${safe(item.score ?? '--')}</div></div></article>`).join('') : '<div class="card empty">暂无真实内容数据。粘贴链接并完成平台授权后，这里才会显示抓取结果。</div>';
       }
 
       function renderContentMonth() {
         const selected = $('contentMonth').value;
         const data = monthlyContent[selected];
+        if (!data) {
+          $('monthExposure').textContent = '暂无';
+          $('monthExposureNote').textContent = '等待真实内容抓取';
+          $('monthEngagement').textContent = '暂无';
+          $('monthSales').textContent = '暂无';
+          $('contentExposureChart').innerHTML = '<div class="empty">暂无真实月度数据</div>';
+          return;
+        }
         const maxExposure = Math.max(...data.weeks.map(w => w.exposure));
         const maxInteractions = Math.max(...data.weeks.map(w => w.interactions));
         $('monthExposure').textContent = formatCount(data.exposure);
@@ -707,6 +703,10 @@
       function formatCount(value) { return value >= 10000 ? (value/10000).toFixed(value >= 100000 ? 1 : 2) + '万' : Number(value).toLocaleString('zh-CN'); }
 
       function renderSales() {
+        if (!chartData.length) $('salesChart').innerHTML = '<div class="empty">暂无真实销售数据</div>';
+        if (!modelData.length) $('modelList').innerHTML = '<div class="empty">暂无真实销售型号</div>';
+        if (!sales.length) $('salesRows').innerHTML = '<tr><td colspan="8"><div class="empty">暂无真实联盟订单</div></td></tr>';
+        if (!chartData.length && !modelData.length && !sales.length) return;
         const max = Math.max(...chartData.map(v => v.v));
         $('salesChart').innerHTML = chartData.map(item => `<div class="bar-column"><span class="bar-value">${(item.v/1000).toFixed(1)}k</span><span class="bar" style="height:${Math.round(item.v/max*155)}px"></span><span class="bar-label">${item.d}</span></div>`).join('');
         $('modelList').innerHTML = modelData.map(item => `<div class="model-row"><div><div class="model-name">${item.name}</div><div class="model-sales">${money(item.sales)}</div></div><span class="badge">${item.pct}%</span><div class="model-track"><div class="model-fill" style="width:${item.pct}%"></div></div></div>`).join('');
