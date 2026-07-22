@@ -20,6 +20,22 @@ function extractQuote(content) {
   return match ? Number(match[1].replace(/,/g, '')) : 0;
 }
 
+function platformFor(content) {
+  const value = content.toLowerCase();
+  if (value.includes('youtube')) return 'YouTube';
+  if (value.includes('instagram')) return 'Instagram';
+  if (value.includes('tiktok')) return 'TikTok';
+  if (value.includes('小红书') || value.includes('xiaohongshu')) return '小红书';
+  if (value.includes('bilibili')) return 'Bilibili';
+  return '待识别';
+}
+
+function progressFor(intent) {
+  if (intent >= 85) return '高意向，待跟进';
+  if (intent >= 60) return '已回复，待判断';
+  return '待人工确认';
+}
+
 function save(data) {
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, JSON.stringify(data, null, 2) + '\n', 'utf8');
@@ -48,9 +64,17 @@ try {
       const source = message.source?.toString('utf8').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 1400) || '';
       const subject = message.envelope?.subject || '';
       const combined = `${subject} ${source}`;
+      const intent = scoreIntent(combined);
+      const sender = message.envelope?.from?.[0] || {};
       results.push({
-        intent: scoreIntent(combined),
+        name: sender.name || sender.address || '未知发件人',
+        email: sender.address || '',
+        subject,
+        platform: platformFor(combined),
+        intent,
         quote: extractQuote(combined),
+        progress: progressFor(intent),
+        action: intent >= 85 ? '今天回复并确认档期、报价和下一步' : '阅读邮件并补充红人资料',
         receivedAt: message.internalDate?.toISOString() || new Date().toISOString()
       });
     }
@@ -63,6 +87,7 @@ try {
     replyCount: results.length,
     highIntentCount: results.filter(item => item.intent >= 80).length,
     quoteTotal: results.reduce((sum, item) => sum + item.quote, 0),
+    messages: results,
     message: `过去 24 小时分析 ${results.length} 封邮件`
   });
 } catch (error) {

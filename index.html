@@ -721,7 +721,7 @@
       document.querySelectorAll('.modal-backdrop').forEach(modal => modal.addEventListener('click', event => { if (event.target === modal) closeModals(); }));
       document.addEventListener('keydown', event => { if (event.key === 'Escape') closeModals(); });
 
-      $('scanButton').addEventListener('click', () => { const btn=$('scanButton'); btn.disabled=true; btn.textContent='正在分析邮件…'; setTimeout(() => { btn.disabled=false; btn.textContent='扫描新邮件'; showToast('扫描完成：发现 2 封新回复，并提取 1 个新增报价'); },1300); });
+      $('scanButton').addEventListener('click', () => showToast('网页不能直接连接邮箱。请在 GitHub Actions 运行 Daily mailbox scan，完成后刷新本页。'));
       $('contentMonth').addEventListener('change', renderContentMonth);
       document.querySelectorAll('[data-brand]').forEach(btn => btn.addEventListener('click', () => { activeRecommendationBrand = btn.dataset.brand; document.querySelectorAll('[data-brand]').forEach(button => button.classList.toggle('is-active', button.dataset.brand === activeRecommendationBrand)); renderRecommendationFilters(); renderRecommendations(); }));
       ['recommendSearch','recommendTrack','recommendTier'].forEach(id => $(id).addEventListener(id === 'recommendSearch' ? 'input' : 'change', renderRecommendations));
