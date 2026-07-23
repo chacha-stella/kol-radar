@@ -1,8 +1,263 @@
 {
-  "scannedAt": "2026-07-22T11:34:27.273Z",
+  "scannedAt": "2026-07-23T09:36:12.933Z",
   "status": "success",
-  "replyCount": 20,
-  "highIntentCount": 1,
+  "replyCount": 23,
+  "highIntentCount": 2,
   "quoteTotal": 0,
-  "message": "过去 24 小时分析 20 封邮件"
+  "messages": [
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Substack writers with loyal audiences = Big wins for your brand",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-21T16:37:57.000Z"
+    },
+    {
+      "name": "GitHub",
+      "email": "no-reply@github.com",
+      "subject": "Welcome to GitHub—let’s get started 💻",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T04:31:19.000Z"
+    },
+    {
+      "name": "Wade Higgins",
+      "email": "wadehiggins@gmail.com",
+      "subject": "Content and Collaboration ideas",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T04:53:31.000Z"
+    },
+    {
+      "name": "Dr. Jörn Gehring",
+      "email": "joern@chessconnect.de",
+      "subject": "Re: Chessnut Companion Update – Chessnut Next & AI Coach Now Available",
+      "platform": "待识别",
+      "intent": 85,
+      "quote": 0,
+      "progress": "高意向，待跟进",
+      "action": "今天回复并确认档期、报价和下一步",
+      "receivedAt": "2026-07-22T07:04:49.000Z"
+    },
+    {
+      "name": "Afluencer",
+      "email": "support@afluencer.com",
+      "subject": "Your new Afluencer account is ready! [ID: 109146]",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T07:14:40.000Z"
+    },
+    {
+      "name": "Afluencer",
+      "email": "support@afluencer.com",
+      "subject": "Reset your Afluencer password",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T07:16:25.000Z"
+    },
+    {
+      "name": "Afluencer",
+      "email": "support@afluencer.com",
+      "subject": "Account credits updated!",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T07:17:29.000Z"
+    },
+    {
+      "name": "Danny consult",
+      "email": "dannyconsult528@gmail.com",
+      "subject": "Re: [#125542]",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T07:38:49.000Z"
+    },
+    {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "subject": "[GitHub] A first-party GitHub OAuth application has been added to your account",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T09:11:15.000Z"
+    },
+    {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "subject": "[GitHub] A third-party OAuth application has been added to your account",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T11:08:53.000Z"
+    },
+    {
+      "name": "Railway",
+      "email": "hello@notify.railway.app",
+      "subject": "Start Collecting Referral Credits",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T11:23:23.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Chessnutech - Let's Discuss Your Content Marketing Goals",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T16:34:38.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Chessnutech - Yeschat - Your Website Caught My Attention",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T16:35:17.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Chessnutech - Would You Be Interested in New Publishing Opportunities?",
+      "platform": "待识别",
+      "intent": 85,
+      "quote": 0,
+      "progress": "高意向，待跟进",
+      "action": "今天回复并确认档期、报价和下一步",
+      "receivedAt": "2026-07-22T16:35:36.000Z"
+    },
+    {
+      "name": "Danny consult",
+      "email": "dannyconsult528@gmail.com",
+      "subject": "Re: [#125542]",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T16:50:47.000Z"
+    },
+    {
+      "name": "Patrick Chua",
+      "email": "patrick@activeseeding.com",
+      "subject": "Re: NemoChess Partnership",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-22T17:20:44.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: July's Media Opportunities & ecom brand journalist requests",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T00:35:23.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Chessnutech - Let's Discuss Your Content Marketing Goals",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T00:37:11.000Z"
+    },
+    {
+      "name": "chekmatelive",
+      "email": "chekmatelive@gmail.com",
+      "subject": "Re: Collaboration Inquiry: ChekmateLive x Chessnut",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T03:50:40.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: We're featuring Chessnut on our blog next week!",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:10:12.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: NEW-XQR-VN-PN00198108272556XZ00128981762555337373",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:32:26.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: quick question about Pixeldarts",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:32:49.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: 68 videos for HBADA, 28 for Sihoo (3,500+ videographers ready)",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:33:09.000Z"
+    }
+  ],
+  "message": "过去 24 小时分析 23 封邮件"
 }
