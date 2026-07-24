@@ -2,6 +2,10 @@ name: Daily mailbox scan
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "data/digest.json"
   schedule:
     - cron: '30 0 * * *'
 
