@@ -5,6 +5,7 @@ import { ImapFlow } from 'imapflow';
 const output = path.resolve('data/digest.json');
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
+const internalDomains = ['chessnutech.com'];
 
 const collaborationTerms = [
   '合作', '报价', '报价单', '预算', '档期', '赞助', '推广', '评测', '产品', '媒体包',
@@ -42,6 +43,11 @@ function isAutomated(address, subject) {
   const title = String(subject || '').toLowerCase();
   return automatedPrefixes.some(prefix => email.startsWith(prefix)) ||
     /(?:delivery status|undeliverable|failure notice|自动回复|out of office|vacation reply)/i.test(title);
+}
+
+function isInternalAddress(address) {
+  const value = String(address || '').toLowerCase();
+  return internalDomains.some(domain => value.endsWith(`@${domain}`));
 }
 
 function isLikelyCreatorReply(content, senderAddress) {
@@ -99,7 +105,8 @@ try {
       const subject = message.envelope?.subject || '';
       const combined = `${subject} ${source}`;
       const sender = message.envelope?.from?.[0] || {};
-      if (!isLikelyCreatorReply(combined, sender.address)) {
+      const receivedAt = message.internalDate || new Date(0);
+      if (receivedAt < since || isInternalAddress(sender.address) || !isLikelyCreatorReply(combined, sender.address)) {
         ignoredMessageCount += 1;
         continue;
       }
@@ -113,7 +120,7 @@ try {
         quote: extractQuote(combined),
         progress: progressFor(intent),
         action: intent >= 85 ? '今天回复并确认档期、报价和下一步' : '阅读邮件并补充红人资料',
-        receivedAt: message.internalDate?.toISOString() || new Date().toISOString()
+        receivedAt: receivedAt.toISOString()
       });
     }
   } finally {
