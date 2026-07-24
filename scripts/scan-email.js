@@ -17,12 +17,28 @@ const collaborationTerms = [
 const automatedPrefixes = ['noreply@', 'no-reply@', 'mailer-daemon@', 'postmaster@', 'notifications@', 'notification@'];
 
 function scoreIntent(content) {
-  const high = ['合作', '档期', '接受', '确认', '报价单', '预算', 'contract', 'available', 'interested'];
-  const medium = ['考虑', '了解', '资料', 'proposal', 'rate card', 'media kit'];
-  const value = content.toLowerCase();
-  if (high.some(word => value.includes(word.toLowerCase()))) return 85;
-  if (medium.some(word => value.includes(word.toLowerCase()))) return 60;
-  return 35;
+  const value = String(content || '').toLowerCase();
+  const highSignals = [
+    /\b(rate card|media kit|deliverables|campaign|contract|sponsorship fee|quoted|my fee)\b/i,
+    /\b(i(?:'m| am) interested|we(?:'d| would) love to|happy to collaborate|let(?:'s| us) work together)\b/i,
+    /\b(available|availability|timeline|schedule|deadline|shipping address)\b/i,
+    /(报价单|合作报价|预算|档期|赞助费|合同|接受合作|愿意合作|可以合作)/i
+  ];
+  const mediumSignals = [
+    /\b(interested|partnership|collaboration|collab|review|product|proposal|details|information)\b/i,
+    /(合作|推广|评测|产品|资料|了解|考虑|媒体包)/i
+  ];
+  const negativeSignals = [
+    /\b(unsubscribe|newsletter|referral credits|build failed|password reset|order confirmation|shipping notification)\b/i,
+    /(退订|验证码|订单通知|发货通知|系统通知|构建失败)/i
+  ];
+  const high = highSignals.filter(pattern => pattern.test(value)).length;
+  const medium = mediumSignals.filter(pattern => pattern.test(value)).length;
+  const negative = negativeSignals.some(pattern => pattern.test(value));
+  if (negative && high === 0) return { score: 10, level: '低意向', reasons: ['系统/通知类邮件'] };
+  if (high >= 2 || (high >= 1 && medium >= 1)) return { score: 85, level: '高意向', reasons: ['出现明确合作动作', '涉及档期、报价或交付'] };
+  if (high === 1 || medium >= 2) return { score: 60, level: '中意向', reasons: ['提到合作或产品评测', '尚未出现明确报价/档期'] };
+  return { score: 35, level: '待确认', reasons: ['只有泛合作词或上下文不足'] };
 }
 
 function extractQuote(content) {
@@ -51,6 +67,14 @@ function summarize(content, subject) {
     .filter(line => !/^(best regards|kind regards|regards|thanks|thank you)[,!]?$/i.test(line));
   const value = cleanContent(lines.slice(0, 8).join(' '));
   return (value || cleanContent(subject) || '无正文，仅有邮件标题').slice(0, 160);
+}
+
+function bodyText(content) {
+  return cleanContent(content)
+    .replace(/(^|\s)(On .*?wrote:|在.*写道：).*$/i, '$1')
+    .replace(/\s*[-_]{3,}\s*/g, ' ')
+    .trim()
+    .slice(0, 12000);
 }
 
 function decodeMimeHeader(value) {
@@ -313,7 +337,8 @@ try {
       const outgoingAt = thread ? repliedThreads.get(thread) : null;
       const repliedByHeader = Boolean(ids.messageId && sentReferenceIds.has(ids.messageId));
       const replied = repliedByHeader || Boolean(outgoingAt && outgoingAt >= receivedAt);
-      const intent = scoreIntent(combined);
+      const intentResult = scoreIntent(combined);
+      const intent = intentResult.score;
       results.push({
         id,
         threadId: thread || ids.messageId || id,
@@ -321,8 +346,11 @@ try {
         email: effectiveSender || '',
         subject: decodeMimeHeader(subject),
         summary: summarize(extractMimeText(rawSource), subject),
+        body: bodyText(extractMimeText(rawSource)),
         platform: platformFor(combined),
         intent,
+        intentLevel: intentResult.level,
+        intentReasons: intentResult.reasons,
         quote: extractQuote(combined),
         progress: progressFor(intent, replied),
         replyStatus: replied ? '已回复' : '新邮件',

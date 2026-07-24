@@ -179,6 +179,8 @@
     .mail-subject { max-width: 230px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mail-summary { max-width: 260px; margin-top: 4px; color: var(--text-2); font-size: 11px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .mail-actions { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .mail-detail { white-space: pre-wrap; max-height: 52vh; overflow: auto; padding: 16px; border-radius: 14px; background: var(--surface-2); color: #38383c; font-size: 13px; line-height: 1.7; }
+    .intent-reasons { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 16px; }
     .tags { display: flex; flex-wrap: wrap; gap: 5px; }
     .tag { padding: 4px 8px; border-radius: 999px; font-size: 10px; white-space: nowrap; background: var(--surface-2); color: #4a4a50; }
     .score { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -509,6 +511,10 @@
 
     <div class="modal-backdrop" id="creatorModal" role="dialog" aria-modal="true" aria-labelledby="creatorModalTitle">
       <div class="modal creator-profile"><div class="modal-head"><h2 id="creatorModalTitle">红人资料卡</h2><button class="btn btn-quiet" type="button" data-close-modal>关闭</button></div><div id="creatorProfileBody"></div></div>
+    </div>
+
+    <div class="modal-backdrop" id="emailModal" role="dialog" aria-modal="true" aria-labelledby="emailModalTitle">
+      <div class="modal"><div class="modal-head"><h2 id="emailModalTitle">邮件内容</h2><button class="btn btn-quiet" type="button" data-close-modal>关闭</button></div><div id="emailDetailBody"></div></div>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

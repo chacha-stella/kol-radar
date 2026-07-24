@@ -32,12 +32,12 @@
       const replyUrl = item.replyUrl || `mailto:${item.email || ''}?subject=${encodeURIComponent(`Re: ${item.subject || ''}`)}`;
       return `<tr class="${closedIds.has(String(item.id)) ? 'is-closed' : ''}">
         <td><div class="person"><span class="avatar">${safe((item.name || item.email || '邮件').slice(0, 2))}</span><div><div class="person-name">${safe(item.name || '未知红人')}</div><div class="person-email">${safe(item.email || '')}</div></div></div></td>
-        <td><div class="mail-subject" title="${safe(item.subject || '')}">${safe(item.subject || '无标题')}</div><div class="mail-summary" title="${safe(item.summary || '')}">${safe(item.summary || '暂无摘要')}</div></td>
+        <td><button class="btn btn-quiet mail-subject" type="button" data-email-view="${safe(item.id)}" title="点击查看全文">${safe(item.subject || '无标题')}</button><div class="mail-summary" title="${safe(item.summary || '')}">${safe(item.summary || '暂无摘要')}</div></td>
         <td>${safe(item.platform || '待识别')}</td>
         <td><div class="score"><span>${safe(item.intent ?? 0)}</span><span class="score-track"><span class="score-fill" style="width:${Math.min(100, Math.max(0, Number(item.intent || 0)))}%"></span></span></div></td>
         <td class="nowrap">${safe(dateLabel(item.lastIncomingAt || item.receivedAt))}</td>
         <td><span class="badge ${isNew ? 'badge-orange' : 'badge-green'}">${safe(status)}</span></td>
-        <td><div class="nowrap">${money(item.quote)}</div><div class="muted" style="margin-top:4px;font-size:11px">${safe(item.progress || '待跟进')}</div></td>
+        <td><div class="nowrap">${money(item.quote)}</div><div class="muted" style="margin-top:4px;font-size:11px">${safe(item.progress || '待跟进')}</div><div class="muted" style="margin-top:4px;font-size:10px">${safe(item.intentLevel || '')}</div></td>
         <td><div class="mail-actions"><a class="btn btn-primary" href="${safe(replyUrl)}">回复</a><button class="btn btn-quiet" type="button" data-email-action="${closedIds.has(String(item.id)) ? 'reopen' : 'close'}" data-email-id="${safe(item.id)}">${closedIds.has(String(item.id)) ? '恢复' : '关闭'}</button></div></td>
       </tr>`;
     }).join('') : `<tr><td colspan="8"><div class="empty">${showClosed ? '暂无已关闭邮件' : '暂无未关闭的真实合作邮件'}</div></td></tr>`;
@@ -46,6 +46,16 @@
       if (button.dataset.emailAction === 'close') closedIds.add(id); else closedIds.delete(id);
       saveClosed();
       renderMessages();
+    }));
+    rows.querySelectorAll('[data-email-view]').forEach(button => button.addEventListener('click', () => {
+      const item = (digest?.messages || []).find(value => String(value.id) === String(button.dataset.emailView));
+      if (!item) return;
+      const reasons = Array.isArray(item.intentReasons) ? item.intentReasons : [];
+      const body = document.querySelector('#emailDetailBody');
+      const title = document.querySelector('#emailModalTitle');
+      if (title) title.textContent = item.subject || '邮件内容';
+      if (body) body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="badge ${Number(item.intent || 0) >= 80 ? 'badge-green' : Number(item.intent || 0) >= 60 ? 'badge-orange' : 'badge-red'}">意向度 ${safe(item.intent ?? 0)} · ${safe(item.intentLevel || '待确认')}</span>${reasons.map(reason => `<span class="tag">${safe(reason)}</span>`).join('')}</div><div class="mail-detail">${safe(item.body || item.summary || '暂无可解析正文')}</div>`;
+      document.querySelector('#emailModal')?.classList.add('is-open');
     }));
     const toggle = document.querySelector('#toggleClosedEmails');
     if (toggle) toggle.textContent = showClosed ? '隐藏已关闭' : `显示已关闭${closedIds.size ? ` (${closedIds.size})` : ''}`;
