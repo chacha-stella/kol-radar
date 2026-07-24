@@ -1,11 +1,16 @@
 {
   "scannedAt": "2026-07-24T05:44:20.870Z",
   "status": "success",
+  "scanMode": "cumulative",
   "scannedMessageCount": 14,
+  "scannedInboxCount": 14,
+  "scannedSentCount": 0,
   "ignoredMessageCount": 14,
   "replyCount": 0,
+  "newEmailCount": 0,
+  "repliedCount": 0,
   "highIntentCount": 0,
   "quoteTotal": 0,
   "messages": [],
-  "message": "过去 24 小时扫描 14 封邮件，筛选出 0 封疑似合作回复"
+  "message": "最近一次邮箱扫描读取了 14 封收件箱邮件；当前没有筛选到合作相关外部来信。下次扫描将继续累积历史邮件。"
 }

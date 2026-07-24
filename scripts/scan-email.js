@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { ImapFlow } from 'imapflow';
 
 const output = path.resolve('data/digest.json');
@@ -25,7 +26,7 @@ function scoreIntent(content) {
 }
 
 function extractQuote(content) {
-  const match = content.match(/(?:¥|￥|rmb\s*|cny\s*)\s*([\d,]+(?:\.\d{1,2})?)/i);
+  const match = content.match(/(?:¥|￥|rmb\s*|cny\s*|\$|usd\s*)\s*([\d,]+(?:\.\d{1,2})?)/i);
   return match ? Number(match[1].replace(/,/g, '')) : 0;
 }
 
@@ -35,8 +36,21 @@ function cleanContent(value) {
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<[^>]*>/g, ' ')
     .replace(/=\r?\n/g, '')
+    .replace(/\r/g, '')
     .replace(/\s+/g, ' ')
+    .trim()
     .slice(0, 5000);
+}
+
+function summarize(content, subject) {
+  const lines = String(content || '')
+    .replace(/(^|\s)(On .*?wrote:|在.*写道：).*$/i, '$1')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(line => line && !/^>/.test(line) && !/^[-_]{3,}$/.test(line))
+    .filter(line => !/^(best regards|kind regards|regards|thanks|thank you)[,!]?$/i.test(line));
+  const value = cleanContent(lines.slice(0, 8).join(' '));
+  return (value || cleanContent(subject) || '无正文，仅有邮件标题').slice(0, 160);
 }
 
 function decodeMimeHeader(value) {
@@ -85,12 +99,18 @@ function extractMimeText(raw) {
   const headers = parseMimeHeaders(source.slice(0, separator));
   const body = source.slice(separator + 2);
   const type = String(headers['content-type'] || 'text/plain').toLowerCase();
-  const boundary = type.match(/boundary\s*=\s*(?:"([^"]+)"|([^;\s]+))/i)?.[1] || type.match(/boundary\s*=\s*(?:"([^"]+)"|([^;\s]+))/i)?.[2];
+  const boundaryMatch = type.match(/boundary\s*=\s*(?:"([^"]+)"|([^;\s]+))/i);
+  const boundary = boundaryMatch?.[1] || boundaryMatch?.[2];
   if (boundary) {
     return body.split(`--${boundary}`).filter(part => part && !/^--\s*$/.test(part.trim())).map(extractMimeText).join('\n');
   }
   if (type.includes('message/rfc822')) return extractMimeText(body);
   return decodeMimeBody(body, headers['content-transfer-encoding'], headers['content-type']?.match(/charset\s*=\s*["']?([^;"']+)/i)?.[1] || 'utf-8');
+}
+
+function headerValue(raw, name) {
+  const headers = parseMimeHeaders(String(raw || '').split(/\r?\n\r?\n/)[0]);
+  return headers[name.toLowerCase()] || '';
 }
 
 function isAutomated(address, subject) {
@@ -146,10 +166,34 @@ function platformFor(content) {
   return '待识别';
 }
 
-function progressFor(intent) {
+function progressFor(intent, replied) {
+  if (replied) return '已回复，等待红人下一步';
   if (intent >= 85) return '高意向，待跟进';
-  if (intent >= 60) return '已回复，待判断';
-  return '待人工确认';
+  if (intent >= 60) return '新邮件，待判断';
+  return '新邮件，待人工确认';
+}
+
+function normalizeSubject(subject) {
+  return decodeMimeHeader(String(subject || ''))
+    .replace(/^\s*((re|fw|fwd|回复|答复|转发)\s*[:：]\s*)+/i, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function messageIdentifiers(message, rawSource) {
+  const envelope = message.envelope || {};
+  const messageId = envelope.messageId || headerValue(rawSource, 'message-id');
+  const inReplyTo = envelope.inReplyTo || headerValue(rawSource, 'in-reply-to');
+  const refs = Array.isArray(envelope.references)
+    ? envelope.references
+    : String(headerValue(rawSource, 'references') || '').split(/\s+/).filter(Boolean);
+  return { messageId: String(messageId || '').trim(), inReplyTo: String(inReplyTo || '').trim(), references: refs.map(value => String(value).trim()).filter(Boolean) };
+}
+
+function stableId(mailbox, message, rawSource, ids) {
+  const sourceKey = ids.messageId || `${mailbox}:${message.uid || ''}:${message.internalDate || ''}`;
+  return crypto.createHash('sha1').update(sourceKey || rawSource).digest('hex').slice(0, 20);
 }
 
 function save(data) {
@@ -158,7 +202,7 @@ function save(data) {
 }
 
 if (!password || !user) {
-  save({ scannedAt: new Date().toISOString(), status: 'missing_secret', replyCount: 0, highIntentCount: 0, quoteTotal: 0, message: '请在 GitHub Actions Secrets 填写邮箱账号和安全码。' });
+  save({ scannedAt: new Date().toISOString(), status: 'missing_secret', replyCount: 0, newEmailCount: 0, repliedCount: 0, highIntentCount: 0, quoteTotal: 0, messages: [], message: '请在 GitHub Actions Secrets 填写邮箱账号和安全码。' });
   process.exit(0);
 }
 
@@ -170,65 +214,151 @@ const client = new ImapFlow({
   logger: false
 });
 
+async function listMailboxes() {
+  const listed = await client.list();
+  return Array.isArray(listed) ? listed : [];
+}
+
+function mailboxPath(mailbox) {
+  return String(mailbox?.path || mailbox?.name || '');
+}
+
+function isInbox(pathname) {
+  return pathname.toLowerCase() === 'inbox' || pathname.toLowerCase().endsWith('/inbox');
+}
+
+function isSent(pathname) {
+  const value = pathname.toLowerCase();
+  return /(?:sent|已发送|发件|outbox|geschickt|gesendet)/i.test(value) && !isInbox(value);
+}
+
+function hasFlag(mailbox, flag) {
+  return [...(mailbox?.flags || [])].some(value => String(value).toLowerCase() === flag.toLowerCase());
+}
+
+async function readMailbox(pathname, callback) {
+  let lock;
+  try {
+    lock = await client.getMailboxLock(pathname);
+    for await (const message of client.fetch('1:*', { envelope: true, source: true, internalDate: true })) {
+      await callback(message, pathname);
+    }
+  } finally {
+    lock?.release();
+  }
+}
+
 try {
   await client.connect();
-  const lock = await client.getMailboxLock('INBOX');
+  const mailboxes = await listMailboxes();
+  const inboxes = mailboxes.filter(mailbox => isInbox(mailboxPath(mailbox)) || hasFlag(mailbox, '\\inbox')).map(mailboxPath);
+  const configuredSent = String(process.env.MAIL_IMAP_SENT_FOLDER || '').trim();
+  const sentFolders = configuredSent
+    ? [configuredSent]
+    : mailboxes.filter(mailbox => isSent(mailboxPath(mailbox)) || hasFlag(mailbox, '\\sent')).map(mailboxPath);
+  if (!inboxes.length) inboxes.push('INBOX');
+
+  const sentReferenceIds = new Set();
+  const repliedThreads = new Map();
+  let scannedSentCount = 0;
+  for (const folder of sentFolders) {
+    await readMailbox(folder, async (message) => {
+      scannedSentCount += 1;
+      const rawSource = message.source?.toString('utf8') || '';
+      const ids = messageIdentifiers(message, rawSource);
+      const subject = message.envelope?.subject || headerValue(rawSource, 'subject');
+      const thread = normalizeSubject(subject);
+      const date = new Date(message.internalDate || message.envelope?.date || 0);
+      if (ids.inReplyTo) sentReferenceIds.add(ids.inReplyTo);
+      ids.references.forEach(value => sentReferenceIds.add(value));
+      if (thread) {
+        const previous = repliedThreads.get(thread);
+        if (!previous || date > previous) repliedThreads.set(thread, date);
+      }
+    });
+  }
+
   const results = [];
-  let scannedMessageCount = 0;
+  let scannedInboxCount = 0;
   let ignoredMessageCount = 0;
-  try {
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    for await (const message of client.fetch({ since }, { envelope: true, source: true, internalDate: true })) {
-      scannedMessageCount += 1;
+  const seenIds = new Set();
+  for (const folder of inboxes) {
+    await readMailbox(folder, async (message) => {
+      scannedInboxCount += 1;
       const rawSource = message.source?.toString('utf8') || '';
       const source = cleanContent(extractMimeText(rawSource));
-      const subject = message.envelope?.subject || '';
+      const subject = message.envelope?.subject || headerValue(rawSource, 'subject');
       const combined = `${subject} ${source}`;
-      const sender = message.envelope?.from?.[0] || {};
-      const receivedAt = message.internalDate || new Date(0);
+      const sender = message.envelope?.from?.[0] || addressInfo(headerValue(rawSource, 'from')) || {};
+      const receivedAt = new Date(message.internalDate || message.envelope?.date || 0);
       const original = isInternalAddress(sender.address)
         ? (originalSenderInfo(rawSource) || originalSenderInfo(source))
         : null;
-      const externalSender = original?.address || (!isInternalAddress(sender.address) ? sender.address : externalAddressFromContent(source));
+      // Never treat an arbitrary address found in the body as the sender. In
+      // forwarded Aliyun mail, only an explicit original From/Reply-To header
+      // is authoritative; body addresses can be signatures or quoted content.
+      const externalSender = original?.address || (!isInternalAddress(sender.address) ? sender.address : '');
       const effectiveSender = externalSender || sender.address;
       const forwarded = Boolean(original);
-      if (receivedAt < since || !effectiveSender || isAutomated(effectiveSender, subject) ||
+      const ids = messageIdentifiers(message, rawSource);
+      const id = stableId(folder, message, rawSource, ids);
+      if (seenIds.has(id)) return;
+      seenIds.add(id);
+      if (!effectiveSender || isAutomated(effectiveSender, subject) ||
         (isInternalAddress(sender.address) && !externalSender) || !isLikelyCreatorReply(combined, effectiveSender, subject, forwarded)) {
         ignoredMessageCount += 1;
-        continue;
+        return;
       }
+      const thread = normalizeSubject(subject);
+      const outgoingAt = thread ? repliedThreads.get(thread) : null;
+      const repliedByHeader = Boolean(ids.messageId && sentReferenceIds.has(ids.messageId));
+      const replied = repliedByHeader || Boolean(outgoingAt && outgoingAt >= receivedAt);
       const intent = scoreIntent(combined);
       results.push({
+        id,
+        threadId: thread || ids.messageId || id,
         name: original?.name || sender.name || effectiveSender || '未知发件人',
         email: effectiveSender || '',
-        subject,
+        subject: decodeMimeHeader(subject),
+        summary: summarize(extractMimeText(rawSource), subject),
         platform: platformFor(combined),
         intent,
         quote: extractQuote(combined),
-        progress: progressFor(intent),
-        action: intent >= 85 ? '今天回复并确认档期、报价和下一步' : '阅读邮件并补充红人资料',
-        receivedAt: receivedAt.toISOString()
+        progress: progressFor(intent, replied),
+        replyStatus: replied ? '已回复' : '新邮件',
+        lastOutgoingAt: outgoingAt?.toISOString() || null,
+        replyUrl: `mailto:${effectiveSender || ''}?subject=${encodeURIComponent(`Re: ${decodeMimeHeader(subject)}`)}`,
+        action: replied ? '等待红人继续回复；必要时查看线程' : (intent >= 85 ? '今天回复并确认档期、报价和下一步' : '阅读摘要并补充红人资料'),
+        receivedAt: receivedAt.toISOString(),
+        lastIncomingAt: receivedAt.toISOString()
       });
-    }
-  } finally {
-    lock.release();
+    });
   }
+
+  results.sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt));
+  const newMessages = results.filter(item => item.replyStatus === '新邮件');
+  const repliedMessages = results.filter(item => item.replyStatus === '已回复');
   save({
     scannedAt: new Date().toISOString(),
     status: 'success',
-    scannedMessageCount,
+    scanMode: 'cumulative',
+    scannedMessageCount: scannedInboxCount + scannedSentCount,
+    scannedInboxCount,
+    scannedSentCount,
     ignoredMessageCount,
     replyCount: results.length,
+    newEmailCount: newMessages.length,
+    repliedCount: repliedMessages.length,
     highIntentCount: results.filter(item => item.intent >= 80).length,
     quoteTotal: results.reduce((sum, item) => sum + item.quote, 0),
     messages: results,
-    message: `过去 24 小时扫描 ${scannedMessageCount} 封邮件，筛选出 ${results.length} 封疑似合作回复`
+    message: `累计扫描收件箱 ${scannedInboxCount} 封、已发送 ${scannedSentCount} 封，保留 ${results.length} 封真实外部来信；其中新邮件 ${newMessages.length} 封，已回复 ${repliedMessages.length} 封`
   });
-  console.info(`[scan] scanned=${scannedMessageCount} selected=${results.length} ignored=${ignoredMessageCount}`);
-  for (const item of results) console.info(`[selected] ${item.email} | ${item.subject} | intent=${item.intent} | quote=${item.quote}`);
+  console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${results.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
+  for (const item of results) console.info(`[selected] ${item.email} | ${item.subject} | status=${item.replyStatus} | intent=${item.intent} | quote=${item.quote}`);
 } catch (error) {
-  save({ scannedAt: new Date().toISOString(), status: 'error', replyCount: 0, highIntentCount: 0, quoteTotal: 0, message: '邮箱扫描失败，请检查账号或安全码。' });
-  console.error(error.message);
+  save({ scannedAt: new Date().toISOString(), status: 'error', replyCount: 0, newEmailCount: 0, repliedCount: 0, highIntentCount: 0, quoteTotal: 0, messages: [], message: '邮箱扫描失败，请检查账号、安全码或邮箱文件夹权限。' });
+  console.error(error?.stack || error?.message || error);
   process.exitCode = 1;
 } finally {
   try { await client.logout(); } catch { /* Ignore disconnect errors. */ }

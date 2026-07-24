@@ -176,6 +176,9 @@
     .person { display: flex; align-items: center; gap: 10px; min-width: 190px; }
     .person-name { font-weight: 600; }
     .person-email { margin-top: 3px; color: var(--text-2); font-size: 11px; }
+    .mail-subject { max-width: 230px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mail-summary { max-width: 260px; margin-top: 4px; color: var(--text-2); font-size: 11px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .mail-actions { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
     .tags { display: flex; flex-wrap: wrap; gap: 5px; }
     .tag { padding: 4px 8px; border-radius: 999px; font-size: 10px; white-space: nowrap; background: var(--surface-2); color: #4a4a50; }
     .score { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -412,8 +415,8 @@
           </aside>
         </div>
         <section class="card table-card">
-          <div class="table-card-head"><div><h2>最新邮件回复</h2><p class="page-description">按意向度与最新回复时间排序</p></div><button class="btn btn-quiet" type="button" data-go-page="collaborators">查看全部红人</button></div>
-          <div class="table-wrap"><table><thead><tr><th>红人 / 邮箱</th><th>平台</th><th>意向度</th><th>最新回复</th><th>报价</th><th>合作进度</th><th>今日动作</th></tr></thead><tbody id="replyRows"></tbody></table></div>
+          <div class="table-card-head"><div><h2>累计合作邮件</h2><p class="page-description">历史邮件持续累积；没有你的回复会标记为“新邮件”</p></div><div class="inline-actions"><button class="btn btn-quiet" id="toggleClosedEmails" type="button">显示已关闭</button><button class="btn btn-quiet" type="button" data-go-page="collaborators">查看全部红人</button></div></div>
+          <div class="table-wrap"><table><thead><tr><th>红人 / 邮箱</th><th>邮件内容</th><th>平台</th><th>意向度</th><th>最新来信</th><th>状态</th><th>报价 / 进度</th><th>操作</th></tr></thead><tbody id="replyRows"></tbody></table></div>
         </section>
       </section>
 
@@ -557,7 +560,7 @@
       function closeModals() { document.querySelectorAll('.modal-backdrop').forEach(el => el.classList.remove('is-open')); }
 
       function renderReplies() {
-        $('replyRows').innerHTML = replies.length ? replies.map(r => `<tr><td><div class="person"><span class="avatar">${safe(initials(r.name))}</span><div><div class="person-name">${safe(r.name)}</div><div class="person-email">${safe(r.email)}</div></div></div></td><td>${safe(r.platform)}</td><td><div class="score"><span>${r.intent}</span><span class="score-track"><span class="score-fill" style="width:${r.intent}%"></span></span></div></td><td class="nowrap">${r.reply}</td><td class="nowrap">${money(r.quote)}</td><td><span class="badge ${r.intent >= 85 ? 'badge-green' : 'badge-orange'}">${safe(r.progress)}</span></td><td>${safe(r.action)}</td></tr>`).join('') : '<tr><td colspan="7"><div class="empty">等待邮箱首次扫描；不会显示示例红人。</div></td></tr>';
+        $('replyRows').innerHTML = replies.length ? replies.map(r => `<tr><td><div class="person"><span class="avatar">${safe(initials(r.name))}</span><div><div class="person-name">${safe(r.name)}</div><div class="person-email">${safe(r.email)}</div></div></div></td><td>${safe(r.platform)}</td><td><div class="score"><span>${r.intent}</span><span class="score-track"><span class="score-fill" style="width:${r.intent}%"></span></span></div></td><td class="nowrap">${r.reply}</td><td class="nowrap">${money(r.quote)}</td><td><span class="badge ${r.intent >= 85 ? 'badge-green' : 'badge-orange'}">${safe(r.progress)}</span></td><td>${safe(r.action)}</td></tr>`).join('') : '<tr><td colspan="8"><div class="empty">等待邮箱首次扫描；不会显示示例红人。</div></td></tr>';
       }
 
       function monthLabel(month) { const [year,m] = month.split('-'); return `${year} 年 ${Number(m)} 月`; }

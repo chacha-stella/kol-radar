@@ -26,7 +26,12 @@ jobs:
           MAIL_IMAP_PORT: 993
           MAIL_IMAP_USER: ${{ secrets.MAIL_IMAP_USER }}
           MAIL_IMAP_PASSWORD: ${{ secrets.MAIL_IMAP_PASSWORD }}
-        run: node scripts/scan-email.js
+        run: |
+          if [ "$MAIL_IMAP_USER" != "stella.zhuang@chessnutech.com" ]; then
+            echo "MAIL_IMAP_USER is not the configured stella.zhuang@chessnutech.com account. Update the GitHub secret." >&2
+            exit 1
+          fi
+          node scripts/scan-email.js
       - name: Publish aggregate digest
         run: |
           git config user.name "github-actions[bot]"
