@@ -10,7 +10,8 @@ const internalDomains = ['chessnutech.com'];
 const collaborationTerms = [
   '合作', '报价', '报价单', '预算', '档期', '赞助', '推广', '评测', '产品', '媒体包',
   'media kit', 'rate card', 'sponsor', 'sponsored', 'collab', 'collaboration', 'review',
-  'brand deal', 'interested', 'available', 'partnership', 'proposal'
+  'brand deal', 'interested', 'available', 'partnership', 'proposal', 'campaign', 'deliverables',
+  'timeline', 'fee', 'price', 'pricing', 'usd', 'eur', 'sure', 'yes', 'okay', 'accept'
 ];
 const automatedPrefixes = ['noreply@', 'no-reply@', 'mailer-daemon@', 'postmaster@', 'notifications@', 'notification@'];
 
@@ -38,6 +39,60 @@ function cleanContent(value) {
     .slice(0, 5000);
 }
 
+function decodeMimeHeader(value) {
+  return String(value || '').replace(/=\?([^?]+)\?([bq])\?([^?]*)\?=/gi, (_, charset, encoding, payload) => {
+    try {
+      const bytes = encoding.toLowerCase() === 'b'
+        ? Buffer.from(payload, 'base64')
+        : Buffer.from(payload.replace(/_/g, ' ').replace(/=([0-9a-f]{2})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16))), 'binary');
+      return new TextDecoder(charset.toLowerCase()).decode(bytes);
+    } catch {
+      return payload;
+    }
+  });
+}
+
+function parseMimeHeaders(block) {
+  const unfolded = String(block || '').replace(/\r?\n[ \t]+/g, ' ');
+  const headers = {};
+  for (const line of unfolded.split(/\r?\n/)) {
+    const index = line.indexOf(':');
+    if (index <= 0) continue;
+    headers[line.slice(0, index).trim().toLowerCase()] = decodeMimeHeader(line.slice(index + 1).trim());
+  }
+  return headers;
+}
+
+function decodeMimeBody(body, transferEncoding, charset = 'utf-8') {
+  let bytes;
+  const encoding = String(transferEncoding || '').toLowerCase();
+  if (encoding.includes('base64')) {
+    bytes = Buffer.from(String(body).replace(/\s+/g, ''), 'base64');
+  } else if (encoding.includes('quoted-printable')) {
+    const binary = String(body).replace(/=\r?\n/g, '').replace(/=([0-9a-f]{2})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+    bytes = Buffer.from(binary, 'binary');
+  } else {
+    bytes = Buffer.from(String(body), 'utf8');
+  }
+  try { return new TextDecoder(String(charset).split(';')[0].trim().toLowerCase() || 'utf-8').decode(bytes); }
+  catch { return bytes.toString('utf8'); }
+}
+
+function extractMimeText(raw) {
+  const source = String(raw || '').replace(/\r\n/g, '\n');
+  const separator = source.indexOf('\n\n');
+  if (separator < 0) return source;
+  const headers = parseMimeHeaders(source.slice(0, separator));
+  const body = source.slice(separator + 2);
+  const type = String(headers['content-type'] || 'text/plain').toLowerCase();
+  const boundary = type.match(/boundary\s*=\s*(?:"([^"]+)"|([^;\s]+))/i)?.[1] || type.match(/boundary\s*=\s*(?:"([^"]+)"|([^;\s]+))/i)?.[2];
+  if (boundary) {
+    return body.split(`--${boundary}`).filter(part => part && !/^--\s*$/.test(part.trim())).map(extractMimeText).join('\n');
+  }
+  if (type.includes('message/rfc822')) return extractMimeText(body);
+  return decodeMimeBody(body, headers['content-transfer-encoding'], headers['content-type']?.match(/charset\s*=\s*["']?([^;"']+)/i)?.[1] || 'utf-8');
+}
+
 function isAutomated(address, subject) {
   const email = String(address || '').toLowerCase();
   const title = String(subject || '').toLowerCase();
@@ -50,10 +105,21 @@ function isInternalAddress(address) {
   return internalDomains.some(domain => value.endsWith(`@${domain}`));
 }
 
-function originalSender(source) {
-  const header = source.match(/(?:^|\s)(?:from|发件人|sender|reply-to|回复):\s*([^\r\n]{0,240})/i)?.[1] || '';
-  const candidates = header.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g) || [];
-  return candidates.find(address => !isInternalAddress(address) && address.toLowerCase() !== user.toLowerCase()) || '';
+function addressInfo(value) {
+  const text = decodeMimeHeader(String(value || '').trim());
+  const address = text.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/)?.[0] || '';
+  if (!address) return null;
+  const name = text.match(/^(.*?)\s*<[^>]+>/)?.[1]?.replace(/^['"]|['"]$/g, '').trim() || '';
+  return { address, name };
+}
+
+function originalSenderInfo(source) {
+  const headers = String(source).match(/(?:^|\n)(?:from|发件人|sender|reply-to|回复|original-from|x-original-from|return-path):\s*([^\r\n]{0,240})/gi) || [];
+  for (const line of headers) {
+    const info = addressInfo(line.replace(/^[^:]+:\s*/, ''));
+    if (info && !isInternalAddress(info.address) && info.address.toLowerCase() !== user.toLowerCase()) return info;
+  }
+  return null;
 }
 
 function externalAddressFromContent(source) {
@@ -61,11 +127,13 @@ function externalAddressFromContent(source) {
   return candidates.find(address => !isInternalAddress(address) && address.toLowerCase() !== user.toLowerCase() && !isAutomated(address, '')) || '';
 }
 
-function isLikelyCreatorReply(content, senderAddress) {
+function isLikelyCreatorReply(content, senderAddress, subject, forwarded) {
   const value = content.toLowerCase();
   const sender = String(senderAddress || '').toLowerCase();
   if (!sender || sender === user.toLowerCase() || isAutomated(sender, content)) return false;
-  return collaborationTerms.some(term => value.includes(term.toLowerCase()));
+  const hasTerms = collaborationTerms.some(term => value.includes(term.toLowerCase()));
+  const replyMarker = /(?:^|\s)(?:re|回复|答复|fwd|转发)\s*:/i.test(String(subject || ''));
+  return hasTerms || (forwarded && (replyMarker || value.length > 20)) || replyMarker;
 }
 
 function platformFor(content) {
@@ -112,23 +180,26 @@ try {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
     for await (const message of client.fetch({ since }, { envelope: true, source: true, internalDate: true })) {
       scannedMessageCount += 1;
-      const source = cleanContent(message.source?.toString('utf8'));
+      const rawSource = message.source?.toString('utf8') || '';
+      const source = cleanContent(extractMimeText(rawSource));
       const subject = message.envelope?.subject || '';
       const combined = `${subject} ${source}`;
       const sender = message.envelope?.from?.[0] || {};
       const receivedAt = message.internalDate || new Date(0);
-      const externalSender = isInternalAddress(sender.address)
-        ? (originalSender(source) || externalAddressFromContent(source))
-        : sender.address;
+      const original = isInternalAddress(sender.address)
+        ? (originalSenderInfo(rawSource) || originalSenderInfo(source))
+        : null;
+      const externalSender = original?.address || (!isInternalAddress(sender.address) ? sender.address : externalAddressFromContent(source));
       const effectiveSender = externalSender || sender.address;
+      const forwarded = Boolean(original);
       if (receivedAt < since || !effectiveSender || isAutomated(effectiveSender, subject) ||
-        (isInternalAddress(sender.address) && !externalSender) || !isLikelyCreatorReply(combined, effectiveSender)) {
+        (isInternalAddress(sender.address) && !externalSender) || !isLikelyCreatorReply(combined, effectiveSender, subject, forwarded)) {
         ignoredMessageCount += 1;
         continue;
       }
       const intent = scoreIntent(combined);
       results.push({
-        name: sender.name || effectiveSender || '未知发件人',
+        name: original?.name || sender.name || effectiveSender || '未知发件人',
         email: effectiveSender || '',
         subject,
         platform: platformFor(combined),
@@ -153,6 +224,8 @@ try {
     messages: results,
     message: `过去 24 小时扫描 ${scannedMessageCount} 封邮件，筛选出 ${results.length} 封疑似合作回复`
   });
+  console.info(`[scan] scanned=${scannedMessageCount} selected=${results.length} ignored=${ignoredMessageCount}`);
+  for (const item of results) console.info(`[selected] ${item.email} | ${item.subject} | intent=${item.intent} | quote=${item.quote}`);
 } catch (error) {
   save({ scannedAt: new Date().toISOString(), status: 'error', replyCount: 0, highIntentCount: 0, quoteTotal: 0, message: '邮箱扫描失败，请检查账号或安全码。' });
   console.error(error.message);
