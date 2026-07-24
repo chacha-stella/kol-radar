@@ -6,6 +6,7 @@ import { ImapFlow } from 'imapflow';
 const output = path.resolve('data/digest.json');
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
+const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
 const internalDomains = ['chessnutech.com'];
 
 const collaborationTerms = [
@@ -46,7 +47,7 @@ function extractQuote(content) {
   return match ? Number(match[1].replace(/,/g, '')) : 0;
 }
 
-function cleanContent(value) {
+function cleanContent(value, limit = 5000) {
   return String(value || '')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
@@ -55,7 +56,7 @@ function cleanContent(value) {
     .replace(/\r/g, '')
     .replace(/\s+/g, ' ')
     .trim()
-    .slice(0, 5000);
+    .slice(0, limit);
 }
 
 function summarize(content, subject) {
@@ -70,11 +71,33 @@ function summarize(content, subject) {
 }
 
 function bodyText(content) {
-  return cleanContent(content)
-    .replace(/(^|\s)(On .*?wrote:|在.*写道：).*$/i, '$1')
-    .replace(/\s*[-_]{3,}\s*/g, ' ')
-    .trim()
-    .slice(0, 12000);
+  return cleanContent(content, Number.MAX_SAFE_INTEGER);
+}
+
+function hasCjk(value) {
+  return /[\u3400-\u9fff]/.test(String(value || ''));
+}
+
+async function translateToEnglish(text) {
+  const value = String(text || '').trim();
+  if (!value || !hasCjk(value)) return { text: value, status: 'already_english' };
+  if (!geminiApiKey) return { text: '', status: 'translation_not_configured' };
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `Translate the following email into natural, faithful English. Keep names, email addresses, URLs, product names, numbers, prices, and formatting. Return only the translation, with no commentary.\n\n${value}` }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
+      })
+    });
+    if (!response.ok) return { text: '', status: `translation_error_${response.status}` };
+    const payload = await response.json();
+    const translated = payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
+    return translated ? { text: translated, status: 'translated' } : { text: '', status: 'translation_empty' };
+  } catch {
+    return { text: '', status: 'translation_error' };
+  }
 }
 
 function decodeMimeHeader(value) {
@@ -339,6 +362,8 @@ try {
       const replied = repliedByHeader || Boolean(outgoingAt && outgoingAt >= receivedAt);
       const intentResult = scoreIntent(combined);
       const intent = intentResult.score;
+      const originalBody = bodyText(extractMimeText(rawSource));
+      const translatedBody = await translateToEnglish(originalBody);
       results.push({
         id,
         threadId: thread || ids.messageId || id,
@@ -346,7 +371,10 @@ try {
         email: effectiveSender || '',
         subject: decodeMimeHeader(subject),
         summary: summarize(extractMimeText(rawSource), subject),
-        body: bodyText(extractMimeText(rawSource)),
+        body: originalBody,
+        bodyEnglish: translatedBody.text,
+        summaryEnglish: translatedBody.text ? summarize(translatedBody.text, subject) : '',
+        translationStatus: translatedBody.status,
         platform: platformFor(combined),
         intent,
         intentLevel: intentResult.level,

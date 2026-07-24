@@ -179,7 +179,9 @@
     .mail-subject { max-width: 230px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mail-summary { max-width: 260px; margin-top: 4px; color: var(--text-2); font-size: 11px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .mail-actions { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-    .mail-detail { white-space: pre-wrap; max-height: 52vh; overflow: auto; padding: 16px; border-radius: 14px; background: var(--surface-2); color: #38383c; font-size: 13px; line-height: 1.7; }
+    .mail-detail { white-space: pre-wrap; padding: 16px; border-radius: 14px; background: var(--surface-2); color: #38383c; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+    .mail-original { display: none; margin-top: 10px; }
+    .mail-original.is-visible { display: block; }
     .intent-reasons { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 16px; }
     .tags { display: flex; flex-wrap: wrap; gap: 5px; }
     .tag { padding: 4px 8px; border-radius: 999px; font-size: 10px; white-space: nowrap; background: var(--surface-2); color: #4a4a50; }

@@ -26,6 +26,8 @@ jobs:
           MAIL_IMAP_PORT: 993
           MAIL_IMAP_USER: ${{ secrets.MAIL_IMAP_USER }}
           MAIL_IMAP_PASSWORD: ${{ secrets.MAIL_IMAP_PASSWORD }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
           if [ "$MAIL_IMAP_USER" != "stella.zhuang@chessnutech.com" ]; then
             echo "MAIL_IMAP_USER is not the configured stella.zhuang@chessnutech.com account. Update the GitHub secret." >&2

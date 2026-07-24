@@ -32,7 +32,7 @@
       const replyUrl = item.replyUrl || `mailto:${item.email || ''}?subject=${encodeURIComponent(`Re: ${item.subject || ''}`)}`;
       return `<tr class="${closedIds.has(String(item.id)) ? 'is-closed' : ''}">
         <td><div class="person"><span class="avatar">${safe((item.name || item.email || '邮件').slice(0, 2))}</span><div><div class="person-name">${safe(item.name || '未知红人')}</div><div class="person-email">${safe(item.email || '')}</div></div></div></td>
-        <td><button class="btn btn-quiet mail-subject" type="button" data-email-view="${safe(item.id)}" title="点击查看全文">${safe(item.subject || '无标题')}</button><div class="mail-summary" title="${safe(item.summary || '')}">${safe(item.summary || '暂无摘要')}</div></td>
+        <td><button class="btn btn-quiet mail-subject" type="button" data-email-view="${safe(item.id)}" title="点击查看全文">${safe(item.subject || '无标题')}</button><div class="mail-summary" title="${safe(item.summaryEnglish || item.summary || '')}">${safe(item.summaryEnglish || item.summary || '暂无摘要')}</div></td>
         <td>${safe(item.platform || '待识别')}</td>
         <td><div class="score"><span>${safe(item.intent ?? 0)}</span><span class="score-track"><span class="score-fill" style="width:${Math.min(100, Math.max(0, Number(item.intent || 0)))}%"></span></span></div></td>
         <td class="nowrap">${safe(dateLabel(item.lastIncomingAt || item.receivedAt))}</td>
@@ -54,7 +54,23 @@
       const body = document.querySelector('#emailDetailBody');
       const title = document.querySelector('#emailModalTitle');
       if (title) title.textContent = item.subject || '邮件内容';
-      if (body) body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="badge ${Number(item.intent || 0) >= 80 ? 'badge-green' : Number(item.intent || 0) >= 60 ? 'badge-orange' : 'badge-red'}">意向度 ${safe(item.intent ?? 0)} · ${safe(item.intentLevel || '待确认')}</span>${reasons.map(reason => `<span class="tag">${safe(reason)}</span>`).join('')}</div><div class="mail-detail">${safe(item.body || item.summary || '暂无可解析正文')}</div>`;
+      if (body) {
+        const original = item.body || item.summary || '暂无可解析正文';
+        const english = item.bodyEnglish || '';
+        const primary = english || original;
+        const translationNote = english
+          ? 'English translation'
+          : item.translationStatus === 'translation_not_configured'
+            ? 'English translation unavailable: add GEMINI_API_KEY in GitHub Secrets'
+            : item.translationStatus === 'already_english' ? 'Original email is already in English' : 'Translation unavailable; showing original';
+        body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="badge ${Number(item.intent || 0) >= 80 ? 'badge-green' : Number(item.intent || 0) >= 60 ? 'badge-orange' : 'badge-red'}">意向度 ${safe(item.intent ?? 0)} · ${safe(item.intentLevel || '待确认')}</span>${reasons.map(reason => `<span class="tag">${safe(reason)}</span>`).join('')}</div><div class="muted" style="margin-bottom:8px">${safe(translationNote)}</div><div class="mail-detail" id="emailPrimaryBody">${safe(primary)}</div>${english ? `<button class="btn btn-quiet" type="button" data-email-toggle="original" style="margin-top:10px">查看原文</button><div class="mail-detail mail-original" id="emailOriginalBody">${safe(original)}</div>` : ''}`;
+        body.querySelector('[data-email-toggle]')?.addEventListener('click', event => {
+          const originalBody = body.querySelector('#emailOriginalBody');
+          if (!originalBody) return;
+          const showing = originalBody.classList.toggle('is-visible');
+          event.currentTarget.textContent = showing ? '隐藏原文' : '查看原文';
+        });
+      }
       document.querySelector('#emailModal')?.classList.add('is-open');
     }));
     const toggle = document.querySelector('#toggleClosedEmails');
