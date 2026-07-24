@@ -10,7 +10,8 @@ const internalDomains = ['chessnutech.com'];
 const collaborationTerms = [
   '合作', '报价', '报价单', '预算', '档期', '赞助', '推广', '评测', '产品', '媒体包',
   'media kit', 'rate card', 'sponsor', 'sponsored', 'collab', 'collaboration', 'review',
-  'brand deal', 'interested', 'available', 'partnership', 'proposal'
+  'brand deal', 'interested', 'available', 'partnership', 'proposal', 'campaign', 'deliverables',
+  'timeline', 'fee', 'price', 'pricing', 'usd', 'eur', 'sure', 'yes', 'okay', 'accept'
 ];
 const automatedPrefixes = ['noreply@', 'no-reply@', 'mailer-daemon@', 'postmaster@', 'notifications@', 'notification@'];
 
@@ -113,9 +114,12 @@ function addressInfo(value) {
 }
 
 function originalSenderInfo(source) {
-  const header = String(source).match(/(?:^|\n)(?:from|发件人|sender|reply-to|回复):\s*([^\r\n]{0,240})/i)?.[1] || '';
-  const info = addressInfo(header);
-  return info && !isInternalAddress(info.address) && info.address.toLowerCase() !== user.toLowerCase() ? info : null;
+  const headers = String(source).match(/(?:^|\n)(?:from|发件人|sender|reply-to|回复|original-from|x-original-from|return-path):\s*([^\r\n]{0,240})/gi) || [];
+  for (const line of headers) {
+    const info = addressInfo(line.replace(/^[^:]+:\s*/, ''));
+    if (info && !isInternalAddress(info.address) && info.address.toLowerCase() !== user.toLowerCase()) return info;
+  }
+  return null;
 }
 
 function externalAddressFromContent(source) {
@@ -129,7 +133,7 @@ function isLikelyCreatorReply(content, senderAddress, subject, forwarded) {
   if (!sender || sender === user.toLowerCase() || isAutomated(sender, content)) return false;
   const hasTerms = collaborationTerms.some(term => value.includes(term.toLowerCase()));
   const replyMarker = /(?:^|\s)(?:re|回复|答复|fwd|转发)\s*:/i.test(String(subject || ''));
-  return hasTerms || (forwarded && replyMarker) || replyMarker;
+  return hasTerms || (forwarded && (replyMarker || value.length > 20)) || replyMarker;
 }
 
 function platformFor(content) {
