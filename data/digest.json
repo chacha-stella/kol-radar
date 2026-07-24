@@ -1,11 +1,45 @@
 {
-  "scannedAt": "2026-07-24T05:44:20.870Z",
+  "scannedAt": "2026-07-24T05:49:01.351Z",
   "status": "success",
   "scannedMessageCount": 14,
-  "ignoredMessageCount": 14,
-  "replyCount": 0,
+  "ignoredMessageCount": 11,
+  "replyCount": 3,
   "highIntentCount": 0,
   "quoteTotal": 0,
-  "messages": [],
-  "message": "过去 24 小时扫描 14 封邮件，筛选出 0 封疑似合作回复"
+  "messages": [
+    {
+      "name": "contact",
+      "email": "88cal@previewer.co",
+      "subject": "Fwd: We're featuring Chessnut on our blog next week!",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:10:12.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "nanfeng@windpolar.com",
+      "subject": "Fwd: NEW-XQR-VN-PN00198108272556XZ00128981762555337373",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:32:26.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "kristina.z@puriphy.eu",
+      "subject": "Fwd: quick question about Pixeldarts",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:32:49.000Z"
+    }
+  ],
+  "message": "过去 24 小时扫描 14 封邮件，筛选出 3 封疑似合作回复"
 }
