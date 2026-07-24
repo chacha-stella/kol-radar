@@ -1,16 +1,67 @@
 {
-  "scannedAt": "2026-07-24T05:44:20.870Z",
+  "scannedAt": "2026-07-24T06:18:21.124Z",
   "status": "success",
-  "scanMode": "cumulative",
   "scannedMessageCount": 14,
-  "scannedInboxCount": 14,
-  "scannedSentCount": 0,
-  "ignoredMessageCount": 14,
-  "replyCount": 0,
-  "newEmailCount": 0,
-  "repliedCount": 0,
-  "highIntentCount": 0,
+  "ignoredMessageCount": 9,
+  "replyCount": 5,
+  "highIntentCount": 2,
   "quoteTotal": 0,
-  "messages": [],
-  "message": "最近一次邮箱扫描读取了 14 封收件箱邮件；当前没有筛选到合作相关外部来信。下次扫描将继续累积历史邮件。"
+  "messages": [
+    {
+      "name": "contact",
+      "email": "cal@previewer.co",
+      "subject": "Fwd: We're featuring Chessnut on our blog next week!",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:10:12.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "nanfeng@windpolar.com",
+      "subject": "Fwd: NEW-XQR-VN-PN00198108272556XZ00128981762555337373",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:32:26.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "kristina.z@puriphy.eu",
+      "subject": "Fwd: quick question about Pixeldarts",
+      "platform": "待识别",
+      "intent": 35,
+      "quote": 0,
+      "progress": "待人工确认",
+      "action": "阅读邮件并补充红人资料",
+      "receivedAt": "2026-07-23T08:32:49.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "yane@ohhhcontest.com",
+      "subject": "Fwd: 68 videos for HBADA, 28 for Sihoo (3,500+ videographers ready)",
+      "platform": "待识别",
+      "intent": 85,
+      "quote": 0,
+      "progress": "高意向，待跟进",
+      "action": "今天回复并确认档期、报价和下一步",
+      "receivedAt": "2026-07-23T08:33:09.000Z"
+    },
+    {
+      "name": "contact",
+      "email": "caitlin@thecorporatelivewireawards.com",
+      "subject": "Fwd: Corporate LiveWire Global Awards 2026/27",
+      "platform": "待识别",
+      "intent": 85,
+      "quote": 0,
+      "progress": "高意向，待跟进",
+      "action": "今天回复并确认档期、报价和下一步",
+      "receivedAt": "2026-07-23T16:37:08.000Z"
+    }
+  ],
+  "message": "过去 24 小时扫描 14 封邮件，筛选出 5 封疑似合作回复"
 }
