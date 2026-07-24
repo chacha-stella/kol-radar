@@ -387,8 +387,8 @@
       </nav>
       <div class="sidebar-bottom">
         <div class="sync-card">
-          <div class="sync-line"><span class="sync-dot"></span><span>日报任务运行中</span></div>
-          <div class="sync-detail">邮箱扫描：每日 08:30<br>下次同步：明天 08:30</div>
+          <div class="sync-line"><span class="sync-dot"></span><span>日报任务已配置</span></div>
+          <div class="sync-detail">邮箱扫描：每日 08:30<br>扫描完成后自动更新网页</div>
           <button class="btn btn-quiet" id="settingsButton" type="button" style="margin-top:9px;padding-left:0">数据源设置</button>
         </div>
       </div>
@@ -407,7 +407,7 @@
         </div>
         <div class="home-grid">
           <article class="card report-card">
-            <div class="card-head"><h2>AI 日报摘要</h2><span class="badge badge-blue">08:31 生成</span></div>
+          <div class="card-head"><h2>AI 日报摘要</h2><span class="badge badge-blue" id="digestStatusBadge">等待扫描</span></div>
             <p class="report-copy" id="digestSummary">尚未读取到真实邮箱扫描结果。完成 GitHub Actions 扫描后，这里只显示真实统计。</p>
             <div class="sync-detail muted" style="margin-top:18px">等待邮箱自动扫描</div>
           </article>
@@ -733,7 +733,7 @@
       document.querySelectorAll('.modal-backdrop').forEach(modal => modal.addEventListener('click', event => { if (event.target === modal) closeModals(); }));
       document.addEventListener('keydown', event => { if (event.key === 'Escape') closeModals(); });
 
-      $('scanButton').addEventListener('click', () => showToast('网页不能直接连接邮箱。请在 GitHub Actions 运行 Daily mailbox scan，完成后刷新本页。'));
+      $('scanButton').addEventListener('click', () => window.open('https://github.com/chacha-stella/kol-radar/actions/workflows/daily-scan.yml', '_blank', 'noopener'));
       $('contentMonth').addEventListener('change', renderContentMonth);
       document.querySelectorAll('[data-brand]').forEach(btn => btn.addEventListener('click', () => { activeRecommendationBrand = btn.dataset.brand; document.querySelectorAll('[data-brand]').forEach(button => button.classList.toggle('is-active', button.dataset.brand === activeRecommendationBrand)); renderRecommendationFilters(); renderRecommendations(); }));
       ['recommendSearch','recommendTrack','recommendTier'].forEach(id => $(id).addEventListener(id === 'recommendSearch' ? 'input' : 'change', renderRecommendations));

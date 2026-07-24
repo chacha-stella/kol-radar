@@ -29,12 +29,13 @@
     const rows = document.querySelector('#replyRows');
     if (!rows) return;
     const messages = visibleMessages();
+    const summaryFor = item => item.summaryChinese || (item.translationStatus === 'translated_to_chinese' ? item.summary : '中文翻译排队中，将在下一次扫描继续');
     rows.innerHTML = messages.length ? messages.map(item => {
       const isNew = item.replyStatus !== '已回复';
       const status = item.replyStatus || (isNew ? '新邮件' : '已回复');
       return `<tr class="${closedIds.has(String(item.id)) ? 'is-closed' : ''}">
         <td><div class="person"><span class="avatar">${safe((item.name || item.email || '邮件').slice(0, 2))}</span><div><div class="person-name">${safe(item.name || '未知红人')}</div><div class="person-email">${safe(item.email || '')}</div></div></div></td>
-        <td><button class="btn btn-quiet mail-subject" type="button" data-email-view="${safe(item.id)}" title="点击查看全文">${safe(item.subject || '无标题')}</button><div class="mail-summary" title="${safe(item.summaryChinese || item.summary || '')}">${safe(item.summaryChinese || item.summary || '暂无摘要')}</div></td>
+        <td><button class="btn btn-quiet mail-subject" type="button" data-email-view="${safe(item.id)}" title="点击查看全文">${safe(item.subject || '无标题')}</button><div class="mail-summary" title="${safe(summaryFor(item))}">${safe(summaryFor(item))}</div></td>
         <td><span class="badge ${item.brand === 'Dartsnut' ? 'badge-purple' : 'badge-blue'}">${safe(item.brand || '待识别')}</span></td>
         <td><div class="score"><span>${safe(item.intent ?? 0)}</span><span class="score-track"><span class="score-fill" style="width:${Math.min(100, Math.max(0, Number(item.intent || 0)))}%"></span></span></div></td>
         <td class="nowrap">${safe(dateLabel(item.lastIncomingAt || item.receivedAt))}</td>
@@ -64,7 +65,7 @@
           ? '已转换为中文'
           : item.translationStatus === 'translation_not_configured'
             ? '未配置翻译密钥，暂显示原文'
-            : '中文转换失败，暂显示原文';
+            : '中文翻译排队中，当前先显示原文；下一次扫描会继续重试';
         body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="badge ${Number(item.intent || 0) >= 80 ? 'badge-green' : Number(item.intent || 0) >= 60 ? 'badge-orange' : 'badge-red'}">意向度 ${safe(item.intent ?? 0)} · ${safe(item.intentLevel || '待确认')}</span><span class="tag">品牌：${safe(item.brand || '待识别')}</span>${reasons.map(reason => `<span class="tag">${safe(reason)}</span>`).join('')}</div><div class="muted" style="margin-bottom:8px">${safe(translationNote)}</div><div class="mail-detail" id="emailPrimaryBody">${safe(primary)}</div><div class="muted" style="margin-top:10px">原始邮件保存在系统中；上方显示完整中文内容。</div>`;
       }
       document.querySelector('#emailModal')?.classList.add('is-open');
@@ -110,6 +111,10 @@
         const stamp = new Date(digest.scannedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
         syncDetail.innerHTML = `邮箱累计扫描：${safe(stamp)}<br>${safe(digest.message || '日报数据已更新')}`;
       }
+      const reportBadge = document.querySelector('#digestStatusBadge');
+      if (reportBadge) reportBadge.textContent = digest.translationSummary
+        ? `中文 ${digest.translationSummary.translated || 0} / 待翻译 ${digest.translationSummary.pending || 0}`
+        : (digest.status === 'success' ? '真实数据' : '等待扫描');
       renderMessages();
     })
     .catch(() => {});

@@ -8,6 +8,7 @@ const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
 const internalDomains = ['chessnutech.com'];
+let lastTranslationRequestAt = 0;
 
 const collaborationTerms = [
   '合作', '报价', '报价单', '预算', '档期', '赞助', '推广', '评测', '产品', '媒体包',
@@ -102,17 +103,28 @@ function hasCjk(value) {
 async function translateChunk(value, label = '正文') {
   const text = repairMojibake(String(value || '').trim());
   if (!text) return '';
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: `把下面邮件${label}完整翻译成自然、准确的简体中文。不得删减、总结或改写。保留人名、邮箱、网址、产品名、数字、金额和原有段落。只返回翻译后的${label}纯文本，不要 Markdown，不要解释。\n\n${text}` }] }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
-    })
-  });
-  if (!response.ok) throw new Error(`translation_${response.status}`);
-  const payload = await response.json();
-  return payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
+  if (hasCjk(text) && !/[A-Za-z]{4,}/.test(text)) return text;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const wait = Math.max(0, 4300 - (Date.now() - lastTranslationRequestAt));
+    if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+    lastTranslationRequestAt = Date.now();
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `把下面邮件${label}完整翻译成自然、准确的简体中文。不得删减、总结或改写。保留人名、邮箱、网址、产品名、数字、金额和原有段落。只返回翻译后的${label}纯文本，不要 Markdown，不要解释。\n\n${text}` }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
+      })
+    });
+    if (response.ok) {
+      const payload = await response.json();
+      return payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
+    }
+    if (response.status !== 429 || attempt === 2) throw new Error(`translation_${response.status}`);
+    const retryAfter = Number(response.headers.get('retry-after') || 0);
+    await new Promise(resolve => setTimeout(resolve, Math.max(10000, retryAfter * 1000)));
+  }
+  return '';
 }
 
 async function translateEmailToChinese(subject, body) {
@@ -124,7 +136,7 @@ async function translateEmailToChinese(subject, body) {
     const translatedSubject = await translateChunk(title, '标题');
     // Translate in bounded chunks so long threads are never silently truncated.
     const chunks = [];
-    for (let offset = 0; offset < value.length; offset += 4500) chunks.push(value.slice(offset, offset + 4500));
+    for (let offset = 0; offset < value.length; offset += 3000) chunks.push(value.slice(offset, offset + 3000));
     const translatedChunks = [];
     for (const chunk of chunks) translatedChunks.push(await translateChunk(chunk, '正文'));
     return {
@@ -193,7 +205,14 @@ function extractMimeText(raw) {
   const boundaryMatch = type.match(/boundary\s*=\s*(?:"([^"]+)"|([^;\s]+))/i);
   const boundary = boundaryMatch?.[1] || boundaryMatch?.[2];
   if (boundary) {
-    return body.split(`--${boundary}`).filter(part => part && !/^--\s*$/.test(part.trim())).map(extractMimeText).join('\n');
+    return body.split(`--${boundary}`).filter(part => part && !/^--\s*$/.test(part.trim())).map(part => {
+      const partSeparator = part.indexOf('\n\n');
+      const partHeaders = parseMimeHeaders(partSeparator >= 0 ? part.slice(0, partSeparator) : part);
+      const partType = String(partHeaders['content-type'] || '').toLowerCase();
+      // Ignore binary attachments and inline images; they are not email prose.
+      if (!partType.startsWith('text/plain') && !partType.startsWith('text/html') && !partType.startsWith('message/')) return '';
+      return extractMimeText(part);
+    }).filter(Boolean).join('\n');
   }
   if (type.includes('message/rfc822')) return extractMimeText(body);
   return decodeMimeBody(body, headers['content-transfer-encoding'], headers['content-type']?.match(/charset\s*=\s*["']?([^;"']+)/i)?.[1] || 'utf-8');
@@ -407,8 +426,8 @@ try {
         subject: translatedBody.subject || repairMojibake(decodeMimeHeader(subject)),
         summary: summarize(extractMimeText(rawSource), subject),
         body: originalBody,
-        bodyChinese: translatedBody.text,
-        summaryChinese: translatedBody.text ? summarize(translatedBody.text, translatedBody.subject || subject) : '',
+        bodyChinese: translatedBody.status === 'translated_to_chinese' ? translatedBody.text : '',
+        summaryChinese: translatedBody.status === 'translated_to_chinese' ? summarize(translatedBody.text, translatedBody.subject || subject) : '',
         translationStatus: translatedBody.status,
         brand,
         intent,
@@ -429,7 +448,7 @@ try {
   results.sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt));
   const newMessages = results.filter(item => item.replyStatus === '新邮件');
   const repliedMessages = results.filter(item => item.replyStatus === '已回复');
-  save({
+    save({
     scannedAt: new Date().toISOString(),
     status: 'success',
     scanMode: 'cumulative',
@@ -443,7 +462,11 @@ try {
     highIntentCount: results.filter(item => item.intent >= 80).length,
     quoteTotal: results.reduce((sum, item) => sum + item.quote, 0),
     messages: results,
-    message: `累计扫描收件箱 ${scannedInboxCount} 封、已发送 ${scannedSentCount} 封，保留 ${results.length} 封真实外部来信；其中新邮件 ${newMessages.length} 封，已回复 ${repliedMessages.length} 封`
+    message: `累计扫描收件箱 ${scannedInboxCount} 封、已发送 ${scannedSentCount} 封，保留 ${results.length} 封真实外部来信；其中新邮件 ${newMessages.length} 封，已回复 ${repliedMessages.length} 封`,
+    translationSummary: {
+      translated: results.filter(item => item.translationStatus === 'translated_to_chinese').length,
+      pending: results.filter(item => item.translationStatus !== 'translated_to_chinese').length
+    }
   });
   console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${results.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
   for (const item of results) console.info(`[selected] ${item.email} | ${item.subject} | status=${item.replyStatus} | intent=${item.intent} | quote=${item.quote}`);
