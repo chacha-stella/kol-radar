@@ -50,6 +50,11 @@ function isInternalAddress(address) {
   return internalDomains.some(domain => value.endsWith(`@${domain}`));
 }
 
+function originalSender(source) {
+  const match = source.match(/(?:^|\s)(?:from|发件人|sender):\s*(?:[^<]*<)?([\w.+-]+@[\w.-]+)>?/i);
+  return match?.[1] || '';
+}
+
 function isLikelyCreatorReply(content, senderAddress) {
   const value = content.toLowerCase();
   const sender = String(senderAddress || '').toLowerCase();
@@ -106,14 +111,17 @@ try {
       const combined = `${subject} ${source}`;
       const sender = message.envelope?.from?.[0] || {};
       const receivedAt = message.internalDate || new Date(0);
-      if (receivedAt < since || isInternalAddress(sender.address) || !isLikelyCreatorReply(combined, sender.address)) {
+      const externalSender = isInternalAddress(sender.address) ? originalSender(source) : sender.address;
+      const effectiveSender = externalSender || sender.address;
+      if (receivedAt < since || !effectiveSender || isAutomated(effectiveSender, subject) ||
+        (isInternalAddress(sender.address) && !externalSender) || !isLikelyCreatorReply(combined, effectiveSender)) {
         ignoredMessageCount += 1;
         continue;
       }
       const intent = scoreIntent(combined);
       results.push({
-        name: sender.name || sender.address || '未知发件人',
-        email: sender.address || '',
+        name: sender.name || effectiveSender || '未知发件人',
+        email: effectiveSender || '',
         subject,
         platform: platformFor(combined),
         intent,
