@@ -6,7 +6,7 @@ import { ImapFlow } from 'imapflow';
 const output = path.resolve('data/digest.json');
 let previousDigest = null;
 try { previousDigest = JSON.parse(fs.readFileSync(output, 'utf8')); } catch { /* First scan has no cache. */ }
-let translationsRemaining = Number(process.env.MAX_TRANSLATIONS_PER_RUN || 12);
+let translationsRemaining = Number(process.env.MAX_TRANSLATIONS_PER_RUN || 3);
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
@@ -108,27 +108,20 @@ async function translateChunk(value, label = '正文') {
   const text = repairMojibake(String(value || '').trim());
   if (!text) return '';
   if (hasCjk(text) && !/[A-Za-z]{4,}/.test(text)) return text;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    const wait = Math.max(0, 4300 - (Date.now() - lastTranslationRequestAt));
-    if (wait) await new Promise(resolve => setTimeout(resolve, wait));
-    lastTranslationRequestAt = Date.now();
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
+  const wait = Math.max(0, 4300 - (Date.now() - lastTranslationRequestAt));
+  if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+  lastTranslationRequestAt = Date.now();
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: `把下面邮件${label}完整翻译成自然、准确的简体中文。不得删减、总结或改写。保留人名、邮箱、网址、产品名、数字、金额和原有段落。只返回翻译后的${label}纯文本，不要 Markdown，不要解释。\n\n${text}` }] }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
       })
-    });
-    if (response.ok) {
-      const payload = await response.json();
-      return payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
-    }
-    if (response.status !== 429 || attempt === 2) throw new Error(`translation_${response.status}`);
-    const retryAfter = Number(response.headers.get('retry-after') || 0);
-    await new Promise(resolve => setTimeout(resolve, Math.max(10000, retryAfter * 1000)));
-  }
-  return '';
+  });
+  if (!response.ok) throw new Error(`translation_${response.status}`);
+  const payload = await response.json();
+  return payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
 }
 
 async function translateEmailToChinese(subject, body) {
@@ -430,7 +423,11 @@ try {
         translatedBody = { subject: cached.subject, text: cached.bodyChinese || '', status: 'translated_to_chinese' };
       } else if (geminiApiKey && translationsRemaining > 0) {
         translationsRemaining -= 1;
-        translatedBody = await translateEmailToChinese(subject, originalBody);
+        try {
+          translatedBody = await translateEmailToChinese(subject, originalBody);
+        } catch (error) {
+          translatedBody = { subject, text: originalBody, status: `translation_deferred_${error.message || 'error'}` };
+        }
       } else {
         translatedBody = { subject, text: originalBody, status: geminiApiKey ? 'translation_deferred' : 'translation_not_configured' };
       }
@@ -485,7 +482,7 @@ try {
     translationSummary: {
       translated: results.filter(item => item.translationStatus === 'translated_to_chinese').length,
       pending: results.filter(item => item.translationStatus !== 'translated_to_chinese').length,
-      attemptedThisRun: Number(process.env.MAX_TRANSLATIONS_PER_RUN || 12) - translationsRemaining
+      attemptedThisRun: Number(process.env.MAX_TRANSLATIONS_PER_RUN || 3) - translationsRemaining
     }
   });
   console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${results.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
