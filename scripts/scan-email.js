@@ -6,6 +6,7 @@ import { ImapFlow } from 'imapflow';
 const output = path.resolve('data/digest.json');
 let previousDigest = null;
 try { previousDigest = JSON.parse(fs.readFileSync(output, 'utf8')); } catch { /* First scan has no cache. */ }
+let translationsRemaining = Number(process.env.MAX_TRANSLATIONS_PER_RUN || 12);
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
@@ -423,10 +424,16 @@ try {
       const intentResult = scoreIntent(combined);
       const intent = intentResult.score;
       const originalBody = bodyText(extractMimeText(rawSource));
-      const cached = (previousDigest?.messages || []).find(item => item.id === id && item.body === originalBody && item.subject === subject && item.translationStatus === 'translated_to_chinese');
-      const translatedBody = cached
-        ? { subject: cached.subject, text: cached.bodyChinese || '', status: cached.translationStatus || 'translation_not_configured' }
-        : await translateEmailToChinese(subject, originalBody);
+      const cached = (previousDigest?.messages || []).find(item => item.id === id && item.body === originalBody && item.translationStatus === 'translated_to_chinese');
+      let translatedBody;
+      if (cached) {
+        translatedBody = { subject: cached.subject, text: cached.bodyChinese || '', status: 'translated_to_chinese' };
+      } else if (geminiApiKey && translationsRemaining > 0) {
+        translationsRemaining -= 1;
+        translatedBody = await translateEmailToChinese(subject, originalBody);
+      } else {
+        translatedBody = { subject, text: originalBody, status: geminiApiKey ? 'translation_deferred' : 'translation_not_configured' };
+      }
       const brand = brandFor(`${subject} ${originalBody}`);
       results.push({
         id,
@@ -477,7 +484,8 @@ try {
     message: `累计扫描收件箱 ${scannedInboxCount} 封、已发送 ${scannedSentCount} 封，保留 ${results.length} 封真实外部来信；其中新邮件 ${newMessages.length} 封，已回复 ${repliedMessages.length} 封`,
     translationSummary: {
       translated: results.filter(item => item.translationStatus === 'translated_to_chinese').length,
-      pending: results.filter(item => item.translationStatus !== 'translated_to_chinese').length
+      pending: results.filter(item => item.translationStatus !== 'translated_to_chinese').length,
+      attemptedThisRun: Number(process.env.MAX_TRANSLATIONS_PER_RUN || 12) - translationsRemaining
     }
   });
   console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${results.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
