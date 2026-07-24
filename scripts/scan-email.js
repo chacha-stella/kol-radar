@@ -4,6 +4,8 @@ import crypto from 'node:crypto';
 import { ImapFlow } from 'imapflow';
 
 const output = path.resolve('data/digest.json');
+let previousDigest = null;
+try { previousDigest = JSON.parse(fs.readFileSync(output, 'utf8')); } catch { /* First scan has no cache. */ }
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
@@ -205,14 +207,18 @@ function extractMimeText(raw) {
   const boundaryMatch = type.match(/boundary\s*=\s*(?:"([^"]+)"|([^;\s]+))/i);
   const boundary = boundaryMatch?.[1] || boundaryMatch?.[2];
   if (boundary) {
-    return body.split(`--${boundary}`).filter(part => part && !/^--\s*$/.test(part.trim())).map(part => {
+    const parts = body.split(`--${boundary}`).filter(part => part && !/^--\s*$/.test(part.trim())).map(part => {
       const partSeparator = part.indexOf('\n\n');
       const partHeaders = parseMimeHeaders(partSeparator >= 0 ? part.slice(0, partSeparator) : part);
       const partType = String(partHeaders['content-type'] || '').toLowerCase();
       // Ignore binary attachments and inline images; they are not email prose.
-      if (!partType.startsWith('text/plain') && !partType.startsWith('text/html') && !partType.startsWith('message/')) return '';
-      return extractMimeText(part);
-    }).filter(Boolean).join('\n');
+      if (!partType.startsWith('text/plain') && !partType.startsWith('text/html') && !partType.startsWith('message/')) return null;
+      return { type: partType, text: extractMimeText(part) };
+    }).filter(part => part?.text);
+    // multipart/alternative contains the same message twice; prefer plain text.
+    return parts.find(part => part.type.startsWith('text/plain'))?.text
+      || parts.find(part => part.type.startsWith('text/html'))?.text
+      || parts.map(part => part.text).join('\n');
   }
   if (type.includes('message/rfc822')) return extractMimeText(body);
   return decodeMimeBody(body, headers['content-transfer-encoding'], headers['content-type']?.match(/charset\s*=\s*["']?([^;"']+)/i)?.[1] || 'utf-8');
@@ -416,14 +422,19 @@ try {
       const intentResult = scoreIntent(combined);
       const intent = intentResult.score;
       const originalBody = bodyText(extractMimeText(rawSource));
-      const translatedBody = await translateEmailToChinese(subject, originalBody);
+      const cached = (previousDigest?.messages || []).find(item => item.id === id && item.body === originalBody && item.subject === subject);
+      const translatedBody = cached
+        ? { subject: cached.subject, text: cached.bodyChinese || '', status: cached.translationStatus || 'translation_not_configured' }
+        : await translateEmailToChinese(subject, originalBody);
       const brand = brandFor(`${subject} ${originalBody}`);
       results.push({
         id,
         threadId: thread || ids.messageId || id,
         name: original?.name || sender.name || effectiveSender || '未知发件人',
         email: effectiveSender || '',
-        subject: translatedBody.subject || repairMojibake(decodeMimeHeader(subject)),
+        subject: translatedBody.status === 'translated_to_chinese'
+          ? (translatedBody.subject || repairMojibake(decodeMimeHeader(subject)))
+          : repairMojibake(decodeMimeHeader(subject)),
         summary: summarize(extractMimeText(rawSource), subject),
         body: originalBody,
         bodyChinese: translatedBody.status === 'translated_to_chinese' ? translatedBody.text : '',
