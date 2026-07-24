@@ -3,13 +3,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ImapFlow } from 'imapflow';
+import nodemailer from 'nodemailer';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dashboardPath = path.join(__dirname, 'outputs', 'kol-dashboard.html');
+const dashboardPath = path.join(__dirname, 'index.html');
 const port = Number(process.env.PORT || 3000);
 const timezone = process.env.APP_TIMEZONE || 'Asia/Shanghai';
 const scanHour = Number(process.env.SCAN_HOUR || 8);
 const scanMinute = Number(process.env.SCAN_MINUTE || 30);
+const replyToken = String(process.env.KOL_REPLY_TOKEN || '').trim();
+
+const mimeTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
 
 let latestDigest = {
   scannedAt: null,
@@ -51,6 +55,13 @@ function getMailConfig() {
       pass: password
     }
   };
+}
+
+function getSmtpTransport() {
+  const user = process.env.MAIL_SMTP_USER || process.env.MAIL_IMAP_USER;
+  const pass = process.env.MAIL_SMTP_PASSWORD || process.env.MAIL_IMAP_PASSWORD;
+  if (!user || !pass) return null;
+  return nodemailer.createTransport({ host: process.env.MAIL_SMTP_HOST || 'smtp.qiye.aliyun.com', port: Number(process.env.MAIL_SMTP_PORT || 465), secure: true, auth: { user, pass } });
 }
 
 async function scanInbox() {
@@ -127,6 +138,12 @@ function scheduleScan() {
 
 const server = http.createServer(async (request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
+  const allowedOrigin = process.env.CORS_ORIGIN || 'https://chacha-stella.github.io';
+  const requestOrigin = request.headers.origin;
+  if (requestOrigin === allowedOrigin) response.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  response.setHeader('Access-Control-Allow-Headers', 'content-type');
+  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  if (request.method === 'OPTIONS') { response.writeHead(204); response.end(); return; }
   if (url.pathname === '/api/digest') {
     response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
     response.end(JSON.stringify(latestDigest));
@@ -138,9 +155,38 @@ const server = http.createServer(async (request, response) => {
     response.end(JSON.stringify(result));
     return;
   }
+  if (url.pathname === '/api/reply' && request.method === 'POST') {
+    let raw = '';
+    for await (const chunk of request) raw += chunk;
+    try {
+      if (!replyToken || request.headers['x-kol-reply-token'] !== replyToken) throw new Error('回复令牌无效或未配置');
+      const payload = JSON.parse(raw || '{}');
+      const to = text(payload.to);
+      const subject = text(payload.subject);
+      const body = String(payload.body || '').trim();
+      if (!to || !subject || !body) throw new Error('缺少收件人、主题或正文');
+      const transporter = getSmtpTransport();
+      if (!transporter) throw new Error('未配置 MAIL_SMTP_USER / MAIL_SMTP_PASSWORD');
+      const info = await transporter.sendMail({ from: process.env.MAIL_SMTP_USER || process.env.MAIL_IMAP_USER, to, subject: subject.startsWith('Re:') ? subject : `Re: ${subject}`, text: body });
+      response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      response.end(JSON.stringify({ status: 'sent', messageId: info.messageId }));
+    } catch (error) {
+      response.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+      response.end(JSON.stringify({ status: 'error', message: error.message }));
+    }
+    return;
+  }
   if (url.pathname === '/' || url.pathname === '/index.html') {
     response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
     fs.createReadStream(dashboardPath).pipe(response);
+    return;
+  }
+  const relativePath = decodeURIComponent(url.pathname.replace(/^\/+/, ''));
+  const staticPath = path.resolve(__dirname, relativePath);
+  if (staticPath.startsWith(__dirname) && fs.existsSync(staticPath) && fs.statSync(staticPath).isFile()) {
+    const extension = path.extname(staticPath).toLowerCase();
+    response.writeHead(200, { 'Content-Type': mimeTypes[extension] || 'application/octet-stream', 'Cache-Control': extension === '.json' ? 'no-store' : 'public, max-age=300' });
+    fs.createReadStream(staticPath).pipe(response);
     return;
   }
   response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });

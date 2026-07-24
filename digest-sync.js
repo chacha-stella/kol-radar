@@ -1,10 +1,13 @@
 (() => {
+  const apiBase = window.KOL_API_BASE || '';
+  const replyTokenKey = 'kolReplyToken';
   const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = value => Number(value || 0) ? '¥' + Number(value).toLocaleString('zh-CN') : '暂无';
   const dateLabel = value => value ? new Date(value).toLocaleDateString('zh-CN') : '暂无';
   const storageKey = 'kolClosedEmails';
   let digest = null;
   let showClosed = false;
+  let replyItem = null;
   let closedIds = new Set();
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -29,16 +32,15 @@
     rows.innerHTML = messages.length ? messages.map(item => {
       const isNew = item.replyStatus !== '已回复';
       const status = item.replyStatus || (isNew ? '新邮件' : '已回复');
-      const replyUrl = item.replyUrl || `mailto:${item.email || ''}?subject=${encodeURIComponent(`Re: ${item.subject || ''}`)}`;
       return `<tr class="${closedIds.has(String(item.id)) ? 'is-closed' : ''}">
         <td><div class="person"><span class="avatar">${safe((item.name || item.email || '邮件').slice(0, 2))}</span><div><div class="person-name">${safe(item.name || '未知红人')}</div><div class="person-email">${safe(item.email || '')}</div></div></div></td>
-        <td><button class="btn btn-quiet mail-subject" type="button" data-email-view="${safe(item.id)}" title="点击查看全文">${safe(item.subject || '无标题')}</button><div class="mail-summary" title="${safe(item.summaryEnglish || item.summary || '')}">${safe(item.summaryEnglish || item.summary || '暂无摘要')}</div></td>
-        <td>${safe(item.platform || '待识别')}</td>
+        <td><button class="btn btn-quiet mail-subject" type="button" data-email-view="${safe(item.id)}" title="点击查看全文">${safe(item.subject || '无标题')}</button><div class="mail-summary" title="${safe(item.summaryChinese || item.summary || '')}">${safe(item.summaryChinese || item.summary || '暂无摘要')}</div></td>
+        <td><span class="badge ${item.brand === 'Dartsnut' ? 'badge-purple' : 'badge-blue'}">${safe(item.brand || '待识别')}</span></td>
         <td><div class="score"><span>${safe(item.intent ?? 0)}</span><span class="score-track"><span class="score-fill" style="width:${Math.min(100, Math.max(0, Number(item.intent || 0)))}%"></span></span></div></td>
         <td class="nowrap">${safe(dateLabel(item.lastIncomingAt || item.receivedAt))}</td>
         <td><span class="badge ${isNew ? 'badge-orange' : 'badge-green'}">${safe(status)}</span></td>
         <td><div class="nowrap">${money(item.quote)}</div><div class="muted" style="margin-top:4px;font-size:11px">${safe(item.progress || '待跟进')}</div><div class="muted" style="margin-top:4px;font-size:10px">${safe(item.intentLevel || '')}</div></td>
-        <td><div class="mail-actions"><a class="btn btn-primary" href="${safe(replyUrl)}">回复</a><button class="btn btn-quiet" type="button" data-email-action="${closedIds.has(String(item.id)) ? 'reopen' : 'close'}" data-email-id="${safe(item.id)}">${closedIds.has(String(item.id)) ? '恢复' : '关闭'}</button></div></td>
+        <td><div class="mail-actions"><button class="btn btn-primary" type="button" data-email-reply="${safe(item.id)}">回复</button><button class="btn btn-quiet" type="button" data-email-action="${closedIds.has(String(item.id)) ? 'reopen' : 'close'}" data-email-id="${safe(item.id)}">${closedIds.has(String(item.id)) ? '恢复' : '关闭'}</button></div></td>
       </tr>`;
     }).join('') : `<tr><td colspan="8"><div class="empty">${showClosed ? '暂无已关闭邮件' : '暂无未关闭的真实合作邮件'}</div></td></tr>`;
     rows.querySelectorAll('[data-email-action]').forEach(button => button.addEventListener('click', () => {
@@ -56,22 +58,23 @@
       if (title) title.textContent = item.subject || '邮件内容';
       if (body) {
         const original = item.body || item.summary || '暂无可解析正文';
-        const english = item.bodyEnglish || '';
-        const primary = english || original;
-        const translationNote = english
-          ? 'English translation'
+        const chinese = item.bodyChinese || '';
+        const primary = chinese || original;
+        const translationNote = chinese
+          ? '已转换为中文'
           : item.translationStatus === 'translation_not_configured'
-            ? 'English translation unavailable: add GEMINI_API_KEY in GitHub Secrets'
-            : item.translationStatus === 'already_english' ? 'Original email is already in English' : 'Translation unavailable; showing original';
-        body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="badge ${Number(item.intent || 0) >= 80 ? 'badge-green' : Number(item.intent || 0) >= 60 ? 'badge-orange' : 'badge-red'}">意向度 ${safe(item.intent ?? 0)} · ${safe(item.intentLevel || '待确认')}</span>${reasons.map(reason => `<span class="tag">${safe(reason)}</span>`).join('')}</div><div class="muted" style="margin-bottom:8px">${safe(translationNote)}</div><div class="mail-detail" id="emailPrimaryBody">${safe(primary)}</div>${english ? `<button class="btn btn-quiet" type="button" data-email-toggle="original" style="margin-top:10px">查看原文</button><div class="mail-detail mail-original" id="emailOriginalBody">${safe(original)}</div>` : ''}`;
-        body.querySelector('[data-email-toggle]')?.addEventListener('click', event => {
-          const originalBody = body.querySelector('#emailOriginalBody');
-          if (!originalBody) return;
-          const showing = originalBody.classList.toggle('is-visible');
-          event.currentTarget.textContent = showing ? '隐藏原文' : '查看原文';
-        });
+            ? '未配置翻译密钥，暂显示原文'
+            : '中文转换失败，暂显示原文';
+        body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="badge ${Number(item.intent || 0) >= 80 ? 'badge-green' : Number(item.intent || 0) >= 60 ? 'badge-orange' : 'badge-red'}">意向度 ${safe(item.intent ?? 0)} · ${safe(item.intentLevel || '待确认')}</span><span class="tag">品牌：${safe(item.brand || '待识别')}</span>${reasons.map(reason => `<span class="tag">${safe(reason)}</span>`).join('')}</div><div class="muted" style="margin-bottom:8px">${safe(translationNote)}</div><div class="mail-detail" id="emailPrimaryBody">${safe(primary)}</div><div class="muted" style="margin-top:10px">原始邮件保存在系统中；上方显示完整中文内容。</div>`;
       }
       document.querySelector('#emailModal')?.classList.add('is-open');
+    }));
+    rows.querySelectorAll('[data-email-reply]').forEach(button => button.addEventListener('click', () => {
+      replyItem = (digest?.messages || []).find(value => String(value.id) === String(button.dataset.emailReply));
+      if (!replyItem) return;
+      document.querySelector('#replyRecipient').textContent = `${replyItem.email || ''} · ${replyItem.subject || ''}`;
+      document.querySelector('#replyBody').value = '';
+      document.querySelector('#replyModal')?.classList.add('is-open');
     }));
     const toggle = document.querySelector('#toggleClosedEmails');
     if (toggle) toggle.textContent = showClosed ? '隐藏已关闭' : `显示已关闭${closedIds.size ? ` (${closedIds.size})` : ''}`;
@@ -114,5 +117,24 @@
   document.querySelector('#toggleClosedEmails')?.addEventListener('click', () => {
     showClosed = !showClosed;
     renderMessages();
+  });
+  document.querySelector('#sendReplyButton')?.addEventListener('click', async () => {
+    if (!replyItem) return;
+    const body = document.querySelector('#replyBody').value.trim();
+    if (!body) return;
+    const button = document.querySelector('#sendReplyButton');
+    button.disabled = true;
+    try {
+      const token = localStorage.getItem(replyTokenKey) || prompt('请输入 Railway 中设置的 KOL_REPLY_TOKEN：');
+      if (!token) throw new Error('未提供回复令牌');
+      localStorage.setItem(replyTokenKey, token);
+      const response = await fetch(`${apiBase}/api/reply`, { method: 'POST', headers: {'content-type': 'application/json', 'x-kol-reply-token': token}, body: JSON.stringify({to: replyItem.email, subject: replyItem.subject, body}) });
+      const result = await response.json();
+      if (!response.ok || result.status !== 'sent') throw new Error(result.message || '发送失败');
+      document.querySelector('#replyModal')?.classList.remove('is-open');
+      alert('已通过阿里云企业邮箱发送');
+    } catch (error) {
+      alert(`发送失败：${error.message}`);
+    } finally { button.disabled = false; }
   });
 })();

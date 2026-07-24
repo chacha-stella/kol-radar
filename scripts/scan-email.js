@@ -59,6 +59,17 @@ function cleanContent(value, limit = 5000) {
     .slice(0, limit);
 }
 
+function repairMojibake(value) {
+  const text = String(value || '');
+  if (!/[鈥鍙銆锛闂鐨]/.test(text)) return text;
+  try {
+    const repaired = Buffer.from(text, 'latin1').toString('utf8');
+    return repaired.includes('\ufffd') ? text : repaired;
+  } catch {
+    return text;
+  }
+}
+
 function summarize(content, subject) {
   const lines = String(content || '')
     .replace(/(^|\s)(On .*?wrote:|在.*写道：).*$/i, '$1')
@@ -66,8 +77,8 @@ function summarize(content, subject) {
     .map(line => line.trim())
     .filter(line => line && !/^>/.test(line) && !/^[-_]{3,}$/.test(line))
     .filter(line => !/^(best regards|kind regards|regards|thanks|thank you)[,!]?$/i.test(line));
-  const value = cleanContent(lines.slice(0, 8).join(' '));
-  return (value || cleanContent(subject) || '无正文，仅有邮件标题').slice(0, 160);
+  const value = cleanContent(repairMojibake(lines.slice(0, 8).join(' ')));
+  return (value || cleanContent(repairMojibake(subject)) || '无正文，仅有邮件标题').slice(0, 260);
 }
 
 function bodyText(content) {
@@ -78,26 +89,39 @@ function hasCjk(value) {
   return /[\u3400-\u9fff]/.test(String(value || ''));
 }
 
-async function translateToEnglish(text) {
-  const value = String(text || '').trim();
-  if (!value || !hasCjk(value)) return { text: value, status: 'already_english' };
-  if (!geminiApiKey) return { text: '', status: 'translation_not_configured' };
+async function translateEmailToChinese(subject, body) {
+  const title = repairMojibake(String(subject || '').trim());
+  const value = repairMojibake(String(body || '').trim());
+  if (!title && !value) return { subject: '', text: '', status: 'empty' };
+  if (!geminiApiKey) return { subject: title, text: value, status: 'translation_not_configured' };
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `Translate the following email into natural, faithful English. Keep names, email addresses, URLs, product names, numbers, prices, and formatting. Return only the translation, with no commentary.\n\n${value}` }] }],
+        contents: [{ parts: [{ text: `将下面邮件完整翻译成自然、准确的简体中文。标题和正文都必须翻译。保留人名、邮箱、网址、产品名、数字、金额和段落，不要删减。只返回 JSON，不要 Markdown：{"subject":"中文标题","body":"完整中文正文"}\n\n邮件标题：${title}\n邮件正文：${value}` }] }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
       })
     });
     if (!response.ok) return { text: '', status: `translation_error_${response.status}` };
     const payload = await response.json();
     const translated = payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
-    return translated ? { text: translated, status: 'translated' } : { text: '', status: 'translation_empty' };
+    const jsonText = translated.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    try {
+      const parsed = JSON.parse(jsonText);
+      if (parsed?.body) return { subject: String(parsed.subject || title), text: String(parsed.body), status: 'translated_to_chinese' };
+    } catch { /* Fall through to a conservative original-language fallback. */ }
+    return translated ? { subject: title, text: translated, status: 'translated_to_chinese' } : { subject: title, text: value, status: 'translation_empty' };
   } catch {
-    return { text: '', status: 'translation_error' };
+    return { subject: title, text: value, status: 'translation_error' };
   }
+}
+
+function brandFor(content) {
+  const value = repairMojibake(String(content || '')).toLowerCase();
+  if (/dartsnut|dartnut|electronic dart|dartboard|\bdarts\b|飞镖/.test(value)) return 'Dartsnut';
+  if (/chessnut|chess board|chessboard|stockfish|chess\.com|国际象棋|棋盘/.test(value)) return 'Chessnut';
+  return '待识别';
 }
 
 function decodeMimeHeader(value) {
@@ -201,16 +225,6 @@ function isLikelyCreatorReply(content, senderAddress, subject, forwarded) {
   const hasTerms = collaborationTerms.some(term => value.includes(term.toLowerCase()));
   const replyMarker = /(?:^|\s)(?:re|回复|答复|fwd|转发)\s*:/i.test(String(subject || ''));
   return hasTerms || (forwarded && (replyMarker || value.length > 20)) || replyMarker;
-}
-
-function platformFor(content) {
-  const value = content.toLowerCase();
-  if (value.includes('youtube')) return 'YouTube';
-  if (value.includes('instagram')) return 'Instagram';
-  if (value.includes('tiktok')) return 'TikTok';
-  if (value.includes('小红书') || value.includes('xiaohongshu')) return '小红书';
-  if (value.includes('bilibili')) return 'Bilibili';
-  return '待识别';
 }
 
 function progressFor(intent, replied) {
@@ -363,19 +377,20 @@ try {
       const intentResult = scoreIntent(combined);
       const intent = intentResult.score;
       const originalBody = bodyText(extractMimeText(rawSource));
-      const translatedBody = await translateToEnglish(originalBody);
+      const translatedBody = await translateEmailToChinese(subject, originalBody);
+      const brand = brandFor(`${subject} ${originalBody}`);
       results.push({
         id,
         threadId: thread || ids.messageId || id,
         name: original?.name || sender.name || effectiveSender || '未知发件人',
         email: effectiveSender || '',
-        subject: decodeMimeHeader(subject),
+        subject: translatedBody.subject || repairMojibake(decodeMimeHeader(subject)),
         summary: summarize(extractMimeText(rawSource), subject),
         body: originalBody,
-        bodyEnglish: translatedBody.text,
-        summaryEnglish: translatedBody.text ? summarize(translatedBody.text, subject) : '',
+        bodyChinese: translatedBody.text,
+        summaryChinese: translatedBody.text ? summarize(translatedBody.text, translatedBody.subject || subject) : '',
         translationStatus: translatedBody.status,
-        platform: platformFor(combined),
+        brand,
         intent,
         intentLevel: intentResult.level,
         intentReasons: intentResult.reasons,
@@ -383,7 +398,7 @@ try {
         progress: progressFor(intent, replied),
         replyStatus: replied ? '已回复' : '新邮件',
         lastOutgoingAt: outgoingAt?.toISOString() || null,
-        replyUrl: `mailto:${effectiveSender || ''}?subject=${encodeURIComponent(`Re: ${decodeMimeHeader(subject)}`)}`,
+        replyUrl: '',
         action: replied ? '等待红人继续回复；必要时查看线程' : (intent >= 85 ? '今天回复并确认档期、报价和下一步' : '阅读摘要并补充红人资料'),
         receivedAt: receivedAt.toISOString(),
         lastIncomingAt: receivedAt.toISOString()

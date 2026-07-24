@@ -420,7 +420,7 @@
         </div>
         <section class="card table-card">
           <div class="table-card-head"><div><h2>累计合作邮件</h2><p class="page-description">历史邮件持续累积；没有你的回复会标记为“新邮件”</p></div><div class="inline-actions"><button class="btn btn-quiet" id="toggleClosedEmails" type="button">显示已关闭</button><button class="btn btn-quiet" type="button" data-go-page="collaborators">查看全部红人</button></div></div>
-          <div class="table-wrap"><table><thead><tr><th>红人 / 邮箱</th><th>邮件内容</th><th>平台</th><th>意向度</th><th>最新来信</th><th>状态</th><th>报价 / 进度</th><th>操作</th></tr></thead><tbody id="replyRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>红人 / 邮箱</th><th>邮件内容</th><th>品牌</th><th>意向度</th><th>最新来信</th><th>状态</th><th>报价 / 进度</th><th>操作</th></tr></thead><tbody id="replyRows"></tbody></table></div>
         </section>
       </section>
 
@@ -519,11 +519,16 @@
       <div class="modal"><div class="modal-head"><h2 id="emailModalTitle">邮件内容</h2><button class="btn btn-quiet" type="button" data-close-modal>关闭</button></div><div id="emailDetailBody"></div></div>
     </div>
 
+    <div class="modal-backdrop" id="replyModal" role="dialog" aria-modal="true" aria-labelledby="replyModalTitle">
+      <div class="modal"><div class="modal-head"><h2 id="replyModalTitle">回复邮件</h2><button class="btn btn-quiet" type="button" data-close-modal>关闭</button></div><p class="modal-copy" id="replyRecipient"></p><textarea class="field" id="replyBody" rows="9" placeholder="输入回复内容"></textarea><div class="modal-actions"><button class="btn" type="button" data-close-modal>取消</button><button class="btn btn-primary" id="sendReplyButton" type="button">通过阿里云企业邮箱发送</button></div></div>
+    </div>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
 
   <script>
     (() => {
+      window.KOL_API_BASE = window.KOL_API_BASE || '';
       const app = document.getElementById('app');
       const $ = id => document.getElementById(id);
       const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

@@ -45,6 +45,7 @@ jobs:
             exit 0
           fi
           git commit -m "chore: update daily email digest"
+          # Rebase onto a concurrent workflow update before retrying the push.
           for attempt in 1 2 3; do
             git pull --rebase origin main && git push && exit 0
             sleep 2
