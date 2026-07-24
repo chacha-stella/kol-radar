@@ -51,8 +51,14 @@ function isInternalAddress(address) {
 }
 
 function originalSender(source) {
-  const match = source.match(/(?:^|\s)(?:from|发件人|sender):\s*(?:[^<]*<)?([\w.+-]+@[\w.-]+)>?/i);
-  return match?.[1] || '';
+  const header = source.match(/(?:^|\s)(?:from|发件人|sender|reply-to|回复):\s*([^\r\n]{0,240})/i)?.[1] || '';
+  const candidates = header.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g) || [];
+  return candidates.find(address => !isInternalAddress(address) && address.toLowerCase() !== user.toLowerCase()) || '';
+}
+
+function externalAddressFromContent(source) {
+  const candidates = source.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g) || [];
+  return candidates.find(address => !isInternalAddress(address) && address.toLowerCase() !== user.toLowerCase() && !isAutomated(address, '')) || '';
 }
 
 function isLikelyCreatorReply(content, senderAddress) {
@@ -111,7 +117,9 @@ try {
       const combined = `${subject} ${source}`;
       const sender = message.envelope?.from?.[0] || {};
       const receivedAt = message.internalDate || new Date(0);
-      const externalSender = isInternalAddress(sender.address) ? originalSender(source) : sender.address;
+      const externalSender = isInternalAddress(sender.address)
+        ? (originalSender(source) || externalAddressFromContent(source))
+        : sender.address;
       const effectiveSender = externalSender || sender.address;
       if (receivedAt < since || !effectiveSender || isAutomated(effectiveSender, subject) ||
         (isInternalAddress(sender.address) && !externalSender) || !isLikelyCreatorReply(combined, effectiveSender)) {
