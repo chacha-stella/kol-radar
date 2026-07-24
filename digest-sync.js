@@ -120,6 +120,10 @@
   });
   document.querySelector('#sendReplyButton')?.addEventListener('click', async () => {
     if (!replyItem) return;
+    if (!apiBase) {
+      alert('尚未配置 Railway 邮件服务地址。请先点击“打开阿里云企业邮箱”，或在网页配置 KOL_API_BASE。');
+      return;
+    }
     const body = document.querySelector('#replyBody').value.trim();
     if (!body) return;
     const button = document.querySelector('#sendReplyButton');
