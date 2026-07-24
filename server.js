@@ -12,6 +12,7 @@ const timezone = process.env.APP_TIMEZONE || 'Asia/Shanghai';
 const scanHour = Number(process.env.SCAN_HOUR || 8);
 const scanMinute = Number(process.env.SCAN_MINUTE || 30);
 const replyToken = String(process.env.KOL_REPLY_TOKEN || '').trim();
+const replyAttempts = new Map();
 
 const mimeTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
 
@@ -62,6 +63,16 @@ function getSmtpTransport() {
   const pass = process.env.MAIL_SMTP_PASSWORD || process.env.MAIL_IMAP_PASSWORD;
   if (!user || !pass) return null;
   return nodemailer.createTransport({ host: process.env.MAIL_SMTP_HOST || 'smtp.qiye.aliyun.com', port: Number(process.env.MAIL_SMTP_PORT || 465), secure: true, auth: { user, pass } });
+}
+
+function replyAllowed(to, subject) {
+  try {
+    const digestPath = path.join(__dirname, 'data', 'digest.json');
+    const digest = JSON.parse(fs.readFileSync(digestPath, 'utf8'));
+    return (digest.messages || []).some(item => String(item.email || '').toLowerCase() === to.toLowerCase() && String(item.subject || '') === subject);
+  } catch {
+    return false;
+  }
 }
 
 async function scanInbox() {
@@ -165,6 +176,14 @@ const server = http.createServer(async (request, response) => {
       const subject = text(payload.subject);
       const body = String(payload.body || '').trim();
       if (!to || !subject || !body) throw new Error('缺少收件人、主题或正文');
+      if (!replyAllowed(to, subject)) throw new Error('只能回复日报中已识别的邮件联系人');
+      if (body.length > 20000) throw new Error('回复正文不能超过 20000 个字符');
+      const ip = String(request.headers['x-forwarded-for'] || request.socket.remoteAddress || 'unknown').split(',')[0].trim();
+      const now = Date.now();
+      const recent = (replyAttempts.get(ip) || []).filter(timestamp => now - timestamp < 60 * 60 * 1000);
+      if (recent.length >= 10) throw new Error('发送过于频繁，请一小时后再试');
+      recent.push(now);
+      replyAttempts.set(ip, recent);
       const transporter = getSmtpTransport();
       if (!transporter) throw new Error('未配置 MAIL_SMTP_USER / MAIL_SMTP_PASSWORD');
       const info = await transporter.sendMail({ from: process.env.MAIL_SMTP_USER || process.env.MAIL_IMAP_USER, to, subject: subject.startsWith('Re:') ? subject : `Re: ${subject}`, text: body });

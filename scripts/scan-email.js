@@ -82,11 +82,37 @@ function summarize(content, subject) {
 }
 
 function bodyText(content) {
-  return cleanContent(content, Number.MAX_SAFE_INTEGER);
+  return String(content || '')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/=\r?\n/g, '')
+    .replace(/\r/g, '')
+    .split('\n')
+    .map(line => line.replace(/[ \t]+/g, ' ').trim())
+    .filter((line, index, lines) => line || lines[index - 1])
+    .join('\n')
+    .trim();
 }
 
 function hasCjk(value) {
   return /[\u3400-\u9fff]/.test(String(value || ''));
+}
+
+async function translateChunk(value, label = '正文') {
+  const text = repairMojibake(String(value || '').trim());
+  if (!text) return '';
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: `把下面邮件${label}完整翻译成自然、准确的简体中文。不得删减、总结或改写。保留人名、邮箱、网址、产品名、数字、金额和原有段落。只返回翻译后的${label}纯文本，不要 Markdown，不要解释。\n\n${text}` }] }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
+    })
+  });
+  if (!response.ok) throw new Error(`translation_${response.status}`);
+  const payload = await response.json();
+  return payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
 }
 
 async function translateEmailToChinese(subject, body) {
@@ -95,25 +121,19 @@ async function translateEmailToChinese(subject, body) {
   if (!title && !value) return { subject: '', text: '', status: 'empty' };
   if (!geminiApiKey) return { subject: title, text: value, status: 'translation_not_configured' };
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: `将下面邮件完整翻译成自然、准确的简体中文。标题和正文都必须翻译。保留人名、邮箱、网址、产品名、数字、金额和段落，不要删减。只返回 JSON，不要 Markdown：{"subject":"中文标题","body":"完整中文正文"}\n\n邮件标题：${title}\n邮件正文：${value}` }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
-      })
-    });
-    if (!response.ok) return { text: '', status: `translation_error_${response.status}` };
-    const payload = await response.json();
-    const translated = payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
-    const jsonText = translated.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-    try {
-      const parsed = JSON.parse(jsonText);
-      if (parsed?.body) return { subject: String(parsed.subject || title), text: String(parsed.body), status: 'translated_to_chinese' };
-    } catch { /* Fall through to a conservative original-language fallback. */ }
-    return translated ? { subject: title, text: translated, status: 'translated_to_chinese' } : { subject: title, text: value, status: 'translation_empty' };
-  } catch {
-    return { subject: title, text: value, status: 'translation_error' };
+    const translatedSubject = await translateChunk(title, '标题');
+    // Translate in bounded chunks so long threads are never silently truncated.
+    const chunks = [];
+    for (let offset = 0; offset < value.length; offset += 4500) chunks.push(value.slice(offset, offset + 4500));
+    const translatedChunks = [];
+    for (const chunk of chunks) translatedChunks.push(await translateChunk(chunk, '正文'));
+    return {
+      subject: translatedSubject || title,
+      text: translatedChunks.join('\n\n') || value,
+      status: translatedChunks.length && translatedChunks.every(Boolean) ? 'translated_to_chinese' : 'translation_partial'
+    };
+  } catch (error) {
+    return { subject: title, text: value, status: `translation_error_${error.message || 'unknown'}` };
   }
 }
 

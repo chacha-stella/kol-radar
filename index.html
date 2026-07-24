@@ -535,7 +535,7 @@
       const money = value => '¥' + Number(value || 0).toLocaleString('zh-CN');
       const initials = name => String(name).replace(/[^A-Za-z\u4e00-\u9fa5]/g,'').slice(0,2).toUpperCase();
       const defaultCollaborators = [];
-      const replies = [];
+      // Mail rows are populated by digest-sync.js after the cumulative scan.
       // Do not ship fabricated creator, content, sales, or exposure figures.
       const sales = [];
       const chartData = [];
@@ -571,10 +571,6 @@
 
       function openModal(id) { $(id).classList.add('is-open'); }
       function closeModals() { document.querySelectorAll('.modal-backdrop').forEach(el => el.classList.remove('is-open')); }
-
-      function renderReplies() {
-        $('replyRows').innerHTML = replies.length ? replies.map(r => `<tr><td><div class="person"><span class="avatar">${safe(initials(r.name))}</span><div><div class="person-name">${safe(r.name)}</div><div class="person-email">${safe(r.email)}</div></div></div></td><td>${safe(r.platform)}</td><td><div class="score"><span>${r.intent}</span><span class="score-track"><span class="score-fill" style="width:${r.intent}%"></span></span></div></td><td class="nowrap">${r.reply}</td><td class="nowrap">${money(r.quote)}</td><td><span class="badge ${r.intent >= 85 ? 'badge-green' : 'badge-orange'}">${safe(r.progress)}</span></td><td>${safe(r.action)}</td></tr>`).join('') : '<tr><td colspan="8"><div class="empty">等待邮箱首次扫描；不会显示示例红人。</div></td></tr>';
-      }
 
       function monthLabel(month) { const [year,m] = month.split('-'); return `${year} 年 ${Number(m)} 月`; }
 
@@ -760,7 +756,7 @@
       });
 
       $('todayDate').textContent = new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'long'}).format(new Date());
-      renderReplies(); renderCollabFilters(); renderMonthBar(); renderCollaborators(); renderContent(); renderContentMonth(); renderRecommendationFilters(); renderRecommendations(); renderSales(); loadRecommendations();
+      renderCollabFilters(); renderMonthBar(); renderCollaborators(); renderContent(); renderContentMonth(); renderRecommendationFilters(); renderRecommendations(); renderSales(); loadRecommendations();
       const initial = location.hash.replace('#','');
       if (['home','collaborators','content','sales','recommendations'].includes(initial)) showPage(initial);
     })();
