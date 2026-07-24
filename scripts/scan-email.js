@@ -9,6 +9,7 @@ try { previousDigest = JSON.parse(fs.readFileSync(output, 'utf8')); } catch { /*
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+const geminiModel = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
 const internalDomains = ['chessnutech.com'];
 let lastTranslationRequestAt = 0;
 
@@ -110,7 +111,7 @@ async function translateChunk(value, label = '正文') {
     const wait = Math.max(0, 4300 - (Date.now() - lastTranslationRequestAt));
     if (wait) await new Promise(resolve => setTimeout(resolve, wait));
     lastTranslationRequestAt = Date.now();
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -422,7 +423,7 @@ try {
       const intentResult = scoreIntent(combined);
       const intent = intentResult.score;
       const originalBody = bodyText(extractMimeText(rawSource));
-      const cached = (previousDigest?.messages || []).find(item => item.id === id && item.body === originalBody && item.subject === subject);
+      const cached = (previousDigest?.messages || []).find(item => item.id === id && item.body === originalBody && item.subject === subject && item.translationStatus === 'translated_to_chinese');
       const translatedBody = cached
         ? { subject: cached.subject, text: cached.bodyChinese || '', status: cached.translationStatus || 'translation_not_configured' }
         : await translateEmailToChinese(subject, originalBody);
