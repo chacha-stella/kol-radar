@@ -6,6 +6,13 @@ const output = path.resolve('data/digest.json');
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
 
+const collaborationTerms = [
+  '合作', '报价', '报价单', '预算', '档期', '赞助', '推广', '评测', '产品', '媒体包',
+  'media kit', 'rate card', 'sponsor', 'sponsored', 'collab', 'collaboration', 'review',
+  'brand deal', 'interested', 'available', 'partnership', 'proposal'
+];
+const automatedPrefixes = ['noreply@', 'no-reply@', 'mailer-daemon@', 'postmaster@', 'notifications@', 'notification@'];
+
 function scoreIntent(content) {
   const high = ['合作', '档期', '接受', '确认', '报价单', '预算', 'contract', 'available', 'interested'];
   const medium = ['考虑', '了解', '资料', 'proposal', 'rate card', 'media kit'];
@@ -16,8 +23,32 @@ function scoreIntent(content) {
 }
 
 function extractQuote(content) {
-  const match = content.match(/(?:¥|￥|rmb\s*|cny\s*|\$)\s*([\d,]+(?:\.\d{1,2})?)/i);
+  const match = content.match(/(?:¥|￥|rmb\s*|cny\s*)\s*([\d,]+(?:\.\d{1,2})?)/i);
   return match ? Number(match[1].replace(/,/g, '')) : 0;
+}
+
+function cleanContent(value) {
+  return String(value || '')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/=\r?\n/g, '')
+    .replace(/\s+/g, ' ')
+    .slice(0, 5000);
+}
+
+function isAutomated(address, subject) {
+  const email = String(address || '').toLowerCase();
+  const title = String(subject || '').toLowerCase();
+  return automatedPrefixes.some(prefix => email.startsWith(prefix)) ||
+    /(?:delivery status|undeliverable|failure notice|自动回复|out of office|vacation reply)/i.test(title);
+}
+
+function isLikelyCreatorReply(content, senderAddress) {
+  const value = content.toLowerCase();
+  const sender = String(senderAddress || '').toLowerCase();
+  if (!sender || sender === user.toLowerCase() || isAutomated(sender, content)) return false;
+  return collaborationTerms.some(term => value.includes(term.toLowerCase()));
 }
 
 function platformFor(content) {
@@ -58,14 +89,21 @@ try {
   await client.connect();
   const lock = await client.getMailboxLock('INBOX');
   const results = [];
+  let scannedMessageCount = 0;
+  let ignoredMessageCount = 0;
   try {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
     for await (const message of client.fetch({ since }, { envelope: true, source: true, internalDate: true })) {
-      const source = message.source?.toString('utf8').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 1400) || '';
+      scannedMessageCount += 1;
+      const source = cleanContent(message.source?.toString('utf8'));
       const subject = message.envelope?.subject || '';
       const combined = `${subject} ${source}`;
-      const intent = scoreIntent(combined);
       const sender = message.envelope?.from?.[0] || {};
+      if (!isLikelyCreatorReply(combined, sender.address)) {
+        ignoredMessageCount += 1;
+        continue;
+      }
+      const intent = scoreIntent(combined);
       results.push({
         name: sender.name || sender.address || '未知发件人',
         email: sender.address || '',
@@ -84,11 +122,13 @@ try {
   save({
     scannedAt: new Date().toISOString(),
     status: 'success',
+    scannedMessageCount,
+    ignoredMessageCount,
     replyCount: results.length,
     highIntentCount: results.filter(item => item.intent >= 80).length,
     quoteTotal: results.reduce((sum, item) => sum + item.quote, 0),
     messages: results,
-    message: `过去 24 小时分析 ${results.length} 封邮件`
+    message: `过去 24 小时扫描 ${scannedMessageCount} 封邮件，筛选出 ${results.length} 封疑似合作回复`
   });
 } catch (error) {
   save({ scannedAt: new Date().toISOString(), status: 'error', replyCount: 0, highIntentCount: 0, quoteTotal: 0, message: '邮箱扫描失败，请检查账号或安全码。' });
