@@ -1,17 +1,43 @@
 {
-  "scannedAt": "2026-07-24T08:30:05.355Z",
+  "scannedAt": "2026-07-24T09:30:47.571Z",
   "status": "success",
   "scanMode": "cumulative",
-  "scannedMessageCount": 258,
+  "scannedMessageCount": 252,
   "scannedInboxCount": 159,
-  "scannedSentCount": 99,
-  "ignoredMessageCount": 65,
-  "replyCount": 94,
-  "newEmailCount": 28,
-  "repliedCount": 66,
-  "highIntentCount": 49,
+  "scannedSentCount": 93,
+  "ignoredMessageCount": 66,
+  "replyCount": 93,
+  "newEmailCount": 29,
+  "repliedCount": 64,
+  "highIntentCount": 48,
   "quoteTotal": 58028.8,
   "messages": [
+    {
+      "id": "19b2ba1f8b00a506bcfc",
+      "threadId": "<CAECCMDUcj=wv2KY3CVjpdHzWQx6_GBL_cR2GfUo92aeeuXk8kw@mail.gmail.com>",
+      "name": "Danny consult",
+      "email": "dannyconsult528@gmail.com",
+      "subject": "Re:",
+      "summary": "Good morning Stella On Tue, Jul 21, 2026, 9:03 PM Danny consult wrote: Good morning Stella On Tue, Jul 21, 2026, 9:03 PM Danny consult &lt; dannyconsult528@gmai",
+      "body": "Good morning Stella On Tue, Jul 21, 2026, 9:03 PM Danny consult wrote: > Hi Stella, > > Thank you for your reply. I appreciate you letting me know about your > affiliate program. > > The reason I reached out wasn't simply to ask about commissions. I had > spent some time looking into your online visibility and noticed there are > opportunities to connect Chessnut with people who are already searching for > products like yours but may not be finding your brand first. > > My approach focuses on improving how your products appear across Google > Search, Google Shopping, AI search platforms, and relevant online > communities where buyers are actively asking for recommendations. The goal > is to increase qualified traffic, improve conversions, and create more > consistent sales rather than relying on one traffic source. > > I believe this works well for ecommerce because it targets people with > existing purchase intent while also strengthening your brand's visibility > over time. > > If you're open to exploring this further, would you be comfortable sharing > your WhatsApp number? I find it's much easier to discuss the strategy > there, answer questions, and outline the next steps. I can also explain how > we can help your products appear more prominently when people search for > your product category and your brand. > > I look forward to hearing from you. > > Best regards, > > Miracle > > On Tue, Jul 21, 2026, 8:36 AM Stella Zhuang > wrote: > >> Yes, we have an affiliate program. Once you join, you'll earn 5% >> commission on sales. >> >> ------------------------------------------------------------------ >> 发件人：contact >> 发送时间：2026年7月18日(周六) 00:28 >> 收件人：\"stella.zhuang\" >> 主 题：Fwd: [#125542] >> >> AI routed this ticket to Stella and forwarded a copy for visibility. >> Reason: The customer is proposing a commission-based sales partnership, >> which should be handled by Stella. >> >> >> Best, >> Stella >> Business Development Manager | Chessnut >> On Fri, 17 Jul at 11:33 PM , Danny consult >> wrote: >> Hi Chessnutech >> >> >> Can we work on commission if I can generate sales for you. >> >> >> 125542:2750839 >> >> Good morning Stella On Tue, Jul 21, 2026, 9:03 PM Danny consult &lt; dannyconsult528@gmail.com &gt; wrote: Hi Stella, Thank you for your reply. I appreciate you letting me know about your affiliate program. The reason I reached out wasn&#39;t simply to ask about commissions. I had spent some time looking into your online visibility and noticed there are opportunities to connect Chessnut with people who are already searching for products like yours but may not be finding your brand first. My approach focuses on improving how your products appear across Google Search, Google Shopping, AI search platforms, and relevant online communities where buyers are actively asking for recommendations. The goal is to increase qualified traffic, improve conversions, and create more consistent sales rather than relying on one traffic source. I believe this works well for ecommerce because it targets people with existing purchase intent while also strengthening your brand&#39;s visibility over time. If you&#39;re open to exploring this further, would you be comfortable sharing your WhatsApp number? I find it&#39;s much easier to discuss the strategy there, answer questions, and outline the next steps. I can also explain how we can help your products appear more prominently when people search for your product category and your brand. I look forward to hearing from you. Best regards, Miracle On Tue, Jul 21, 2026, 8:36 AM Stella Zhuang &lt; stella.zhuang@chessnutech.com &gt; wrote: Yes, we have an affiliate program. Once you join, you&#39;ll earn 5% commission on sales. ------------------------------------------------------------------ 发件人：contact &lt; contact@chessnutech.com &gt; 发送时间：2026年7月18日(周六) 00:28 收件人：&quot;stella.zhuang&quot;&lt; stella.zhuang@chessnutech.com &gt; 主 题：Fwd: [#125542] AI routed this ticket to Stella and forwarded a copy for visibility. Reason: The customer is proposing a commission-based sales partnership, which should be handled by Stella. Best, Stella Business Development Manager | Chessnut On Fri, 17 Jul at 11:33 PM , Danny consult &lt; dannyconsult528@gmail.com &gt; wrote: Hi Chessnutech Can we work on commission if I can generate sales for you. 125542:2750839",
+      "bodyEnglish": "",
+      "summaryEnglish": "",
+      "translationStatus": "translation_not_configured",
+      "platform": "待识别",
+      "intent": 35,
+      "intentLevel": "待确认",
+      "intentReasons": [
+        "只有泛合作词或上下文不足"
+      ],
+      "quote": 0,
+      "progress": "新邮件，待人工确认",
+      "replyStatus": "新邮件",
+      "lastOutgoingAt": null,
+      "replyUrl": "mailto:dannyconsult528@gmail.com?subject=Re%3A%20Re%3A",
+      "action": "阅读摘要并补充红人资料",
+      "receivedAt": "2026-07-24T09:27:37.000Z",
+      "lastIncomingAt": "2026-07-24T09:27:37.000Z"
+    },
     {
       "id": "f29981901b7300edec24",
       "threadId": "collaboration inquiry: chekmatelive x chessnut",
@@ -2456,60 +2482,7 @@
       "action": "等待红人继续回复；必要时查看线程",
       "receivedAt": "2026-06-24T14:16:43.000Z",
       "lastIncomingAt": "2026-06-24T14:16:43.000Z"
-    },
-    {
-      "id": "3b7a4c05688addcbcb22",
-      "threadId": "request for official chessnut move promotional videos",
-      "name": "fnholding",
-      "email": "fnholding@protonmail.com",
-      "subject": "Re: 回复：Request for Official Chessnut Move Promotional Videos",
-      "summary": "Hi Stella, thank you for your reply. The landing page will direct visitors to your website via my affiliate link, so the entire purchase process will take place",
-      "body": "Hi Stella, thank you for your reply. The landing page will direct visitors to your website via my affiliate link, so the entire purchase process will take place on the Chessnut website. I hope this clarifies my plan. Please let me know if you need any further information. Best regards, Frederik On Wednesday, June 24th, 2026 at 10:11, Stella Zhuang wrote: > Hi Frederik, > > Thanks for your message — and great to see your initiative on the landing page. > Just to clarify: while we really appreciate your support as an affiliate partner, creating a dedicated landing page for our products is typically handled by our authorized distributors or official partners. This is because it involves how the purchase flow is structured and where the traffic is directed, which falls under distribution rights. > Could you let us know where the purchase path will ultimately lead — will it direct users to the Chessnut website, or is it a different setup?This will help us understand your plan better and see how we can best support you within our current framework. > > Best, > StellaBusiness Development Manager | Chessnut > >> ------------------------------------------------------------------ >> 发件人：fnholding >> 发送时间：2026年6月24日(周三) 13:42 >> 收件人：Stella Zhuang >> 主 题：Request for Official Chessnut Move Promotional Videos >> >> Hi Stella, >> >> I hope you're doing well! >> >> I'm currently having a dedicated landing page created specifically for the Chessnut Move. Here's a preview of the prototype: >> >> https://www.figma.com/proto/elF83S1YJp8FDXiaxpcMCQ/Chessnut-Landing-Page?page-id=0%3A1&node-id=2-1151&viewport=718%2C300%2C0.23&t=ojGP9nNaVCZdBz4D-1&scaling=min-zoom&content-scaling=fixed >> >> I have one question: Would it be possible for Chessnut to provide two high-quality, short promotional videos specifically showcasing the Chessnut Move? They would be used in the interactive sections of the landing page and would really help complete the overall presentation. >> >> If you have any official marketing footage available, I'd really appreciate it. >> >> Thank you very much! >> >> Best regards, >> >> Frederik",
-      "bodyEnglish": "",
-      "summaryEnglish": "",
-      "translationStatus": "translation_not_configured",
-      "platform": "待识别",
-      "intent": 85,
-      "intentLevel": "高意向",
-      "intentReasons": [
-        "出现明确合作动作",
-        "涉及档期、报价或交付"
-      ],
-      "quote": 0,
-      "progress": "已回复，等待红人下一步",
-      "replyStatus": "已回复",
-      "lastOutgoingAt": "2026-06-24T09:23:19.000Z",
-      "replyUrl": "mailto:fnholding@protonmail.com?subject=Re%3A%20Re%3A%20%E5%9B%9E%E5%A4%8D%EF%BC%9ARequest%20for%20Official%20Chessnut%20Move%20Promotional%20Videos",
-      "action": "等待红人继续回复；必要时查看线程",
-      "receivedAt": "2026-06-24T09:00:09.000Z",
-      "lastIncomingAt": "2026-06-24T09:00:09.000Z"
-    },
-    {
-      "id": "4111d370e8a63b61e320",
-      "threadId": "payment confirmation – payoneer transfer (june 11)",
-      "name": "Khadija Kaboussi",
-      "email": "khadija@my-agency.fr",
-      "subject": "RE: Payment confirmation – Payoneer transfer (June 11)",
-      "summary": "Hi Could you please let me know which invoice this payment relates to? [cid:image001.jpg@01DD03C4.530AC130] Khadija Kaboussi - Assistante administrative Paris |",
-      "body": "Hi Could you please let me know which invoice this payment relates to? Thank you [cid:image001.jpg@01DD03C4.530AC130] Khadija Kaboussi - Assistante administrative Paris | Bruxelles +33 1 42 71 88 99 khadija@my-agency.fr Instagram | Facebook | www.my-agency.fr De : Stella Zhuang Envoyé : mercredi 24 juin 2026 09:34 À : Khadija Kaboussi Objet : Payment confirmation – Payoneer transfer (June 11) Hi, I apologize for the late reply — I just got back from organizing a tournament. We made the payment via Payoneer on June 11. Could you please check if you’ve received it on your end? Best, Stella Business Development Manager | Chessnut",
-      "bodyEnglish": "Hi Could you please let me know which invoice this payment relates to? Thank you [cid:image001.jpg@01DD03C4.530AC130] Khadija Kaboussi - Assistante administrative Paris | Bruxelles +33 1 42 71 88 99 khadija@my-agency.fr Instagram | Facebook | www.my-agency.fr De : Stella Zhuang Envoyé : mercredi 24 juin 2026 09:34 À : Khadija Kaboussi Objet : Payment confirmation – Payoneer transfer (June 11) Hi, I apologize for the late reply — I just got back from organizing a tournament. We made the payment via Payoneer on June 11. Could you please check if you’ve received it on your end? Best, Stella Business Development Manager | Chessnut",
-      "summaryEnglish": "Hi Could you please let me know which invoice this payment relates to? Thank you [cid:image001.jpg@01DD03C4.530AC130] Khadija Kaboussi - Assistante administrati",
-      "translationStatus": "already_english",
-      "platform": "Instagram",
-      "intent": 35,
-      "intentLevel": "待确认",
-      "intentReasons": [
-        "只有泛合作词或上下文不足"
-      ],
-      "quote": 0,
-      "progress": "已回复，等待红人下一步",
-      "replyStatus": "已回复",
-      "lastOutgoingAt": "2026-06-24T08:50:52.000Z",
-      "replyUrl": "mailto:khadija@my-agency.fr?subject=Re%3A%20RE%3A%20Payment%20confirmation%20%E2%80%93%20Payoneer%20transfer%20(June%2011)",
-      "action": "等待红人继续回复；必要时查看线程",
-      "receivedAt": "2026-06-24T08:29:36.000Z",
-      "lastIncomingAt": "2026-06-24T08:29:36.000Z"
     }
   ],
-  "message": "累计扫描收件箱 159 封、已发送 99 封，保留 94 封真实外部来信；其中新邮件 28 封，已回复 66 封"
+  "message": "累计扫描收件箱 159 封、已发送 93 封，保留 93 封真实外部来信；其中新邮件 29 封，已回复 64 封"
 }
