@@ -434,10 +434,11 @@
           <div class="table-card-head"><div><h2 id="collabTitle">2026 年 6 月</h2><p class="page-description" id="collabSubtitle">飞书初始导入记录</p></div><span class="badge badge-blue" id="collabCount">0 位红人</span></div>
           <div class="filters">
             <div class="search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input class="field" id="collabSearch" type="search" placeholder="搜索红人、邮箱或型号"></div>
+            <select class="field" id="collabBrand"><option value="all">全部合作品牌</option><option value="Chessnut">Chessnut</option><option value="Dartsnut">Dartsnut</option></select>
             <select class="field" id="collabPlatform"><option value="all">全部平台</option></select>
             <select class="field" id="collabModel"><option value="all">全部合作型号</option></select>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>红人 / 邮箱</th><th>平台</th><th>合作型号</th><th>合作月份</th><th>合作报价</th><th>合作进度</th><th>来源</th><th></th></tr></thead><tbody id="collabRows"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>红人姓名</th><th>邮箱</th><th>合作品牌</th><th>平台</th><th>合作型号</th><th>合作月份</th><th>合作报价</th><th>合作进度</th><th>来源</th><th></th></tr></thead><tbody id="collabRows"></tbody></table></div>
           <div class="foot"><span>后续新增记录会根据合作日期自动归入对应月份</span><span id="collabFoot"></span></div>
         </section>
       </section>
@@ -508,7 +509,7 @@
     </div>
 
     <div class="modal-backdrop" id="collabModal" role="dialog" aria-modal="true" aria-labelledby="collabModalTitle">
-      <div class="modal"><div class="modal-head"><h2 id="collabModalTitle">新增合作红人</h2><button class="btn btn-quiet" type="button" data-close-modal>关闭</button></div><p class="modal-copy">系统会根据合作日期自动按月份归档。</p><div class="form-grid"><input class="field" id="newName" placeholder="红人名称"><input class="field" id="newEmail" type="email" placeholder="邮箱"><input class="field" id="newPlatform" placeholder="平台，例如 TikTok"><input class="field" id="newModel" placeholder="合作型号，例如 AeroFit Pro"><input class="field" id="newDate" type="date"><input class="field" id="newQuote" type="number" min="0" placeholder="合作报价"><select class="field full" id="newProgress"><option>初次合作</option><option>已达成合作意向</option><option>内容制作中</option><option>已发布</option></select></div><div class="modal-actions"><button class="btn" type="button" data-close-modal>取消</button><button class="btn btn-primary" id="saveCollaboratorButton" type="button">保存红人</button></div></div>
+      <div class="modal"><div class="modal-head"><h2 id="collabModalTitle">新增合作红人</h2><button class="btn btn-quiet" type="button" data-close-modal>关闭</button></div><p class="modal-copy">系统会根据合作日期自动按月份归档。</p><div class="form-grid"><input class="field" id="newName" placeholder="红人名称"><input class="field" id="newEmail" type="email" placeholder="邮箱"><select class="field" id="newBrand"><option value="Chessnut">Chessnut</option><option value="Dartsnut">Dartsnut</option></select><input class="field" id="newPlatform" placeholder="平台，例如 TikTok"><input class="field" id="newModel" placeholder="合作型号，例如 AeroFit Pro"><input class="field" id="newDate" type="date"><input class="field" id="newQuote" type="number" min="0" placeholder="合作报价"><select class="field full" id="newProgress"><option>初次合作</option><option>已达成合作意向</option><option>内容制作中</option><option>已发布</option></select></div><div class="modal-actions"><button class="btn" type="button" data-close-modal>取消</button><button class="btn btn-primary" id="saveCollaboratorButton" type="button">保存红人</button></div></div>
     </div>
 
     <div class="modal-backdrop" id="creatorModal" role="dialog" aria-modal="true" aria-labelledby="creatorModalTitle">
@@ -548,6 +549,7 @@
       let recommendations = {dartsnut:[],chessnut:[]};
       let recommendationMeta = {week:'等待首次采集',platformStatus:{}};
       let collaborators = JSON.parse(localStorage.getItem('kolCollaborators') || 'null') || defaultCollaborators;
+      collaborators = collaborators.map(item => ({...item, brand: item.brand || 'Chessnut'}));
       const savedContents = JSON.parse(localStorage.getItem('kolContents') || '[]');
       const demoContentNames = new Set(['Kiki Goes Global','周末去哪儿','科技阿远','Nora Studio']);
       let contents = Array.isArray(savedContents) ? savedContents.filter(item => item && !demoContentNames.has(item.name) && !String(item.url || '').includes('/demo')) : [];
@@ -594,14 +596,15 @@
 
       function renderCollaborators() {
         const term = $('collabSearch').value.trim().toLowerCase();
+        const brand = $('collabBrand').value;
         const platform = $('collabPlatform').value;
         const model = $('collabModel').value;
-        const list = collaborators.filter(c => c.month === activeMonth && (platform === 'all' || c.platforms.includes(platform)) && (model === 'all' || c.models.includes(model)) && (!term || [c.name,c.email,...c.platforms,...c.models].join(' ').toLowerCase().includes(term))).sort((a,b) => b.date.localeCompare(a.date));
+        const list = collaborators.filter(c => c.month === activeMonth && (brand === 'all' || c.brand === brand) && (platform === 'all' || c.platforms.includes(platform)) && (model === 'all' || c.models.includes(model)) && (!term || [c.name,c.email,c.brand,...c.platforms,...c.models].join(' ').toLowerCase().includes(term))).sort((a,b) => b.date.localeCompare(a.date));
         $('collabTitle').textContent = monthLabel(activeMonth);
         $('collabSubtitle').textContent = activeMonth === '2026-06' ? '飞书初始导入记录' : '按合作日期自动归档';
         $('collabCount').textContent = `${list.length} 位红人`;
         $('collabFoot').textContent = `当前月份共 ${list.length} 条记录`;
-        $('collabRows').innerHTML = list.length ? list.map(c => `<tr><td><div class="person"><span class="avatar">${safe(initials(c.name))}</span><div><div class="person-name">${safe(c.name)}</div><div class="person-email">${safe(c.email)}</div></div></div></td><td><div class="tags">${c.platforms.map(v => `<span class="tag">${safe(v)}</span>`).join('')}</div></td><td><div class="tags">${c.models.map(v => `<span class="tag">${safe(v)}</span>`).join('')}</div></td><td class="nowrap">${monthLabel(c.month)}</td><td class="nowrap">${money(c.quote)}</td><td><span class="badge ${c.progress === '已发布' ? 'badge-green' : 'badge-blue'}">${safe(c.progress)}</span></td><td><span class="badge">${safe(c.source)}</span></td><td><button class="btn btn-quiet" type="button" data-collab-name="${safe(c.name)}">查看</button></td></tr>`).join('') : '<tr><td colspan="8"><div class="empty">这个月份还没有合作红人</div></td></tr>';
+        $('collabRows').innerHTML = list.length ? list.map(c => `<tr><td><div class="person"><span class="avatar">${safe(initials(c.name))}</span><div class="person-name">${safe(c.name)}</div></div></td><td class="person-email">${safe(c.email)}</td><td><span class="badge ${c.brand === 'Dartsnut' ? 'badge-purple' : 'badge-blue'}">${safe(c.brand)}</span></td><td><div class="tags">${c.platforms.map(v => `<span class="tag">${safe(v)}</span>`).join('')}</div></td><td><div class="tags">${c.models.map(v => `<span class="tag">${safe(v)}</span>`).join('')}</div></td><td class="nowrap">${monthLabel(c.month)}</td><td class="nowrap">${money(c.quote)}</td><td><span class="badge ${c.progress === '已发布' ? 'badge-green' : 'badge-blue'}">${safe(c.progress)}</span></td><td><span class="badge">${safe(c.source)}</span></td><td><button class="btn btn-quiet" type="button" data-collab-name="${safe(c.name)}">查看</button></td></tr>`).join('') : '<tr><td colspan="10"><div class="empty">这个月份还没有合作红人</div></td></tr>';
         document.querySelectorAll('[data-collab-name]').forEach(btn => btn.addEventListener('click', () => showToast(`${btn.dataset.collabName} 的合作详情已准备好`)));
       }
 
@@ -615,8 +618,9 @@
         const headers = rows[0].map(h => h.trim().toLowerCase());
         const index = names => names.map(n => headers.indexOf(n)).find(i => i >= 0) ?? -1;
         return rows.slice(1).map((r,i) => ({
-          name:r[index(['红人','昵称','name'])] || `导入红人 ${i+1}`,
+          name:r[index(['红人','红人姓名','昵称','name'])] || `导入红人 ${i+1}`,
           email:r[index(['邮箱','email'])] || '',
+          brand:r[index(['合作品牌','品牌','brand'])] || 'Chessnut',
           platforms:(r[index(['平台','platform'])] || '未知平台').split(/[、/|]/).map(v=>v.trim()).filter(Boolean),
           models:(r[index(['合作型号','型号','model'])] || '未填写型号').split(/[、/|]/).map(v=>v.trim()).filter(Boolean),
           month:'2026-06',
@@ -742,12 +746,12 @@
       $('saveCollaboratorButton').addEventListener('click', () => {
         const name=$('newName').value.trim(); const email=$('newEmail').value.trim(); const date=$('newDate').value;
         if (!name || !email || !date) { showToast('请填写红人名称、邮箱和合作日期'); return; }
-        const entry={name,email,platforms:[$('newPlatform').value.trim() || '未知平台'],models:[$('newModel').value.trim() || '未填写型号'],month:date.slice(0,7),date,quote:Number($('newQuote').value)||0,progress:$('newProgress').value,source:'手动新增'};
+        const entry={name,email,brand:$('newBrand').value,platforms:[$('newPlatform').value.trim() || '未知平台'],models:[$('newModel').value.trim() || '未填写型号'],month:date.slice(0,7),date,quote:Number($('newQuote').value)||0,progress:$('newProgress').value,source:'手动新增'};
         collaborators.push(entry); localStorage.setItem('kolCollaborators',JSON.stringify(collaborators)); activeMonth=entry.month; renderCollabFilters(); renderMonthBar(); renderCollaborators(); closeModals(); ['newName','newEmail','newPlatform','newModel','newQuote'].forEach(id => $(id).value=''); showToast(`已新增 ${name}，归档到 ${monthLabel(entry.month)}`);
       });
       $('importButton').addEventListener('click', () => $('csvInput').click());
       $('csvInput').addEventListener('change', event => { const file=event.target.files[0]; if (!file) return; const reader=new FileReader(); reader.onload=() => { const imported=parseCsv(reader.result); imported.forEach(item => { const idx=collaborators.findIndex(v => v.email && v.email===item.email); if (idx>=0) collaborators[idx]={...collaborators[idx],...item}; else collaborators.push(item); }); localStorage.setItem('kolCollaborators',JSON.stringify(collaborators)); activeMonth='2026-06'; renderCollabFilters(); renderMonthBar(); renderCollaborators(); showToast(`已导入 ${imported.length} 位红人，统一归档至 2026 年 6 月`); }; reader.readAsText(file,'UTF-8'); event.target.value=''; });
-      ['collabSearch','collabPlatform','collabModel'].forEach(id => $(id).addEventListener(id==='collabSearch'?'input':'change',renderCollaborators));
+      ['collabSearch','collabBrand','collabPlatform','collabModel'].forEach(id => $(id).addEventListener(id==='collabSearch'?'input':'change',renderCollaborators));
       $('analyzeButton').addEventListener('click', () => {
         const url=$('contentUrl').value.trim(); if (!url) { showToast('请先粘贴红人发布链接'); return; }
         const platform = url.includes('tiktok')?'TikTok':url.includes('youtube')||url.includes('youtu.be')?'YouTube':url.includes('instagram')?'Instagram':url.includes('xiaohongshu')?'小红书':url.includes('bilibili')?'Bilibili':url.includes('douyin')?'抖音':'待识别平台';
