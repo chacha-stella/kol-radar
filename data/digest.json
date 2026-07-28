@@ -1,10 +1,10 @@
 {
-  "scannedAt": "2026-07-28T09:47:34.693Z",
+  "scannedAt": "2026-07-28T10:15:30.111Z",
   "status": "success",
   "scanMode": "cumulative",
-  "scannedMessageCount": 218,
-  "scannedInboxCount": 133,
-  "scannedSentCount": 85,
+  "scannedMessageCount": 221,
+  "scannedInboxCount": 134,
+  "scannedSentCount": 87,
   "ignoredMessageCount": 67,
   "replyCount": 38,
   "newEmailCount": 14,
@@ -12,6 +12,35 @@
   "highIntentCount": 13,
   "quoteTotal": 17283.49,
   "messages": [
+    {
+      "id": "cf4474959690a62cc241",
+      "threadId": "developer partnership request – chessis × chessnut",
+      "name": "Chessis Support",
+      "email": "support@chessis.app",
+      "subject": "Re: Developer Partnership Request – Chessis × Chessnut",
+      "summary": "Hi Stella, Thank you so much! I really appreciate your support. I had already added Chessnut support to Chessis without having a real Chessnut board to test with, and some users reported issues. Thanks to your help, I’ll finally be able to test everything thor",
+      "body": "Hi Stella,\n\nThank you so much! I really appreciate your support.\n\nI had already added Chessnut support to Chessis without having a real\nChessnut board to test with, and some users reported issues. Thanks to your\nhelp, I’ll finally be able to test everything thoroughly, fix those issues,\nand optimize Chessis to work seamlessly with Chessnut boards.\n\nThanks again. I truly appreciate your kindness and support:)\n\nOn Tue, Jul 28, 2026 at 3:32 PM Stella Zhuang\nwrote:\n\n> Hi Nikhil,\n>\n> Tracking number: 874828393736Carrier: FedEx\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n>\n>\n> ------------------------------------------------------------------\n> 发件人：Chessis Support\n> 发送时间：2026年7月9日(周四) 18:41\n> 收件人：Stella Zhuang\n> 主 题：Re: Developer Partnership Request – Chessis × Chessnut\n>\n> Hi Stella,\n>\n> Yes, this is the correct address.\n>\n> Thank you so much!\n>\n> Best regards,\n> Nikhil\n>\n>\n> On Thu, Jul 9, 2026 at 3:40 PM Stella Zhuang stella.zhuang@chessnutech.com> wrote:\n>\n> Hi Nikhil,\n>\n> I'm preparing the shipment for your Chessnut Air. Could you please confirm\n> if the following address is correct and complete?\n>\n> Full Name: Nikhil Nagpal\n> Phone: +917374961791\n> Address: Near Electric Board, Colony Road, Ward No.6, Sangaria, Sri\n> Ganganagar, Rajasthan 335063, India\n> Email: nikhilnagpal1231@gmail.com\n>\n> I filled in \"Sri Ganganagar\" as the city and \"Rajasthan\" as the state\n> based on your postal code 335063 — this is the most likely match. Please\n> let me know if anything needs to be corrected.\n>\n> Thanks!\n> Stella\n>\n> ------------------------------------------------------------------\n> 发件人：Chessis Support\n> 发送时间：2026年7月9日(周四) 17:03\n> 收件人：Stella Zhuang\n> 主 题：Re: Developer Partnership Request – Chessis × Chessnut\n>\n> Hi Stella,\n>\n> Thank you so much! I really appreciate your support.\n>\n> A Chessnut Air would be perfect for developing and testing the\n> integration. Here are my shipping details:\n>\n> *Full Name:*\n> Nikhil Nagpal\n>\n> *Phone Number:*\n> +917374961791\n>\n> *Postal Code:*\n> 335063\n>\n> *Shipping Address:*\n> Near Electric Board, Colony Road, Ward No.6, Sangaria\n>\n> *Email Address:*\n> nikhilnagpal1231@gmail.com\n>\n> Thanks again for offering to send the unit. I’m looking forward to\n> integrating Chessnut support into Chessis and will let you know once the\n> feature is ready.\n>\n> Best regards,\n> Nikhil\n>\n> On Thu, Jul 9, 2026 at 1:10 PM Stella Zhuang stella.zhuang@chessnutech.com> wrote:\n> Dear Nikhil,\n>\n> Sorry for the misunderstanding — I thought you were applying for the\n> Chessnut Companion. If you are referring to any Chessnut board, I would be\n> happy to send you an Air unit for testing.\n> Since you are based in India, could you please provide the following\n> details so that I can arrange the shipment promptly:\n> Full Name\n> Phone Number\n> Postal Code\n> Shipping Address\n> Email Address\n> Once I have this information, I will get the unit shipped out as soon as\n> possible.\n> Looking forward to your reply.\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n>\n> ------------------------------------------------------------------\n> 发件人：Chessis Support\n> 发送时间：2026年7月8日(周三) 20:10\n> 收件人：Stella Zhuang\n> 抄 送：Chessis Support\n> 主 题：Re: Developer Partnership Request – Chessis × Chessnut\n>\n> Hi Stella,\n>\n> Thank you for getting back to me.\n>\n> I understand that review units are currently out of stock. I have already\n> added Chessnut support to the beta version of the app and hope the\n> integration works as expected; however, I am unable to thoroughly test it\n> without the hardware.\n>\n> I will monitor the beta to see if users report any issues. If necessary, I\n> will order a unit directly from your website. If you have a discount code\n> available, please feel free to share it. For reference, I am based in\n> India, where the Chessnut Air is currently priced at approximately $250.\n>\n> Best regards,\n>\n> Nikhil\n>\n>\n> On Wed, Jul 8, 2026 at 12:35 PM Stella Zhuang stella.zhuang@chessnutech.com> wrote:\n> Hi Nikhil,\n>\n> Yes, we can support this — but we’re currently out of stock for review\n> units. I’ll add you to the priority list so we can send one out as soon as\n> inventory becomes available.\n> In the meantime, could you please share your full name, phone number,\n> postal code, and shipping address so we have everything ready on our end?\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n>\n>\n> ------------------------------------------------------------------\n> 发件人：Chessis Support\n> 发送时间：2026年7月7日(周二) 19:27\n> 收件人：Stella Zhuang\n> 主 题：Re: Developer Partnership Request – Chessis × Chessnut\n>\n> Hi Stella,\n>\n> Thanks for your reply!\n>\n> Yes, I’ve already gone through the API documentation and have started\n> working on the integration. The main blocker at the moment is that I can’t\n> properly develop and test the implementation without having a physical\n> Chessnut board.\n>\n> If I had access to a developer unit, I’m confident I could complete the\n> integration and ship the feature within about a week.\n>\n> Please let me know if it’s possible to provide a developer unit. I’d be\n> excited to bring Chessnut support to Chessis.\n>\n> Best regards,\n> Nikhil\n>\n> On Tue, Jul 7, 2026 at 3:17 PM Stella Zhuang stella.zhuang@chessnutech.com> wrote:\n> Hi Nikhil,\n>\n> Thanks for reaching out. This sounds like a promising integration — we're\n> definitely open to supporting it.\n>\n> A few quick questions to help us better understand your timeline and needs:\n> - What's your planned development timeline for this integration?\n> - Have you had a chance to review our open API documentation?\n>\n> We'd be happy to discuss providing a developer unit. Let me know what\n> works best on your end.\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n>\n>\n> ------------------------------------------------------------------\n> 发件人：contact\n> 发送时间：2026年7月4日(周六) 08:32\n> 收件人：\"stella.zhuang\"\n> 主 题：Fwd: Developer Partnership Request – Chessis × Chessnut\n>\n> AI routed this ticket to Stella and forwarded a copy for visibility.\n> Reason: This is a collaboration/developer partnership inquiry, which should\n> be handled by Stella. It is not a pure product support or shipping/order\n> issue.\n>\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n> On Fri, 3 Jul at 6:05 PM , Chessis Support wrote:\n> Hello Chessnut Team,\n> I’m the developer of Chessis, an Android chess analysis app with a large\n> user base on Google Play.\n> Many Chessis users have requested support for Chessnut boards, and I’d\n> love to add native integration. To properly develop and thoroughly test the\n> feature, I would need access to a Chessnut board.\n> Would you be open to providing a developer unit, or alternatively offering\n> a developer discount? I believe this integration would benefit both\n> Chessnut users and the Chessis community by making your boards compatible\n> with another popular chess app.\n> Thank you for your time, and I look forward to hearing from you.\n> Best regards,\n> Nikhil\n>\n> 123050:2750839\n>\n>",
+      "bodyChinese": "",
+      "summaryChinese": "",
+      "translationStatus": "translation_deferred",
+      "brand": "Chessnut",
+      "intent": 85,
+      "intentLevel": "高意向",
+      "intentReasons": [
+        "出现明确合作动作",
+        "涉及档期、报价或交付"
+      ],
+      "quote": 250,
+      "progress": "高意向，待跟进",
+      "replyStatus": "新邮件",
+      "lastOutgoingAt": "2026-07-28T10:02:22.000Z",
+      "replyUrl": "",
+      "action": "今天回复并确认档期、报价和下一步",
+      "receivedAt": "2026-07-28T10:12:06.000Z",
+      "lastIncomingAt": "2026-07-28T10:12:06.000Z",
+      "threadMessageCount": 5,
+      "firstIncomingAt": "2026-07-07T11:27:30.000Z"
+    },
     {
       "id": "9cf1fd41ce549a860cad",
       "threadId": "chessnut july updates – sale, companion & new app",
@@ -401,7 +430,7 @@
       "quote": 600,
       "progress": "已回复，等待红人下一步",
       "replyStatus": "已回复",
-      "lastOutgoingAt": "2026-07-15T06:28:08.000Z",
+      "lastOutgoingAt": "2026-07-28T10:10:15.000Z",
       "replyUrl": "",
       "action": "等待红人继续回复；必要时查看线程",
       "receivedAt": "2026-07-14T21:20:56.000Z",
@@ -722,35 +751,6 @@
       "lastIncomingAt": "2026-07-10T00:00:11.000Z",
       "threadMessageCount": 1,
       "firstIncomingAt": "2026-07-10T00:00:11.000Z"
-    },
-    {
-      "id": "d377fd546a0980f2e648",
-      "threadId": "developer partnership request – chessis × chessnut",
-      "name": "Chessis Support",
-      "email": "support@chessis.app",
-      "subject": "Re: Developer Partnership Request – Chessis × Chessnut",
-      "summary": "Hi Stella, Yes, this is the correct address. Thank you so much! Nikhil On Thu, Jul 9, 2026 at 3:40 PM Stella Zhuang wrote:",
-      "body": "Hi Stella,\n\nYes, this is the correct address.\n\nThank you so much!\n\nBest regards,\nNikhil\n\nOn Thu, Jul 9, 2026 at 3:40 PM Stella Zhuang\nwrote:\n\n> Hi Nikhil,\n>\n> I'm preparing the shipment for your Chessnut Air. Could you please confirm\n> if the following address is correct and complete?\n>\n> Full Name: Nikhil Nagpal\n> Phone: +917374961791\n> Address: Near Electric Board, Colony Road, Ward No.6, Sangaria, Sri\n> Ganganagar, Rajasthan 335063, India\n> Email: nikhilnagpal1231@gmail.com\n>\n> I filled in \"Sri Ganganagar\" as the city and \"Rajasthan\" as the state\n> based on your postal code 335063 — this is the most likely match. Please\n> let me know if anything needs to be corrected.\n>\n> Thanks!\n> Stella\n>\n> ------------------------------------------------------------------\n> 发件人：Chessis Support\n> 发送时间：2026年7月9日(周四) 17:03\n> 收件人：Stella Zhuang\n> 主 题：Re: Developer Partnership Request – Chessis × Chessnut\n>\n> Hi Stella,\n>\n> Thank you so much! I really appreciate your support.\n>\n> A Chessnut Air would be perfect for developing and testing the\n> integration. Here are my shipping details:\n>\n> *Full Name:*\n> Nikhil Nagpal\n>\n> *Phone Number:*\n> +917374961791\n>\n> *Postal Code:*\n> 335063\n>\n> *Shipping Address:*\n> Near Electric Board, Colony Road, Ward No.6, Sangaria\n>\n> *Email Address:*\n> nikhilnagpal1231@gmail.com\n>\n> Thanks again for offering to send the unit. I’m looking forward to\n> integrating Chessnut support into Chessis and will let you know once the\n> feature is ready.\n>\n> Best regards,\n> Nikhil\n>\n> On Thu, Jul 9, 2026 at 1:10 PM Stella Zhuang stella.zhuang@chessnutech.com> wrote:\n> Dear Nikhil,\n>\n> Sorry for the misunderstanding — I thought you were applying for the\n> Chessnut Companion. If you are referring to any Chessnut board, I would be\n> happy to send you an Air unit for testing.\n> Since you are based in India, could you please provide the following\n> details so that I can arrange the shipment promptly:\n> Full Name\n> Phone Number\n> Postal Code\n> Shipping Address\n> Email Address\n> Once I have this information, I will get the unit shipped out as soon as\n> possible.\n> Looking forward to your reply.\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n>\n> ------------------------------------------------------------------\n> 发件人：Chessis Support\n> 发送时间：2026年7月8日(周三) 20:10\n> 收件人：Stella Zhuang\n> 抄 送：Chessis Support\n> 主 题：Re: Developer Partnership Request – Chessis × Chessnut\n>\n> Hi Stella,\n>\n> Thank you for getting back to me.\n>\n> I understand that review units are currently out of stock. I have already\n> added Chessnut support to the beta version of the app and hope the\n> integration works as expected; however, I am unable to thoroughly test it\n> without the hardware.\n>\n> I will monitor the beta to see if users report any issues. If necessary, I\n> will order a unit directly from your website. If you have a discount code\n> available, please feel free to share it. For reference, I am based in\n> India, where the Chessnut Air is currently priced at approximately $250.\n>\n> Best regards,\n>\n> Nikhil\n>\n>\n> On Wed, Jul 8, 2026 at 12:35 PM Stella Zhuang stella.zhuang@chessnutech.com> wrote:\n> Hi Nikhil,\n>\n> Yes, we can support this — but we’re currently out of stock for review\n> units. I’ll add you to the priority list so we can send one out as soon as\n> inventory becomes available.\n> In the meantime, could you please share your full name, phone number,\n> postal code, and shipping address so we have everything ready on our end?\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n>\n>\n> ------------------------------------------------------------------\n> 发件人：Chessis Support\n> 发送时间：2026年7月7日(周二) 19:27\n> 收件人：Stella Zhuang\n> 主 题：Re: Developer Partnership Request – Chessis × Chessnut\n>\n> Hi Stella,\n>\n> Thanks for your reply!\n>\n> Yes, I’ve already gone through the API documentation and have started\n> working on the integration. The main blocker at the moment is that I can’t\n> properly develop and test the implementation without having a physical\n> Chessnut board.\n>\n> If I had access to a developer unit, I’m confident I could complete the\n> integration and ship the feature within about a week.\n>\n> Please let me know if it’s possible to provide a developer unit. I’d be\n> excited to bring Chessnut support to Chessis.\n>\n> Best regards,\n> Nikhil\n>\n> On Tue, Jul 7, 2026 at 3:17 PM Stella Zhuang stella.zhuang@chessnutech.com> wrote:\n> Hi Nikhil,\n>\n> Thanks for reaching out. This sounds like a promising integration — we're\n> definitely open to supporting it.\n>\n> A few quick questions to help us better understand your timeline and needs:\n> - What's your planned development timeline for this integration?\n> - Have you had a chance to review our open API documentation?\n>\n> We'd be happy to discuss providing a developer unit. Let me know what\n> works best on your end.\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n>\n>\n> ------------------------------------------------------------------\n> 发件人：contact\n> 发送时间：2026年7月4日(周六) 08:32\n> 收件人：\"stella.zhuang\"\n> 主 题：Fwd: Developer Partnership Request – Chessis × Chessnut\n>\n> AI routed this ticket to Stella and forwarded a copy for visibility.\n> Reason: This is a collaboration/developer partnership inquiry, which should\n> be handled by Stella. It is not a pure product support or shipping/order\n> issue.\n>\n>\n> Best,\n> Stella\n> Business Development Manager | Chessnut\n> On Fri, 3 Jul at 6:05 PM , Chessis Support wrote:\n> Hello Chessnut Team,\n> I’m the developer of Chessis, an Android chess analysis app with a large\n> user base on Google Play.\n> Many Chessis users have requested support for Chessnut boards, and I’d\n> love to add native integration. To properly develop and thoroughly test the\n> feature, I would need access to a Chessnut board.\n> Would you be open to providing a developer unit, or alternatively offering\n> a developer discount? I believe this integration would benefit both\n> Chessnut users and the Chessis community by making your boards compatible\n> with another popular chess app.\n> Thank you for your time, and I look forward to hearing from you.\n> Best regards,\n> Nikhil\n>\n> 123050:2750839\n>\n>",
-      "bodyChinese": "",
-      "summaryChinese": "",
-      "translationStatus": "translation_deferred",
-      "brand": "Chessnut",
-      "intent": 85,
-      "intentLevel": "高意向",
-      "intentReasons": [
-        "出现明确合作动作",
-        "涉及档期、报价或交付"
-      ],
-      "quote": 250,
-      "progress": "高意向，待跟进",
-      "replyStatus": "新邮件",
-      "lastOutgoingAt": "2026-07-09T10:10:33.000Z",
-      "replyUrl": "",
-      "action": "今天回复并确认档期、报价和下一步",
-      "receivedAt": "2026-07-09T10:41:35.000Z",
-      "lastIncomingAt": "2026-07-09T10:41:35.000Z",
-      "threadMessageCount": 4,
-      "firstIncomingAt": "2026-07-07T11:27:30.000Z"
     },
     {
       "id": "e6f6930452acd5f52557",
@@ -1698,8 +1698,8 @@
       "receivedAt": "2026-07-28T08:34:51.000Z"
     }
   ],
-  "collapsedThreadCount": 28,
-  "message": "累计扫描收件箱 133 封、已发送 85 封，保留 38 个合作线程；其中新邮件 14 个，已回复 24 个",
+  "collapsedThreadCount": 29,
+  "message": "累计扫描收件箱 134 封、已发送 87 封，保留 38 个合作线程；其中新邮件 14 个，已回复 24 个",
   "translationSummary": {
     "translated": 0,
     "pending": 38,
