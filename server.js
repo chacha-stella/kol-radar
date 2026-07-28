@@ -100,7 +100,13 @@ async function runFullScanner() {
       });
       latestDigest = readPersistedDigest() || latestDigest;
     } catch (error) {
-      latestDigest = { ...latestDigest, scannedAt: new Date().toISOString(), status: 'error', message: '邮箱扫描失败，请检查账号、安全码或翻译服务配置。', error: error.message };
+      latestDigest = {
+        ...latestDigest,
+        scannedAt: new Date().toISOString(),
+        status: 'error',
+        message: '邮箱扫描失败，请检查账号、安全码或邮箱文件夹权限。',
+        error: [error.message, error.stderr, error.stdout].filter(Boolean).join('\n').slice(0, 2000)
+      };
     }
     return latestDigest;
   })().finally(() => { fullScanPromise = null; });
