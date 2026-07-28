@@ -187,6 +187,21 @@ const server = http.createServer(async (request, response) => {
   response.setHeader('Access-Control-Allow-Headers', 'content-type, x-kol-reply-token');
   response.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   if (request.method === 'OPTIONS') { response.writeHead(204); response.end(); return; }
+  if (url.pathname === '/api/status' && request.method === 'GET') {
+    // Report configuration health without exposing any credential values.
+    const mailConfigured = Boolean(getMailConfig()?.auth?.user && process.env.MAIL_IMAP_PASSWORD);
+    const smtpConfigured = Boolean(getSmtpTransport());
+    response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+    response.end(JSON.stringify({
+      status: 'ok',
+      replyTokenConfigured: Boolean(replyToken),
+      imapConfigured: mailConfigured,
+      smtpConfigured,
+      startedAt: process.env.RAILWAY_DEPLOYMENT_ID ? undefined : new Date().toISOString(),
+      deploymentId: process.env.RAILWAY_DEPLOYMENT_ID || null
+    }));
+    return;
+  }
   if (url.pathname === '/api/digest') {
     latestDigest = readPersistedDigest() || latestDigest;
     response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
