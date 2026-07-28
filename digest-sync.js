@@ -174,6 +174,12 @@
     const button = document.querySelector('#sendReplyButton');
     button.disabled = true;
     try {
+      const healthResponse = await fetch(`${apiBase}/api/status`, { cache: 'no-store' });
+      if (!healthResponse.ok) throw new Error('邮件后台暂时无法连接，请稍后再试');
+      const health = await healthResponse.json();
+      if (!health.replyTokenConfigured || !health.smtpConfigured) {
+        throw new Error('Railway 还没有配置 KOL_REPLY_TOKEN 和邮箱发信变量，请在 kol-radar 服务的 Production → Variables 中添加后重新部署');
+      }
       const token = replyToken || prompt('请输入 Railway 中设置的 KOL_REPLY_TOKEN：');
       if (!token) throw new Error('未提供回复令牌');
       replyToken = token;
