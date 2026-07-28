@@ -1,5 +1,5 @@
 {
-  "scannedAt": "2026-07-28T06:42:53.415Z",
+  "scannedAt": "2026-07-28T07:23:14.476Z",
   "status": "success",
   "scanMode": "cumulative",
   "scannedMessageCount": 223,
@@ -1260,6 +1260,638 @@
       "lastIncomingAt": "2026-06-29T18:18:54.000Z",
       "threadMessageCount": 1,
       "firstIncomingAt": "2026-06-29T18:18:54.000Z"
+    }
+  ],
+  "otherMessages": [
+    {
+      "id": "1804553aaca3a4e8fc3d",
+      "name": "alan.wang@chessnutech.com",
+      "email": "alan.wang@chessnutech.com",
+      "subject": "Re: Re：[Chessnut Support] Business / Partnership - Chessnut Move",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-06-29T07:37:26.000Z"
+    },
+    {
+      "id": "51676a0de81971f817ac",
+      "name": "爱彼迎",
+      "email": "automated@airbnb.com",
+      "subject": "请确认您的邮箱地址",
+      "body": "%opentrack%\nhttps://www.airbnb.cn/?c=.pi80.pkYm9va2luZy9hdXRoZW50aWNhdGlvbi9jb25maXJtX2VtYWls&euid=ebab98c1-51a5-674a-c4c4-e8fcc60f6022\n\nYichen，你好！\n\n要完成电子邮件地址的更改，您必须在下方确认您的新地址：\n\n确认邮箱\n[https://zh.airbnb.com/confirm_email?user_id=1718048810116528287&code=acce87fb69b56a2bbc86304ef646bb1f&redirect_params%5Baction%5D=account_activation&redirect_params%5Bcontroller%5D=verification&redirect_params%5Bskip_into%5D=true]\n\nAirbnb, Inc.\n\n888 Brannan St.\n\nSan Francisco, CA 94103, USA",
+      "reason": "普通邮件/未识别为合作",
+      "receivedAt": "2026-06-30T01:01:33.000Z"
+    },
+    {
+      "id": "311ee40023b761bd1d04",
+      "name": "notification@immigration.gov.vn",
+      "email": "notification@immigration.gov.vn",
+      "subject": "您的验证 OTP 代码",
+      "body": "",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-06-30T01:21:24.000Z"
+    },
+    {
+      "id": "33629dcc8d8c063f2002",
+      "name": "notification@immigration.gov.vn",
+      "email": "notification@immigration.gov.vn",
+      "subject": "您提交的越南入境前申报已成功！",
+      "body": "",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-06-30T01:21:44.000Z"
+    },
+    {
+      "id": "87499d256c314e8a4760",
+      "name": "alan.wang@chessnutech.com",
+      "email": "alan.wang@chessnutech.com",
+      "subject": "Re: Re：[Chessnut Support] Business / Partnership - Chessnut Move",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-06-30T03:45:03.000Z"
+    },
+    {
+      "id": "d3064fedf0b1f25bd3c6",
+      "name": "Google Events",
+      "email": "no-reply-eventsatgoogle@google.com",
+      "subject": "Google Marketing Live 2026 席位已确认！",
+      "body": "2026 年 7 月 16 日 10:00 - 18:00（拟定）\n\n深圳前海国际会议中心\n\n庄仪琛 你好！\n\n感谢报名 Google Marketing Live 2026，你的席位已预留！ 签到时间及活动日程将\n于 7 月 8 日递送至你的邮箱！\n\n请截图保存您的签到码\n\n（此码不可转让，请于现场凭此码换取胸卡）\n\n活动亮点（标题图待上传）\n\n01 洞察 AI 时代消费者决策的新趋势，找准出海营销的破局发力点。\n\n02 掌握 Google 广告新玩法，借助智能系统更精准捕获目标消费者。\n\n03 携手 YouTube 创作者沉淀内容资产，在 AI 时代用高质量内容赢取消费者信任。\n\n04 体验前沿 AI 科技，畅享专家 1V1 咨询，完整掌握全新产品的资讯与应用。\n\n你的出海营销困惑，\n我们来解答。\n\n我们希望本次 Google Marketing Live 是一次和出海营销人一起共创的大会。\n\n请告诉我们你对出海营销的疑问。无论是 AI 产品变革，广告投放策略还是 YouTube\n创作者营销实操，我们都将根据你的提问来定制大会分享内容。\n\n除此之外，我们还将有多位 GML 体验官代表你来线上采访 Google 资深产品专家和全\n球顶尖 YouTube 创作者，确保你的疑问在台上台下都能被回答。\n\n点击或扫码提问，\n解锁体验官阵容。\n\n如果您有任何问题，请联系您的 Google 客户经理。\n\nGoogle Marketing Live China 团队",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-06-30T09:02:54.000Z"
+    },
+    {
+      "id": "8920cc9622f7984dfb98",
+      "name": "阿里邮箱",
+      "email": "no-reply@mailsupport.aliyun.com",
+      "subject": "来自no-reply@mailsupport.aliyun.com的退信",
+      "body": "",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-06-30T09:39:48.000Z"
+    },
+    {
+      "id": "41ef7672aa78372b9683",
+      "name": "Google",
+      "email": "no-reply@accounts.google.com",
+      "subject": "Critical security alert",
+      "body": "[image: Google]\nSign-in attempt was blocked\n\nstella.zhuang@chessnutech.com\nSomeone just used your password to try to sign in to your account. Google\nblocked them, but you should check what happened.\nCheck activity\n\nYou can also see security activity at\nhttps://myaccount.google.com/notifications\nYou received this email to let you know about important changes to your\nGoogle Account and services.\n© 2026 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-01T02:21:34.000Z"
+    },
+    {
+      "id": "0f1e9f4b03ec07f7c227",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: About the Chessnut companion",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-01T06:09:23.000Z"
+    },
+    {
+      "id": "ef5ef4863213d63e5419",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Re: BUSINESSiQ September 2026 — Chessnut Move Editorial Review Request",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-01T06:11:12.000Z"
+    },
+    {
+      "id": "04248aa90aebfa10d4ba",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Invoice for commissions",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-03T06:07:05.000Z"
+    },
+    {
+      "id": "7533f4e717b76cb16b9e",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Developer Partnership Request – Chessis × Chessnut",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: This is a collaboration/developer partnership inquiry, which should be handled by Stella. It is not a pure product support or shipping/order issue. Best, Stella Business Development Manager | Chessnut\n\nOn\nFri, 3 Jul at 6:05 PM\n, Chessis Support wrote:\n\nHello Chessnut Team,\nI’m the developer of Chessis, an Android chess analysis app with a large user base on Google Play.\nMany Chessis users have requested support for Chessnut boards, and I’d love to add native integration. To properly develop and thoroughly test the feature, I would need access to a Chessnut board.\nWould you be open to providing a developer unit, or alternatively offering a developer discount? I believe this integration would benefit both Chessnut users and the Chessis community by making your boards compatible with another popular chess app.\nThank you for your time, and I look forward to hearing from you.\nBest regards, Nikhil",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-04T00:32:59.000Z"
+    },
+    {
+      "id": "e90c369bdce8be8ae8bb",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Partnership Inquiry: Product Content for Chess Companion",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-04T15:11:49.000Z"
+    },
+    {
+      "id": "57f199886b025a09f083",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Sponsorship Opportunity - Al Ain Chess & Mind Games Club",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The ticket is a sponsorship and long-term collaboration proposal from a chess club, which falls under partnership/collaboration routing handled by Stella. Best, Stella Business Development Manager | Chessnut\n\nOn\nSat, 4 Jul at 5:02 PM\n, Ammar sbahi wrote:\n\nDear Chessnut Team, I hope you are doing well. My name is Ammar Sbahi, Marketing & Events Coordinator at Al Ain Chess & Mind Games Club. I am reaching out from our official club email to present a structured sponsorship opportunity for a long-term collaboration between Chessnut and our club. Al Ain Chess Club is one of the most active chess organizations in the UAE, currently organizing and participating in more than 40 chess events annually, including:\nOfficial tournaments\nCommunity competitions\nYouth & school programs\nCollaborative chess activations across the UAE\nProposed Partnership Opportunity\nWe would like to explore a strategic collaboration with Chessnut that may include:\nOfficial sponsorship of selected tournaments and events\nProduct showcasing and on-site activation during events\nBranding presence across event materials and digital coverage\nIntegration of Chessnut products in training and competition environments\nLong-term visibility within the UAE chess community\n\nAudience & Reach Our events attract a diverse chess audience, including juniors, amateurs, and competitive players, with continuous engagement from schools, academies, and local chess communities. Collaboration Vision We are looking to build a long-term strategic partnership rather than a one-time activation, where Chessnut becomes an integrated part of our growing chess ecosystem in the UAE. We would be happy to share a detailed proposal deck, event calendar, and media insights if there is interest in moving forward. You can also find coverage of our latest activities and events on our official Instagram page: https://www.instagram.com/acmgae/\n\nWebsite: https://acmg.ae/\n\nLooking forward to your thoughts and the possibility of working together. Best regards,\n\n--\n\nAmmar Sbahi Marketing & Events Coordinator\n\nAl Ain Chess & Mind Games Club\n\nLandline: +971 3 763 3387\n\nMobile:   +971 56 207 1929\n\nAl Ain - United Arab Emirates",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-04T16:40:20.000Z"
+    },
+    {
+      "id": "c25ded3a56970c5ed3fb",
+      "name": "Wade Higgins",
+      "email": "wade.higgins@chessnutech.com",
+      "subject": "Fw: Scholastic Chess Collabs",
+      "body": "Good afternoon Stella,\nPlease see below an email from Oliver.\nWe met Oliver at the Mangus event, and I do believe someone from your team already had a meeting with him, however he sent me this email over the weekend. Forwarding it through to you if it is something you may be interested in.\nRegards,\nWade\n------------------------------------------------------------------\nFrom:Oliver Conran\nSend Time:Sat, Jul 4, 2026, 09:57\nTo:Wade Higgins\nSubject:Scholastic Chess Collabs\nHi Wade,\nGreat meeting you at the June 16th event. I'm contacting you because I'm wondering if there are anyways that Scholastic chess might collab with Chessnut in the future?\nWe are a Hong Kong based chess school with close to 300 students learning weekly across our programs. We could feature Chessnut products in our Workshops and Tournaments, offer exclusive promotions etc.,\nIf you think this might be worthwhile perhaps you could help to put me in touch with somebody to chat to about it?\nBest,\nOliver Conran\nGet Outlook for Android",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-06T02:05:50.000Z"
+    },
+    {
+      "id": "1f064d9d4b33d5577042",
+      "name": "Flavia Cancio-Bello",
+      "email": "fcanciobello@gmail.com",
+      "subject": "Request for Company Tax Information to Issue my Invoices",
+      "body": "",
+      "reason": "普通邮件/未识别为合作",
+      "receivedAt": "2026-07-06T15:36:56.000Z"
+    },
+    {
+      "id": "ce8631341975fc2bb4ab",
+      "name": "Wade Higgins",
+      "email": "wadehiggins@gmail.com",
+      "subject": "Travel Expense Reimbursement - June 2026",
+      "body": "",
+      "reason": "普通邮件/未识别为合作",
+      "receivedAt": "2026-07-07T06:39:22.000Z"
+    },
+    {
+      "id": "38236a00c7931dca749f",
+      "name": "Google",
+      "email": "no-reply@accounts.google.com",
+      "subject": "Someone added you as their recovery email",
+      "body": "[image: Google]\nSomeone added stella.zhuang@chessnutech.com as their recovery email\n\nstella.chessnut@gmail.com wants your email address to be their recovery\nemail.\n\nIf you don’t recognize this account, it’s likely your email address was\nadded in error. You can remove your email address from that account.\nDisconnect\nemail\n\nYou can also see security activity at\nhttps://myaccount.google.com/notifications\n\nEnglish\n\n| Русский\n\n| Deutsch\n\n| 日本語\n\n| español\n\n| français\n\n| 中文\n\n| português\n\n| italiano\n\n| polski\n\n| …\n\nYou received this email to let you know about important changes to your\nGoogle Account and services.\n© 2026 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-07T09:14:28.000Z"
+    },
+    {
+      "id": "4f88926e90ec1ca73e2e",
+      "name": "Google",
+      "email": "no-reply@accounts.google.com",
+      "subject": "Critical security alert",
+      "body": "[image: Google]\nSign-in attempt was blocked\n\nstella.zhuang@chessnutech.com\nSomeone just used your password to try to sign in to your account. Google\nblocked them, but you should check what happened.\nCheck activity\n\nYou can also see security activity at\nhttps://myaccount.google.com/notifications\nYou received this email to let you know about important changes to your\nGoogle Account and services.\n© 2026 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-07T09:41:48.000Z"
+    },
+    {
+      "id": "c6ef69dcc323de40b140",
+      "name": "alan.wang@chessnutech.com",
+      "email": "alan.wang@chessnutech.com",
+      "subject": "Re: Wholesale Pricing Request – EVO / AIR+ / GO (Miguel Illescas)",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-08T06:55:36.000Z"
+    },
+    {
+      "id": "465eab46ce4e2c6a4d0f",
+      "name": "alan.wang@chessnutech.com",
+      "email": "alan.wang@chessnutech.com",
+      "subject": "Re: Wholesale Pricing Request – EVO / AIR+ / GO (Miguel Illescas)",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-08T07:04:12.000Z"
+    },
+    {
+      "id": "c85534959dcf0b45a80f",
+      "name": "Google Events",
+      "email": "no-reply-eventsatgoogle@google.com",
+      "subject": "确认函（附日程） | Google Marketing Live 2026 期待您的参与！",
+      "body": "Google Marketing Live - Don't miss out\n\n深圳前海国际会议中心\n\n深圳前海深港合作区前湾一路\n\n庄仪琛 你好！\n\n请截图保存您的签到码\n\n签到码\n\n（此码不可转让，请于现场凭此码换取胸卡）\n\n活动日程\n\n12:00 - 13:30\n\n签到\n\n1F 大厅\n\n13:30 - 16:00\n\n主题演讲\n\n2F 大会堂\n\n主题演讲\n\n13:30 - 13:40\n\n欢迎致辞\n\n13:40 - 13:50\n\nAI 时代消费者洞察\n\n13:50 - 14:05\n\nAI 驱动营销升级，\n\n把握增长新机遇\n\n14:05 - 14:15\n\n品牌创始人分享：\n\nVIVAIA 的增长进阶之路\n\n14:15 - 14:30\n\n打造可信赖内容声量，\n\n建立 AI 时代品牌护城河\n\n14:30 - 15:00\n\n茶歇\n\n15:00 - 15:10\n\nYouTube 创作者分享：\n\n创造力成就影响力\n\n15:10 - 15:45\n\nYouTube 创作者圆桌会谈：\n\n解码内容共创的品牌合作\n\n15:45 - 15:50\n\n结束语\n\n同时，欢迎您扫码进入“谷歌出海学堂”，\n观看 2025 Google Marketing Live 精彩回放，\n重温去年大会的精彩内容，了解 Google AI 如何全面赋能广告产品、助力出海企业实\n现持续增长。\n\n谷歌出海学堂\n\n立即扫码\n\n如果您有任何问题，请联系您的 Google 客户经理。\n\nGoogle Marketing Live China 团队",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-08T10:16:38.000Z"
+    },
+    {
+      "id": "7cb56c1002f6afb70e5b",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: LinkHaitao x Chessnut | Partnership Growth",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-09T16:35:23.000Z"
+    },
+    {
+      "id": "eafacd1cf4fd3a7ab666",
+      "name": "Google Events",
+      "email": "no-reply-eventsatgoogle@google.com",
+      "subject": "确认函（附日程） | Google Marketing Live 2026 期待您的参与！",
+      "body": "Google Marketing Live - Don't miss out\n\n深圳前海国际会议中心\n\n深圳前海深港合作区前湾一路\n\n庄仪琛 你好！\n\n请截图保存您的签到码\n\n签到码\n\n（此码不可转让，请于现场凭此码换取胸卡）\n\n活动日程\n\n12:00 - 13:30\n\n签到\n\n1F 大厅\n\n13:30 - 16:00\n\n主题演讲\n\n2F 大会堂\n\n主题演讲\n\n13:30 - 13:40\n\n欢迎致辞\n\n13:40 - 13:50\n\nAI 时代消费者洞察\n\n13:50 - 14:05\n\nAI 驱动营销升级，\n\n把握增长新机遇\n\n14:05 - 14:15\n\n品牌创始人分享：\n\nVIVAIA 的增长进阶之路\n\n14:15 - 14:30\n\n打造可信赖内容声量，\n\n建立 AI 时代品牌护城河\n\n14:30 - 15:00\n\n茶歇\n\n15:00 - 15:10\n\nYouTube 创作者分享：\n\n创造力成就影响力\n\n15:10 - 15:45\n\nYouTube 创作者圆桌会谈：\n\n解码内容共创的品牌合作\n\n15:45 - 15:50\n\n结束语\n\n同时，欢迎您扫码进入“谷歌出海学堂”，\n观看 2025 Google Marketing Live 精彩回放，\n重温去年大会的精彩内容，了解 Google AI 如何全面赋能广告产品、助力出海企业实\n现持续增长。\n\n谷歌出海学堂\n\n立即扫码\n\n如果您有任何问题，请联系您的 Google 客户经理。\n\nGoogle Marketing Live China 团队",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-10T09:20:21.000Z"
+    },
+    {
+      "id": "be33feea9215c1f346c1",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Custom Coupon Code Request for Our Chessnut Promotions",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: This is an affiliate collaboration request involving custom promotional coupon codes, so it should be handled by Stella. The customer supplied the affiliate ID, email, platform details, and requested codes; internal review is needed before confirming availability or assignment. Best, Stella Business Development Manager | Chessnut\n\nOn\nSat, 11 Jul at 4:15 PM\n, Partner wrote:\n\nHi Chessnut Team,\nHope you’re doing well.\nWe recently joined the Chessnut affiliate program via Impact and are preparing upcoming promotions across our deal platform and social media channels, focusing on smart chess boards, AI-powered chess training, and connected chess technology.\nCould you please create and assign all of the following custom coupon codes to our affiliate account?\n\nCHECKMATE PLAYSMART TPDEALS\n\nThese short, memorable codes will help us organize and track performance across different promotional campaigns.\nOur Impact ID: 6897106 Email: partner@theplanetdeals.com\n\nLooking forward to working together.\nBest regards, Taufik The Planet Deals\n\n--\n\nTaufik Marketing Manager – The Planet Deals  partner@theplanetdeals.com  https://theplanetdeals.net",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-11T08:29:20.000Z"
+    },
+    {
+      "id": "b16afb4b63c8fcc6c0f8",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: RE: WIRED Review: Best Smart Chess Boards 2026",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-11T15:31:00.000Z"
+    },
+    {
+      "id": "92a136e92722856d45b7",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Continued Cooperation",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The sender is asking Stella about continuing an existing collaboration on behalf of Team GMHikaru. Partnership and influencer collaboration messages are owned by Stella. Best, Stella Business Development Manager | Chessnut\n\nOn\nSat, 11 Jul at 11:50 PM\n, Team Hikaru wrote:\n\nDear Stella, Would you like to continue this collaboration?\nThanks!\n\nHeather, Team GMHikaru",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-11T16:29:47.000Z"
+    },
+    {
+      "id": "8b354577ee5fbda80476",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Re: Appreciation & Updates from Chessnut",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: This is an influencer/creator collaboration request involving a review unit and promotion, which should be handled by Stella. Best, Stella Business Development Manager | Chessnut\n\nOn\nMon, 13 Jul at 10:58 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nI hope you are doing fine.\n\nAny opportunity to receive a Chessnut Evo chessboard to review and promote on my channel?\n\nMy best regards.\n\nAC\n\nIl sabato 27 dicembre 2025 alle ore 09:19:15 CET, Antonino Causa ha scritto:\n\nCiao Stella,\nlast video pubblished:\n\nhttps://youtu.be/QG-Q5I9bhFc\n\nMy best regards.\n\nAC\n\nIl venerdì 19 dicembre 2025 alle ore 13:58:17 CET, Antonino Causa ha scritto:\n\nCiao Stella,\nlast videos pubblished:\n\nVincere Facile con il SISTEMA COLLE ? Tattica e Vantaggio Posizionale contro il Bot di Taiwan\n\nVincere Facile con il SISTEMA COLLE ? Tattica e Vantaggio Posizionale c...\n\nI do not receive any feedback from you for a long time, so I am not sure how our collaboration is progressing and what the future will be between your brand and my channel.\n\nMy best regards.\n\nAC\n\nIl venerdì 12 dicembre 2025 alle ore 09:02:46 CET, Antonino Causa ha scritto:\n\nCiao Stella,\n\nlast videos pubblished:\n\nHO DISTRUTTO L'ATTACCO BOWDLER! ? La MIA Siciliana ha dato una Lezione (Partita Commentata SCACCHI)\n\nHO DISTRUTTO L'ATTACCO BOWDLER! ? La MIA Siciliana ha dato una Lezione ...\n\nI do not receive any feedback from you for a long time, so I am not sure how our collaboration is progressing and what the future will be between your brand and my channel.\n\nMy best regards.\n\nAC\n\nIl venerdì 5 dicembre 2025 alle ore 15:02:05 CET, Antonino Causa ha scritto:\n\nCiao Stella,\nlast videos pubblished:\n\n1. SFIDA TATTICA #5 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacchistici (livello 1600-2000)\n\nSFIDA TATTICA #5 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacc...\n\n2. SFIDA TATTICA #6 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacchistici (livello 1600-2000)\n\nSFIDA TATTICA #6 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacc...\n\nThanks, regards.\n\nAC\n\nIl lunedì 1 dicembre 2025 alle ore 16:02:11 CET, Antonino Causa ha scritto:\n\nCiao Stella,\nlast video pubblished:\n\nhttps://youtu.be/bMyZRSFmo8k\n\nThanks, regards.\n\nAC\n\nIl venerdì 21 novembre 2025 alle ore 09:49:35 CET, Antonino Causa ha scritto:\n\nCiao Stella,\n\nthe last video published:\n\nSFIDA TATTICA #4 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacchistici (livello 1600-2000)\n\nSFIDA TATTICA #4 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacc...\n\nIts seems that some contents created in the past months for CHESSNUT were not linked to Google Ads.\n\nThanks, ciao. AC\n\nIl venerdì 14 novembre 2025 alle ore 11:32:49 CET, contact ha scritto:\n\nHi Antonino Causa, Thank you for the content you created. It has been submitted to the Google team.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 14 Nov at 3:40 PM\n, Antonino Causa wrote:\n\nCiao Stella,\n\nthe last video published:\n\nSFIDA TATTICA #3 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacchistici (livello 1600-2000)\n\nSFIDA TATTICA #3 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacc...\n\nThanks, ciao. AC\n\nIl venerdì 7 novembre 2025 alle ore 12:03:21 CET, Antonino Causa ha scritto:\n\nCiao Stella,\nthe last video pubblished:\n\nSFIDA TATTICA #2 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacchistici (livello 1600-2000)\n\nSFIDA TATTICA #2 ⚔️ Raggiungi i 2000 ELO risolvendo questi Puzzles Scacc...\n\nAny new chessboard to review and use in my videos in the next future?\n\nThanks, ciao. AC\n\nIl giovedì 6 novembre 2025 alle ore 12:03:44 CET, contact ha scritto:\n\nHi Antonino Causa， Thank you, I can see your effort and progress. The submission has been made to the Google Ads team.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nTue, 4 Nov at 4:42 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nthe last video pubblished:\n\nhttps://youtu.be/VzA3xgP1YyM\n\nMy best regards.\n\nAC\n\nIl sabato 25 ottobre 2025 alle ore 11:31:43 CEST, Antonino Causa ha scritto:\n\nCiao Stella,\n\nhe video pubblished yesterday with CHESSNUT PRO:\n\nSICILIANA MODERNA ??️ MASTERCLASS Totale e VITTORIA contro la Spagna | Scacchi Vincenti\n\nSICILIANA MODERNA ??️ MASTERCLASS Totale e VITTORIA contro la Spagna |...\n\nThanks, regards.\n\nAC\n\nIl lunedì 20 ottobre 2025 alle ore 08:27:46 CEST, Antonino Causa ha scritto:\n\nCiao Stella,\njust to inform you that the following videos seem NOT having Google Ads associated, as in YouTube Studio I see them non having contents suggesting them.\n\n1.  https://youtu.be/Y3SwDSIFUHY\n\n2.  https://youtu.be/XTU49daevss\n\nIs it possible to activate Google Ads on these videos?\nThanks, regards. AC\n\nIl venerdì 17 ottobre 2025 alle ore 12:00:15 CEST, contact ha scritto:\n\nHi Antonino Causa, Thank you.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 17 Oct at 2:29 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nthe video pubblished yesterday with CHESSNUT PRO:\n\nIL GAMBETTO ENGLUND MI HA INTRAPPOLATO! ? Sconfitta Shock contro gli Emirati Arabi Uniti\n\nIL GAMBETTO ENGLUND MI HA INTRAPPOLATO! ? Sconfitta Shock contro gli Em...\n\nIL GAMBETTO ENGLUND MI HA INTRAPPOLATO! ? Sconfitta Shock contro gli Em...\n\nThanks, regards.\n\nAC\n\nIl venerdì 10 ottobre 2025 alle ore 08:26:56 CEST, Antonino Causa ha scritto:\n\nCiao Stella,\nthe video pubblished yesterday with CHESSNUT PRO:\n\nCATALANA PAZZESCA! ? Schianto un avversario Finladese in Allenamento | Apertura Scacchi Vincente\n\nCATALANA PAZZESCA! ? Schianto un avversario Finladese in Allenamento | ...\n\nThanks, regards.\n\nAC\n\nIl venerdì 3 ottobre 2025 alle ore 09:34:21 CEST, Antonino Causa ha scritto:\n\nCiao Stella,\nthe video pubblished yesterday with CHESSNUT PRO:\n\nVITTORIA EPICA: Ho battuto il BOT BRASILIANO dopo 2 mesi di Gambetto Benko! ?\n\nVITTORIA EPICA: Ho battuto il BOT BRASILIANO dopo 2 mesi di Gambetto Ben...\n\nThanks, regards.\n\nAC\n\nIl giovedì 25 settembre 2025 alle ore 22:04:26 CEST, Antonino Causa ha scritto:\n\nCiao Stella,\nthe video pubblished today with CHESSNUT PRO:\n\nMai fidarsi di un BOT: ho perso malissimo contro il Gambetto Benko!?‍♂️\n\nMai fidarsi di un BOT: ho perso malissimo contro il Gambetto Benko!?‍♂️\n\nThanks, regards.\n\nAC\n\nThanks, regards.\n\nAC\n\nIl giovedì 18 settembre 2025 alle ore 09:55:01 CEST, contact ha scritto:\n\nHi Antonino Causa,\n\nThank you, I’ve already submitted the placement application.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nWed, 17 Sep at 4:20 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nthe video pubblished yesterday with CHESSNUT PRO:\n\nhttps://youtu.be/2CcjV2GUfdA\n\nThanks, regards.\n\nAC\n\nIl lunedì 15 settembre 2025 alle ore 11:29:42 CEST, Antonino Causa ha scritto:\n\nOk, thanks. Just asked, as I do not see any content suggesting my video...\n\nAC\n\nIl lunedì 15 settembre 2025 alle ore 10:09:45 CEST, contact ha scritto:\n\nHi Antonino Causa,\n\nLooks like it’s already activated—I can see the sponsorship tag.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 12 Sep at 6:12 PM\n, Antonino Causa wrote:\n\nCiao Stella,\njust to inform you that maybe Google Ads were not activated on my video:\n\nQuel Matto degli Scacchi in Giappone | 日本のチェス狂人 | That Chess Fool in Japan\n\nQuel Matto degli Scacchi in Giappone | 日本のチェス狂人 | That Chess Fool in Japan\n\nThanks, regards.\n\nAC\n\nIl martedì 9 settembre 2025 alle ore 09:36:31 CEST, contact ha scritto:\n\nHi AC, Thank you for your emai.It is indeed a beautiful country with so much to explore, and I completely understand your challenges with the local kids. Japan does have its own versions of chess-like games, such as Shogi, which is widely played, but I agree with you that chess itself isn’t as popular. It’s great that you’re interested in helping to promote the game in Japan, and we definitely appreciate your efforts in that direction. Regarding your channel, I want you to know that we are actively trying to help promote it. We’ve been doing our best to support your content, but I really do recommend that you invest in a better camera. A clear picture can significantly reduce the bounce rate, and having good visual quality will help viewers engage better with the content. The clarity of the video is essential for them to truly enjoy the material. As for your question, yes, I am Chinese, and you are correct that in mainland China, social media platforms like Instagram, Facebook, and YouTube are restricted. However, both Hong Kong and Macau still have access to these platforms, so there’s no issue watching your videos from there. Keep up the great work on your channel, and I hope we can continue to collaborate to help it grow!\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nTue, 9 Sep at 12:12 AM\n, Antonino Causa wrote:\n\nHi Stella,\nI'm glad you enjoyed the video. Japan was fantastic, a beautiful country, with so many things and people to discover... It wasn't easy to play with the Japanese kids; I had a hard time convincing them, especially since almost none of them knew how to play chess. It seems like Japan doesn't know chess very well; they need to really penetrate that market, and I'd be happy to lend a hand and/or some advice.\n\nI'm sad to hear I won't be receiving an EVO chessboard to use in my videos. I would have loved to make some videos with this board...\nNever mind... I'll continue making some videos with the CHESSNUT PRO board... please help me grow my channel... I've reached 230 subscribers and 600 watch hours. I still need 170 subscribers and 2,400 watch hours to start monetizing the channel and consider it a \"small channel.\"\n\nIn the meantime, I'll continue making videos featuring your products (I've made about 70 in the past few months, sponsoring your products!)... but if I don't get the results I'm hoping for by January 2026, I'll have to decide what to do: whether to continue or close the channel and give up...\nWe'll keep in touch in the coming weeks, and thank you.\n\nP.S.: Stella, you're Chinese and based in Hong Kong, right? The Chinese guys I met were all really nice, some of them knew how to play chess, but unfortunately they couldn't watch my videos on YouTube, because apparently that social network is banned in China...\n\nCiao.\n\nAC\n\nIl lunedì 8 settembre 2025 alle ore 12:33:12 CEST, contact ha scritto:\n\nHi Antonino Causa, Thank you so much for creating this video — it’s really fun! I love your street challenge and how you’re playing chess everywhere, even by the hot springs! Such dedication! I’ll be sure to share it with the team. How did you find your trip to Japan? I’m excited to hear about your experiences and any tips you’d like to share! As for the Evo, we don’t have any promotional plans for it at the moment, but I truly appreciate your enthusiasm. Thanks again for the awesome video!\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nSun, 7 Sep at 7:01 PM\n, Antonino Causa wrote:\n\nHi Stella,\nthe link to the video which represents the summary of my Japan trip with CHESSNUT GO chessboard: Quel Matto degli Scacchi in Giappone | 日本のチェス狂人 | That Chess Fool in Japan\n\nQuel Matto degli Scacchi in Giappone | 日本のチェス狂人 | That Chess Fool in Japan\n\nQuel Matto degli Scacchi in Giappone | 日本のチェス狂人 | That Chess Fool in Japan\n\nIt was a very challenge adventure... very hard and personal enriching experience!\n\nI hope you could enjoy this video and also my community...\n\nMy best regards.\n\nAC\n\nP.S.: do you think I could have the opportunity to review the CHESSNUT EVO in the next future?...\n\nIl venerdì 15 agosto 2025 alle ore 08:37:44 CEST, contact ha scritto:\n\nHi Antonino Causa, Thanks, we have Google Ads\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nWed, 13 Aug at 5:39 PM\n, Antonino Causa wrote:\n\nHi Stella,\nJust to inform you and your team I am pubblishing 3-4 shorts per day from Japan.\nThanks.\n\nAC\n\nIl mercoledì 6 agosto 2025 alle ore 05:49:26 GMT+9, Antonino Causa ha scritto:\n\nHi Stella,\nI uploaded a new video: SICILIAN - PAULSEN VARIATION: CHESSNUT AIR - 11° allenamento #scacchi vs BOT MIGUEL #chess.com\n\nSICILIAN - PAULSEN VARIATION: CHESSNUT AIR - 11° allenamento #scacchi vs...\n\nMy best regards.\n\nAC\n\nIl martedì 29 luglio 2025 alle ore 23:34:50 CEST, Antonino Causa ha scritto:\n\nHi Stella,\nI uploaded a new video: COLLE-ZUKERTORT SYSTEM CHESSNUT PRO 10° allenamento #scacchionline #scacchi #chess.com #onlinechess\n\nCOLLE-ZUKERTORT SYSTEM CHESSNUT PRO 10° allenamento #scacchionline #scac...\n\nMaybe the last 2 videos were not connected to Google Ads (OLD BENONI: CHESSNUT PRO - 9° allenamento #scacchi vs BOT MIGUEL #chess.com and https://youtube.com/shorts/RdwU4KNHRes?feature=share).\n\nOLD BENONI: CHESSNUT PRO - 9° allenamento #scacchi vs BOT MIGUEL #chess.com\n\nFor sure... once I will be in Japan (on the 9th August) I will upload videos with people!\n\nMy best regards.\n\nAC\n\nIl lunedì 28 luglio 2025 alle ore 12:24:29 CEST, contact ha scritto:\n\nHi Antonino Causa,\n\nThank you so much for the video — I can see you put real effort into it, and I really appreciate your support!\n\nIf there's ever a chance to show a bit more of the chess-playing experience in action, I think that would help viewers better understand the board’s features — but no pressure at all!\n\nWishing you an amazing time in Japan!\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nThu, 24 Jul at 7:25 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nI did my best to improve the video...\n\nあのチェス狂人 (日本) - Quel Matto degli Scacchi (Giappone)... cooming soon... #scacchi #chess #viaggi\n\nあのチェス狂人 (日本) - Quel Matto degli Scacchi (Giappone)... cooming soon... #s...\n\nPlease let me know if ok...\n\nAC\n\nIl giovedì 24 luglio 2025 alle ore 11:03:33 CEST, contact ha scritto:\n\nHi Antonino Causa, Thank you for sharing this! I noticed that the camera quality has been quite blurry. Is there a way to improve the resolution and make it clearer? This could really help with conversions.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nThu, 24 Jul at 7:17 AM\n, Antonino Causa wrote:\n\nCiao Stella,\nI created a promotional coming soon video for Japan...\n\nhttps://youtube.com/shorts/W9f1CML2E2g?feature=share\n\nMy regards.\n\nAC\n\nIl mercoledì 23 luglio 2025 alle ore 08:37:57 CEST, Antonino Causa ha scritto:\n\nHi Stella,\nI upoloaded a new video:\n\nhttps://youtu.be/1ODxUEv4QKk\n\nMy best regards.\n\nAC\n\nIl venerdì 18 luglio 2025 alle ore 11:23:26 CEST, contact ha scritto:\n\nHi Antonino Causa, Thank you for creating the video. Wishing you a wonderful trip in Japan! Looking forward to more interesting videos from you.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 18 Jul at 3:40 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nvideo pubblished yesterday:\n\nPuzzle #6: Allenamento Tattica (passione scacchi chess.com problemi visione calcolo)\n\nPuzzle #6: Allenamento Tattica (passione scacchi chess.com problemi visi...\n\nI am preparing for my journey to Japan (I will go there the 9th August), and I am thrilled to use the Chessnut GO received to make some funny videos in that fantastic country... and I hope also with its fantastic people!\n\nMy best regards.\n\nAC\n\nIl sabato 12 luglio 2025 alle ore 07:21:06 CEST, contact ha scritto:\n\nHi Antonino Causa,\n\n​Thank you.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 11 Jul at 3:09 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nvideo pubblished yesterday:\n\nPuzzle #5: Allenamento Tattica (passione scacchi chess.com problemi visione calcolo)\n\nPuzzle #5: Allenamento Tattica (passione scacchi chess.com problemi visi...\n\nMy regards.\n\nAC\n\nIl lunedì 7 luglio 2025 alle ore 12:36:34 CEST, contact ha scritto:\n\nHi Antonino Causa, Thank you, I have submitted it to the Google Ads campaign list.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 4 Jul at 9:49 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nvideo pubblished yesterday: Puzzle #4: Allenamento Tattica (passione scacchi chess.com problemi visione calcolo)\n\nPuzzle #4: Allenamento Tattica (passione scacchi chess.com problemi visi...\n\nMy regards.\n\nAC\n\nIl venerdì 27 giugno 2025 alle ore 12:27:55 CEST, contact ha scritto:\n\nHi Antonino Causa,\n\nOkay.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 27 Jun at 3:36 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nvideo pubblished yesterday: Puzzle #3: Allenamento Tattica (passione scacchi chess.com problemi visione calcolo)\n\nPuzzle #3: Allenamento Tattica (passione scacchi chess.com problemi visi...\n\nMy best regards.\n\nAC\n\nIl venerdì 20 giugno 2025 alle ore 12:14:59 CEST, contact ha scritto:\n\nHi Antonino Causa, Thank you.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 20 Jun at 3:17 PM\n, Antonino Causa wrote:\n\nCiao Stella,\nchessboard arrived. Thanks so much!\nMy video published yesterday: https://youtu.be/pveZQTom7tw\n\nRegards.\n\nAC\n\nIl giovedì 12 giugno 2025 alle ore 10:58:06 CEST, contact ha scritto:\n\nHi Antonino Causa, Loved your vid! On-point theme  I’ll run Google Ads to push it—let’s track results. Thanks for creating this!\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nThu, 12 Jun at 6:56 AM\n, Antonino Causa wrote:\n\nThank you so much, Stella.\n\nI inform you that I started a new format: high voice tactics calculation / puzzle resolution with chessnut air chessboard.\n\nI already recorded 6 episodes.\n\nThis is the1st published: https://youtu.be/J8RMJEqEzjE?si=5-ng0vNm9sul2sF4?list=PLywNDbpugRtg6rCquvuesqSZJQNBYXBGA\n\nAllenamento Tattica: Risoluzione Puzzle #1 (passione scacchi chess.com p...\n\nRegards.\nAC\n\nIl mercoledì 11 giugno 2025 alle ore 12:17:57 CEST, contact ha scritto:\n\nHi Antonino Causa,\n\nGo and the stand have been shipped. Tracking number: CH473134415DE Carrier: DHL\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 6 Jun at 6:17 PM\n, contact wrote:\n\nHi Antonino Causa, Sure! I’ll send you the orange version as requested. The Go set automatically comes with a carrying bag included, and I’ll make sure to include the missing phone stand as well. Thanks again!\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 6 Jun at 6:16 PM\n, Antonino Causa wrote:\n\nok, fantastic! then OK orange buttons (is the bag icluded, correct?)! do you have also the opportunity to send the stand for the phone that was missing?\nthanks so much! AC\n\nIl venerdì 6 giugno 2025 alle ore 10:44:23 CEST, contact ha scritto:\n\nHi Antonino Causa, Thanks for your message! I'm afraid using IBAN won’t be possible, as we handle all payments through a unified system. That said, I'm really interested in your idea — it sounds like a fantastic plan! I'd be happy to send you a Chessnut Go for your trip. I’m looking forward to seeing your chess videos during your journey in Japan! Just let me know: do you prefer the version with orange buttons or grey buttons?\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nFri, 6 Jun at 1:33 AM\n, Antonino Causa wrote:\n\nJust to add a new video to CHESSNUT PLAYLIST: Zukertort Opening: Ross Gambit - Sfidiamo a scacchi Adolf Anderssen con scacchiera CHESSNUT PRO\n\nZukertort Opening: Ross Gambit - Sfidiamo a scacchi Adolf Anderssen con...\n\nIl giovedì 5 giugno 2025 alle ore 15:37:31 CEST, Antonino Causa ha scritto:\n\nCiao Stella, thanks, I confirm the payment on PayPal now.\n\nIs it possible to use an IBAN instead of PayPal? I ask because I do not find this method available on the account...\n\nI anticipate to you that in August I will do a 3 weeks trip in Japan... which could be an opportunity to sponsor your products playing chess during my trip with shorts videos of \"Quel Matto degli Scacchi\" on Japan trains/metro or in fantastic Japan locations... please, let me know if you could be interested yo send to me (within next 3-4 weeks) any promotional material to bring with me to Japan...\n\nThanks.\n\nAC\n\nIl giovedì 5 giugno 2025 alle ore 12:58:53 CEST, contact ha scritto:\n\nHi Antonino, Could you please check again? The payment should have been completed by now.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\nOn\nTue, 3 Jun at 8:10 PM\n, Antonino Causa wrote:\n\nOk, thanks. But the point is I have neve received money so far in my paypal account since march... any problem?\n\nIl martedì 3 giugno 2025 alle ore 12:04:45 CEST, contact ha scritto:\n\nHi Antonino, Thank you, I will have my colleague handle the Google ads. Regarding the commission settlement, there was a delay due to the weekend on the 1st and 2nd. The payment will be made later today, so please keep an eye out for it.\n\nBest,\nStella\nBusiness Development Manager | Chessnut\n\n54868:2750839",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-13T16:32:09.000Z"
+    },
+    {
+      "id": "7edcf46c39fe7f6a9295",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Target Plus Marketplace",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: This is a commercial collaboration and marketplace expansion pitch, which falls under Stella's partnership and business collaboration responsibilities rather than product support. Best, Stella Business Development Manager | Chessnut\n\nOn\nMon, 13 Jul at 8:13 PM\n, Sadya Zirkind wrote:\n\nHi,\n\nBeyond Target, I noticed you're not on several other marketplaces that would be great fits for chess products. Temu has a growing toys and games section. Oriental Trading targets educational markets. Both could expand your reach significantly.\nMost of our chess product sellers see 40-60% revenue increases when they expand to 3-4 additional channels. Worth a quick conversation?\n\nBest,\nSadya\n\nOn Wed, Jul 8, 2026 at 10:10 PM Sadya Zirkind wrote:\nHi,\n\nQuick follow up on the Target Plus opportunity for your chess computer. Target's board games category is experiencing strong growth. Premium electronic games like yours perform especially well during holiday and back-to-school seasons.\nThe application process takes about 2 weeks. Are you interested in exploring this for Q1?\n\nThanks,\nSadya\n\nOn Mon, Jul 6, 2026 at 10:09 PM Sadya Zirkind wrote:\nHey,\n\nI see your Chessnut Evo AI Chess Computer is selling well on eBay and other marketplaces. Chess players love how responsive and challenging the AI gets. This would be perfect for Target Plus Marketplace customers looking for premium electronic board games. We've helped hundreds of sellers get on Target Plus Marketplace. Our sellers generate over 250M in additional revenue.\nWe're closing out applications for Q1 26. Let me know if you'd like me to send over the application.\n\nThanks, Sadya",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-13T16:37:47.000Z"
+    },
+    {
+      "id": "0b7234551ff29b44836f",
+      "name": "Google Events",
+      "email": "no-reply-eventsatgoogle@google.com",
+      "subject": "倒计时 1 天 | Google Marketing Live 2026 期待您的参与！",
+      "body": "Google Marketing Live - Don't miss out\n\n深圳前海国际会议中心\n\n深圳前海深港合作区前湾一路\n\n庄仪琛 你好！\n\n请截图保存您的签到码\n\n签到码\n\n（此码不可转让，请于现场凭此码换取胸卡）\n\n活动日程\n\n12:00 - 13:30\n\n签到\n\n1F 大厅\n\n13:30 - 16:00\n\n主题演讲\n\n2F 大会堂\n\n主题演讲\n\n13:30 - 13:40\n\n欢迎致辞\n\n13:40 - 13:50\n\nAI 时代消费者洞察\n\n13:50 - 14:05\n\nAI 驱动营销升级，\n\n把握增长新机遇\n\n14:05 - 14:15\n\n品牌创始人分享：\n\nVIVAIA 的增长进阶之路\n\n14:15 - 14:30\n\n打造可信赖内容声量，\n\n建立 AI 时代品牌护城河\n\n14:30 - 15:00\n\n茶歇\n\n15:00 - 15:10\n\nYouTube 创作者分享：\n\n创造力成就影响力\n\n15:10 - 15:45\n\nYouTube 创作者圆桌会谈：\n\n解码内容共创的品牌合作\n\n15:45 - 15:50\n\n结束语\n\n如果您有任何问题，请联系您的 Google 客户经理。\n\nGoogle Marketing Live China 团队",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-15T02:55:24.000Z"
+    },
+    {
+      "id": "f267d37c686a4da5164b",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Order 30 items, Bulk purchase",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-16T06:51:05.000Z"
+    },
+    {
+      "id": "3524d25f38cacb34599a",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: B2B Partnership Proposal for Chessnut Move in Kazakhstan",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-16T09:18:57.000Z"
+    },
+    {
+      "id": "068a79f00a198417a95a",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Collaboration Inquiry: ChekmateLive x Chessnut",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The customer is a YouTube creator proposing product reviews and promotional collaboration, so this should be handled by Stella for partnership and influencer inquiries. Best, Stella Business Development Manager | Chessnut\n\nOn\nThu, 16 Jul at 8:04 PM\n, chekmatelive wrote:\n\nHi Chessnut Team, I’m the creator behind ChekmateLive, a growing YouTube community dedicated to chess puzzles, tactics, and tutorials. I’ve been following Chessnut’s innovation in smart chessboards and believe your products would be a perfect fit for my audience. My channel has seen significant growth recently, reaching over 11,000 views in the last month alone. My viewers are highly engaged with tactical content, with recent videos like my \"Mate in 2\" puzzle series consistently performing well. I’m reaching out to see if you’d be interested in a collaboration. I’d love to feature a Chessnut board in my upcoming videos to demonstrate its features and how it can help players improve their game. In exchange, I can offer: A dedicated product review or integration in my high-performing puzzle videos. Links to your store in the video description. Shoutouts to my growing community of chess enthusiasts. Are you open to sending a review unit or discussing other ways we could work together? I’d love to help more players discover your tech. Looking forward to hearing from you!\n\n-- Best Regards,     Chekmatelive\nhttps://youtube.com/@chekmatelive?feature=shared",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-16T16:37:21.000Z"
+    },
+    {
+      "id": "af0046932840ec3bba1c",
+      "name": "alan.wang@chessnutech.com",
+      "email": "alan.wang@chessnutech.com",
+      "subject": "Re: 转发：Order 30 items, Bulk purchase",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-18T01:25:59.000Z"
+    },
+    {
+      "id": "43a0afb41f771a995b3e",
+      "name": "alan.wang@chessnutech.com",
+      "email": "alan.wang@chessnutech.com",
+      "subject": "Re: 回复：B2B Partnership Proposal for Chessnut Move in Kazakhstan",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-18T01:29:18.000Z"
+    },
+    {
+      "id": "095e57370e9c1c0464b3",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: German U10 Girls Champion heading to the European Championship: partnership idea",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The customer is proposing a sponsorship, influencer collaboration, and possible product partnership, which should be handled by Stella. Best, Stella Business Development Manager | Chessnut\n\nOn\nSun, 19 Jul at 9:31 PM\n, Fariz Bashirov wrote:\n\nHello Chessnut team,\n\nI saw that you sponsored the Magnus Carlsen evening in Hong Kong in June, providing boards for the whole event. That is exactly the kind of visible, hands-on presence I want to talk to you about, just at a much smaller scale and in Europe.\n\nMy daughter Sona Bashirova is 10 years old, German Champion U10 Girls 2025, and a member of the German national youth squad. This year she entered the U12 open section of the German Championship as the only girl in the field, playing boys mostly older than her, rather than defending in the girls' category. From 2 to 13 November she plays for Germany at the European Youth Chess Championship in Crete, U12 Girls.\n\nHer Instagram @sonikchess has over 1,500 followers, our strongest video reached 720,000 views, and a collaboration filmed at the Grenke Open reached 138,000. The audience is chess families in Germany and Europe, which is your market.\n\nWhat we offer for the season:\n\nBronze, 500 euros: your logo on Sona's tournament hoodie, worn at every event including the European Championship.\nSilver, 1,000 euros: plus an authentic Instagram Reel.\n\nWe are also open to a product-based partnership. If Sona trains and analyses on a Chessnut board, that becomes genuine content rather than an advertisement, and a German champion using your board at a European Championship is a credible story for the European market.\n\nThe hoodie goes to print in early October.\n\nBest regards,\nFariz Bashirov\nBerlin, Germany\n+49 176 31182335\ninstagram.com/sonikchess\n\nGerman squad: DSB-Kader 2026 Frauen und weibliche Jugend - Deutscher Schachbund - Schach in Deutschland\n\nDSB-Kader 2026 Frauen und weibliche Jugend - Deutscher Schachbund - Scha...\n\nNational championship: https://www.deutsche-schachjugend.de/2025/dem-u10w/spieler/1/",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-19T16:31:34.000Z"
+    },
+    {
+      "id": "04a479134adbfe7d4430",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Partnering with intent.ly through Impact",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The ticket is a business partnership outreach and should be handled by Stella. Best, Stella Business Development Manager | Chessnut\n\nOn\nMon, 20 Jul at 7:16 PM\n, Mark Payne wrote:\n\nHi Ting, We've reached out a couple of times recently about setting up some time to discuss a partnership. Unfortunately we haven't heard back yet, but perhaps there is a reason. Do you have any concerns, or worries. Something that I can help assure you with? These could be technical blockers, available time, internal pressures or other priorities. Or perhaps you have questions about how it works, but just haven't had time? Let's connect, and jump on a quick call to discuss together, or if you can reply here and let us know your concerns, we'll do our best to help. Best, Mark ------------------------- On 2026-07-16 12:52:18, Ting Wang wrote:\n\nHi Ting,\n\nI wanted to gently follow up on our last note. We've not been able to connect, or schedule any time to explore the partnership, or even it's potenital yet. We would love to change that.\n\nWe're data led and will quickly identify areas of opportunity across your funnel. We share these insights with you, along with the correct recommended action to increase your revenue performance. We're highly targeted, typically engaging with 2-10% of your non-converting audience and we can validate this through our insights platform.\n\nWe work through Impact on your baseline CPA rate, we're a fully managed service (with no additional cost). This includes detailed insights, design, technical support, CS management and access to our platform.\n\nGetting set up takes minutes, any questions, just reach out.\n\nBest,\nMark\n\n-------------------------\nOn 2026-07-14 11:53:54, Ting Wang wrote:\n\nHi Ting,\n\nThanks for accepting us onto your program – we're excited to work with you.\n\nWe've been active on your programme for for some time now. Are you familiar with intent.ly? If not so familiar, I would recommend a short call to align on goals and ways for us to partner. It all begins with integration, but this unlocks the insights needed to recommend the right strategies for the right audience segments.\n\nWith the Impact network it's very easy to get started –\nview tag instructions\n\nIf you have any questions about how it works, what to expect or would like to see a demo, please feel free to reach out to the team.\n\nBest,\nMark\n\nMark Payne\n\nintent.ly\n\nmark.payne@intent.ly\n\nintent.ly\n\nXV7W3\n\nMark Payne\n\nintent.ly\n\nmark.payne@intent.ly\n\nintent.ly\n\n1J5HF\n\nMark Payne\n\nintent.ly\n\nmark.payne@intent.ly\n\nintent.ly\n\nK6GBX\n\n--\n\nIs this email not relevant to you? Click here",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-20T16:41:41.000Z"
+    },
+    {
+      "id": "c33063b9f0e082a6a28c",
+      "name": "Google Events",
+      "email": "no-reply-eventsatgoogle@google.com",
+      "subject": "Google Marketing Live 2026 精彩回顾！",
+      "body": "Google Marketing Live - Thank You\n\n感谢您参加 Google Marketing Live 2026！我们希望本次活动能够帮助您全面拥抱\nAI 时代,助您洞察消费趋势、借力 Google 智能系统精准捕获越来越聪明的消费者；并\n携手 YouTube 优质内容赢取消费者信任。\n\n点击获取活动精华资源包,欢迎您收藏与转发。\n\n扫描下方二维码,可获取现场精美照片。\n\n立即扫码\n\n再次感谢您的参与,期待与您再次相会！\n\n如果您有任何问题,请联系您的 Google 客户经理。\nGoogle Marketing Live China 团队",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-21T03:04:31.000Z"
+    },
+    {
+      "id": "bb299fe3a6453a171f44",
+      "name": "阿里邮箱",
+      "email": "no-reply@mailsupport.aliyun.com",
+      "subject": "【阿里云邮】您的账号异地登录提醒",
+      "body": "异地登录提醒\n尊敬的用户：\n您的账号stella.zhuang@chessnutech.com近期发生一次异常登录，请核实以下详情：\n登录时间：2026-07-21T18:01:48+08:00\n登录城市：Kowloon,Hong Kong,China(仅参考)(IP:103.135.100.150)\n登录方式：APP\n登录状态：SUCCESS\n\n请检查本次登录是否本人所为：\n1.是否在登录地，或者使用归属地为登录地的手机号上网登录\n2.是否使用其他邮件系统进行代收，或者使用第三方邮箱客户端收信\n如判断账号有风险，请及时修改您的邮箱密码。为增强账号安全，建议您前往网页版邮箱设置页开启三方客户端安全密码（开启后将不再发送异地登录提醒）、双重认证安全功能。\n\n关注账号安全，可以 访问网页版邮箱，进入设置－账号设置－历史记录，查询近期登录信息。\n更多关于异地登录的信息和方案建议请 访问帮助中心\n注：邮件来自阿里邮箱，发送时间：2026-07-21T18:01:48+08:00。当系统检测到您的账号发生异地登录事件，会自动发送此提醒邮件给您。\n\n阿里邮箱团队",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-21T10:01:48.000Z"
+    },
+    {
+      "id": "cfb0f2a9ed0b1c5665d2",
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "subject": "🚀 Your GitHub launch code",
+      "body": "Here's your GitHub launch code!\n\nContinue signing up for GitHub by entering the code below:\n\n10220512\n\nYou can enter it by visiting the link below:\n\nhttps://github.com/account_verifications?verification=cd0dfb3c-02d0-4e8f-970e-0b67032ecf61&via_launch_code_email=true\n\nYou’re receiving this email because you recently created a new GitHub account. If this wasn’t you, please ignore this email.\n\nNot able to enter the code? Paste the following link into your browser:\n\nhttps://github.com/account_verifications/confirm/cd0dfb3c-02d0-4e8f-970e-0b67032ecf61/10220512\n\n---\nSent with <3 by GitHub.\nGitHub, Inc. 88 Colin P Kelly Jr Street\nSan Francisco, CA 94107",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-21T10:22:07.000Z"
+    },
+    {
+      "id": "a6f44caf8c3e22157929",
+      "name": "Railway",
+      "email": "hello@notify.railway.app",
+      "subject": "All aboard! Welcome to Railway!",
+      "body": "Thanks for trying out Railway, we’ve pulled together some information and resources to help you get started\n\nRailway Logo\n\n*******************\nWelcome to Railway!\n*******************\n\nWe’re thrilled to have you on board.\n\nHere are some resources to help you get started:\n\n* Read the docs ( https://docs.railway.app/?utm_campaign=PLG+Onboarding+Campaign&utm_content=Welcome&utm_medium=email_action&utm_source=customer.io )\n* Create a project ( https://railway.app/new?utm_campaign=PLG+Onboarding+Campaign&utm_content=Welcome&utm_medium=email_action&utm_source=customer.io )\n* Deploy a template ( https://railway.app/templates?utm_campaign=PLG+Onboarding+Campaign&utm_content=Welcome&utm_medium=email_action&utm_source=customer.io )\n\nView the dashboard ( https://railway.app/dashboard?utm_campaign=PLG+Onboarding+Campaign&utm_content=Welcome&utm_medium=email_action&utm_source=customer.io )\n\nThanks,\n\nYour friends at Railway\n\nUnsubscribe from marketing emails ( https://railway.com/preferences?token=ba399167-50d7-4dce-b7f3-dd059d502e31&utm_campaign=PLG+Onboarding+Campaign&utm_content=Welcome&utm_medium=email_action&utm_source=customer.io )\n\n© 2026 Railway Corp. All rights reserved.",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-21T10:23:10.000Z"
+    },
+    {
+      "id": "c8b70c6208fe918420f4",
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "subject": "[GitHub] Please verify your device",
+      "body": "Hey chacha-stella!\n\nA sign in attempt requires further verification because we did not recognize your device. To complete the sign in, enter the verification code on the unrecognized device.\n\nDevice: Chrome on Windows\nVerification code: 467030\n\nIf you did not attempt to sign in to your account, your password may be compromised. Visit https://github.com/settings/security to create a new, strong password for your GitHub account.\n\nIf you'd like to automatically verify devices in the future, consider enabling two-factor authentication on your account. Visit https://docs.github.com/articles/configuring-two-factor-authentication to learn about two-factor authentication.\n\nIf you decide to enable two-factor authentication, ensure you retain access to one or more account recovery methods. See https://docs.github.com/articles/configuring-two-factor-authentication-recovery-methods in the GitHub Help.\n\nThanks,\nThe GitHub Team",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-21T10:23:24.000Z"
+    },
+    {
+      "id": "c65a53b3390050239b5c",
+      "name": "Railway",
+      "email": "hello@notify.railway.app",
+      "subject": "Build failed for stellar-grace",
+      "body": "Railway Logo\n\nBuild failed for project: stellar-grace\n\n*************\nBuild failed!\n*************\n\nThis is awkward. One of your builds failed to leave the wheelhouse. Details:\n\n* Project: stellar-grace\n* Service: kol-radar\n* Environment: production\n\nView build logs ( https://railway.com/project/4e91e310-55f6-4dc5-a9d6-98d6cbc19c04/service/3b41fb57-635e-488e-ab5f-e15c570ada3e?id=18660973-0635-4300-b780-2a9528fa6864&environmentId=889baf4f-87f1-42f3-bc67-1624edec110d&utm_campaign=Build+failed+email&utm_content=Build+failed+email&utm_medium=email_action&utm_source=customer.io )\n\nIt might help to look at the docs ( https://docs.railway.app/?utm_campaign=Build+failed+email&utm_content=Build+failed+email&utm_medium=email_action&utm_source=customer.io ) and if you're still stuck and think we can help, feel free to reach out to us on our Discord ( https://discord.com/invite/xAm2w6g?utm_campaign=Build+failed+email&utm_content=Build+failed+email&utm_medium=email_action&utm_source=customer.io ).\n\nRegards,\n\nThe Railway Team\n\nManage email preferences ( https://railway.com/preferences?token=ba399167-50d7-4dce-b7f3-dd059d502e31&preference=buildFailedEmail&utm_campaign=Build+failed+email&utm_content=Build+failed+email&utm_medium=email_action&utm_source=customer.io )\n\n© 2026 Railway Corp. All rights reserved.",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-21T10:35:57.000Z"
+    },
+    {
+      "id": "947e673677a3533bc83f",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Substack writers with loyal audiences = Big wins for your brand",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: This is a partnership and affiliate marketing solicitation, which should be routed to Stella. No product support or order issue is involved. Best, Stella Business Development Manager | Chessnut\n\nOn\nTue, 21 Jul at 9:03 PM\n, Growth Team wrote:\n\nGet your brand in front of fans who actually pay attention͏‌\n͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­͏‌  ­\n\nView in browser\n\nAccount ID: 6356449\n\nFind partners and creators\n\nSubstack is like a VIP club for newsletters—where Substack Creators share content, and subscribers actually want to read (and pay for) it! ?? It’s no wonder brands are lining up to reach customers in a whole new way.\n\nView publishers\n\n25 W Cota Street, Santa Barbara,\nCA 93101 +1 (805) 324 6021\n\nHelp Center\n•\nPXA •\nReferral Program\n\n• Terms • Privacy\n© 2026 All rights reserved Impact Tech, Inc.\n\nThanks for being part of our community ? Need help? Visit our Help Center for support, tips, and answers to common questions.\nWant to grow your affiliate and partnership marketing skills? Explore PXA courses. Earn up to $550 for every new brand referred to impact.com. Start referring today!\n\nThis email was sent to mkt@chessnutech.com.\nYou’re receiving this email because you subscribed to updates from impact.com or engaged with our platform. No longer interested? Unsubscribe here.",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-21T16:37:57.000Z"
+    },
+    {
+      "id": "461783c0ea76a1cb40bc",
+      "name": "GitHub",
+      "email": "no-reply@github.com",
+      "subject": "Welcome to GitHub—let’s get started 💻",
+      "body": "Learn coding basics from Harvard & GitHub ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n\nHi there,\n\nWelcome to GitHub. If you're new to coding or want to build on your skills, you’re in the right place.\n\n*📝 Your first challenge? Learning the basics of coding with Harvard’s Professor David Malan.*\n\nIn this free, 10-part course ( https://cs50.harvard.edu/x/2025/weeks/0/?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 ) , you’ll:\n\n✅ Learn basic programming principles\n✅ Plan and build your first project\n✅ Get into the developer mindset\n\nGet started ( https://cs50.harvard.edu/x/2025/weeks/0/?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n\nWant more beginner resources? 🧠\n\n📖 Read and/or watch our \"GitHub for Beginners\" guides ( https://github.blog/tag/github-for-beginners/?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n💬 Join our 150M+ developer community ( https://github.com/community?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n📩 Subscribe to the GitHub Insider newsletter for pro tips ( https://resources.github.com/newsletter/?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n📚 Dive into our documentation to learn all the things ( https://docs.github.com/en/get-started/start-your-journey?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n\nStart your journey ( https://docs.github.com/en/get-started/start-your-journey/about-github-and-git?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n\nHappy coding,\nThe GitHub Team\n\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n\nThe world’s most widely adopted Copilot-powered developer platform\n\nUnsubscribe ( http://github.com/settings/emails/subscriptions/unsubscribe?CTID=0&amp;ECID=LePzGtTY4abxQy7Khtd_C0Ownd6Ye6EuuP4xuKZ3zzg&amp;K=27588ae6-8a5e-488f-b978-36ba33a95d93&amp;D=639202913408876379&amp;PID=19075&amp;TID=00000000-0000-0000-0000-000000000006&amp;CMID=nurture_campaign_sync ) • Email preferences ( https://github.com/settings/emails ) • Terms ( https://help.github.com/articles/github-terms-of-service/?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 ) • Privacy ( https://help.github.com/articles/github-privacy-policy/?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 ) • Sign in to GitHub ( https://github.com/login?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n\n( https://www.instagram.com/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 ) ( https://www.tiktok.com/@github?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 ) ( https://twitter.com/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 ) ( https://www.youtube.com/c/GitHub?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 ) ( https://www.twitch.tv/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 ) ( https://www.linkedin.com/company/github/?utm_source=github&utm_medium=email&utm_campaign=nux_email_1 )\n\nGitHub, Inc.\n88 Colin P Kelly Jr St.\nSan Francisco, CA 94107",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-22T04:31:19.000Z"
+    },
+    {
+      "id": "755df7d359eea27bd0b6",
+      "name": "Afluencer",
+      "email": "support@afluencer.com",
+      "subject": "Your new Afluencer account is ready! [ID: 109146]",
+      "body": "Afluencer Your new Afluencer account is ready, stella!\nUse the link below to sign in and activate your account:\nSign In\nThis link will expire in 7 days.\nIf the link has expired, request a new one at https://app.afluencer.com/password/reset .\n[ID: 109146] Control your notifications by visiting your account here . &copy; 2026 Afluencer. All rights reserved.",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-22T07:14:40.000Z"
+    },
+    {
+      "id": "b8d12b363b11099f5aed",
+      "name": "Afluencer",
+      "email": "support@afluencer.com",
+      "subject": "Reset your Afluencer password",
+      "body": "Afluencer Reset your Afluencer password\nHi stella, we received a request to reset your password.\nReset Password\nIf you didn't request this, you can ignore this email. Control your notifications by visiting your account here . &copy; 2026 Afluencer. All rights reserved.",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-22T07:16:25.000Z"
+    },
+    {
+      "id": "6bd95fa70e75f023eb1a",
+      "name": "Afluencer",
+      "email": "support@afluencer.com",
+      "subject": "Account credits updated!",
+      "body": "Afluencer Dear Afluencer, Your account has been updated with the amount of 20 credits! Your credit balance is now 20 . Control your notifications by visiting your account here . &copy; 2026 Afluencer. All rights reserved.",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-22T07:17:29.000Z"
+    },
+    {
+      "id": "9db097e4ba2b47f1a774",
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "subject": "[GitHub] A first-party GitHub OAuth application has been added to your account",
+      "body": "Hey chacha-stella!\n\nA first-party GitHub OAuth application (Git Credential Manager) with gist, repo, and workflow scopes was recently authorized to access your account.\nVisit https://github.com/settings/connections/applications/0120e057bd645470c1ed for more information.\n\nTo see this and other security events for your account, visit https://github.com/settings/security-log\n\nIf you run into problems, please contact support by visiting https://github.com/contact\n\nThanks,\nThe GitHub Team",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-22T09:11:15.000Z"
+    },
+    {
+      "id": "2acfef179ca6a6033389",
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "subject": "[GitHub] A third-party OAuth application has been added to your account",
+      "body": "Hey chacha-stella!\n\nA third-party OAuth application (Apify) with user:email scopes was recently authorized to access your account.\nVisit https://github.com/settings/connections/applications/766201f5e50edb725ea7 for more information.\n\nTo see this and other security events for your account, visit https://github.com/settings/security-log\n\nIf you run into problems, please contact support by visiting https://github.com/contact\n\nThanks,\nThe GitHub Team",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-22T11:08:53.000Z"
+    },
+    {
+      "id": "c310c9eb43b55068d511",
+      "name": "Railway",
+      "email": "hello@notify.railway.app",
+      "subject": "Start Collecting Referral Credits",
+      "body": "Referrals are a great way to generate credits for Railway, get started today referring friends to Railway\n\nRailway Logo\n\n************************\nReferral Credits for You\n************************\n\nWe'll give you 15% cash earnings of all paid revenue from your friends for a year. It's as easy as that!\n\nRailway Templates\n\nGet your code ( https://railway.app/account/referrals?utm_campaign=PLG+Onboarding+Campaign&utm_content=Referrals&utm_medium=email_action&utm_source=customer.io )\n\nNeed some help? Join Railway on Discord ( https://discord.com/invite/xAm2w6g?utm_campaign=PLG+Onboarding+Campaign&utm_content=Referrals&utm_medium=email_action&utm_source=customer.io ) or reply to this email.\n\nThanks,\n\nYour friends at Railway\n\nUnsubscribe from marketing emails ( https://railway.com/preferences?token=ba399167-50d7-4dce-b7f3-dd059d502e31&utm_campaign=PLG+Onboarding+Campaign&utm_content=Referrals&utm_medium=email_action&utm_source=customer.io )\n\n© 2026 Railway Corp. All rights reserved.",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-22T11:23:23.000Z"
+    },
+    {
+      "id": "a6a89d41637bd3091620",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: NEW-XQR-VN-PN00198108272556XZ00128981762555337373",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-23T08:32:26.000Z"
+    },
+    {
+      "id": "db5680791e954483a50e",
+      "name": "Inias Vissenaekens",
+      "email": "happychessbe@gmail.com",
+      "subject": "reimbursement flyers France",
+      "body": "",
+      "reason": "普通邮件/未识别为合作",
+      "receivedAt": "2026-07-23T13:14:53.000Z"
+    },
+    {
+      "id": "18e4177cfc3926c4d385",
+      "name": "Cloudflare",
+      "email": "noreply@notify.cloudflare.com",
+      "subject": "[Action required] Verify your email address",
+      "body": "This email address was just used to sign up for a Cloudflare account\n\nIf this was you, please verify your email below.\n\nhttps://dash.cloudflare.com/email-verification?token=l7jBWF0ZqhPB9P-FLYi0y_5Mas4V7_8EZMLsepjJV44HXDnLLTpBOUIPY4jwR6RjNw6aQ8tB3KlhOPS-YraddTE4gxAaut_sLybd9NLK3mIYKZa9b5l3qartZ0sq-I2I-DWQmrRDugcAHC_wHbEmDgSh8ZdP7JIxVjjB1-ogzVTN-_LDKWDUzbkPvVHyJYrx4-Hab-v24kWCJ4RkU4XSAG4YO-wbjksSibgomx1eSY6EharXFWGGsrLqRFxboNGf\n\nNot you?\nDon’t worry. Your internet properties on this account (and any other Cloudflare accounts you own) are not at risk.\n\nYou can delete this newly-created account by entering the following token at the link below:\nToken: 3867cc689bf576ffb91cc90cc11bf9c2a28ca83f0827afbc274585a59a0bc287\nhttps://dash.cloudflare.com/unintended-registration\n\n--BjpZ1lvYSf66jaWb8cAZwzeaB4y81vDVBN2hZ0Td\nContent-Type: text/html; charset=utf-8\nContent-Transfer-Encoding: quoted-printable\n\n96\n\nThis email address was used to sign up for a Cloudflare account.\n\n&nbsp;\n\nThis email address was just used to sign up for a Cloudflare account\n\n&nbsp;\n\nIf this was you, please verify your email below.\n\nVerify your email\n\n&nbsp;\n\nNot you?\n\nDon’t worry. Your internet properties on this account (and any other Cloudflare accounts you own) are not at risk.\n\nYou can delete this newly-created account by entering the following token at the link below:\nToken: 3867cc689bf576ffb91cc90cc11bf9c2a28ca83f0827afbc274585a59a0bc287\nhttps://dash.cloudflare.com/unintended-registration\n\n&nbsp;\n\n&nbsp;\n\nCopyright ©&nbsp;2026 Cloudflare,\nInc.\n101 Townsend Street, San Francisco,\nCA 94107\nwww.cloudflare.com\n&nbsp;|&nbsp;\nCommunity\n\n--BjpZ1lvYSf66jaWb8cAZwzeaB4y81vDVBN2hZ0Td--",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-24T10:17:01.000Z"
+    },
+    {
+      "id": "b400ac08ff6f3e48ecfe",
+      "name": "Cloudflare",
+      "email": "noreply@notify.cloudflare.com",
+      "subject": "[Action required] Verify your email address",
+      "body": "This email address was just used to sign up for a Cloudflare account\n\nIf this was you, please verify your email below.\n\nhttps://dash.cloudflare.com/email-verification?token=mOCOQBjgFXH7-EBcNGJnDLY9h47EjuFv0QsNwlATU41KuDZkp9FquEdPhQOGFP87vIfX0I3mLf_49q03bPcQSqgP8sUkeERUDnNcnwcyDqoWC1sXm9-iHOPJjtUoniMppG1Z9rKKQHNPMq0pNC1TMQroHpfGsQMjIXsqaccRXZGX5YF0Bnnz3kWJybRjm35YSBs3cFiZ8lErTxcLNzeDMEugNC1ky8Qx2ujngkKzAOxRu-rbsQgCiJNV1CtwVdWV\n\nNot you?\n\nDon’t worry. You can safely ignore this email. Your internet properties on this account (and any other Cloudflare accounts you own) are not at risk.\n\n--giUeUJDlwS9aqdOgyaF3l9qrNESpdkJLgJcp4zjO\nContent-Type: text/html; charset=utf-8\nContent-Transfer-Encoding: quoted-printable\n\n96\n\nThis email address was used to sign up for a Cloudflare account.\n\n&nbsp;\n\nThis email address was just used to sign up for a Cloudflare account\n\n&nbsp;\n\nIf this was you, please verify your email below.\n\nVerify your email\n\n&nbsp;\n\nNot you?\n\nDon’t worry. You can safely ignore this email. Your internet properties on this account (and any other Cloudflare accounts you own) are not at risk.\n\n&nbsp;\n\n&nbsp;\n\nCopyright ©&nbsp;2026 Cloudflare,\nInc.\n101 Townsend Street, San Francisco,\nCA 94107\nwww.cloudflare.com\n&nbsp;|&nbsp;\nCommunity\n\n--giUeUJDlwS9aqdOgyaF3l9qrNESpdkJLgJcp4zjO--",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-24T10:27:55.000Z"
+    },
+    {
+      "id": "396eb94a873fded0179f",
+      "name": "chacha-stella",
+      "email": "notifications@github.com",
+      "subject": "[chacha-stella/kol-radar] Run failed: Daily mailbox scan - main (853af73)",
+      "body": "[chacha-stella/kol-radar] Daily mailbox scan workflow run\n\nRepository: chacha-stella/kol-radar\nWorkflow: Daily mailbox scan\nDuration: 26 minutes and 44.0 seconds\nFinished: 2026-07-24 11:37:38 UTC\n\nView results: https://github.com/chacha-stella/kol-radar/actions/runs/30088680284\n\nJobs:\n* scan failed (2 annotations)\n\n--\nYou are receiving this because you are subscribed to this thread.\nManage your GitHub Actions notifications: https://github.com/settings/notifications?email_source=notifications&email_token=CJKITTB6O6DPRZZZKNVW22L5GNDBNA5CNFSNUACCM5UWIORPF5TWS5BNNB2WEL2DNBSWG22TOVUXIZKFOZSW45CON52GSZTJMNQXI2LPNYXTQMJVGMZDMNBQGIZDMJJTIIYTOOBUHA4TGMBVHCTHEZLBONXW5IFFMV3GK3TUWFRXGX3TMV2HI2LOM5ZV6Y3MNFRWW",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-24T11:38:01.000Z"
+    },
+    {
+      "id": "ffa9f838532c8cf582ca",
+      "name": "chacha-stella",
+      "email": "notifications@github.com",
+      "subject": "[chacha-stella/kol-radar] Run failed: Daily mailbox scan - main (eb168d5)",
+      "body": "[chacha-stella/kol-radar] Daily mailbox scan workflow run\n\nRepository: chacha-stella/kol-radar\nWorkflow: Daily mailbox scan\nDuration: 25 minutes and 35.0 seconds\nFinished: 2026-07-24 11:50:19 UTC\n\nView results: https://github.com/chacha-stella/kol-radar/actions/runs/30089469589\n\nJobs:\n* scan failed (2 annotations)\n\n--\nYou are receiving this because you are subscribed to this thread.\nManage your GitHub Actions notifications: https://github.com/settings/notifications?email_source=notifications&email_token=CJKITTBGZLR3WKEDYXFIJYT5GNEQ7A5CNFSNUACCM5UWIORPF5TWS5BNNB2WEL2DNBSWG22TOVUXIZKFOZSW45CON52GSZTJMNQXI2LPNYXTQMJVGM2DQNBYHA4DOJJTIIYTOOBUHA4TGOBRHGTHEZLBONXW5IFFMV3GK3TUWFRXGX3TMV2HI2LOM5ZV6Y3MNFRWW",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-24T11:50:42.000Z"
+    },
+    {
+      "id": "0e4f52461aa4a0f6260d",
+      "name": "chacha-stella",
+      "email": "notifications@github.com",
+      "subject": "[chacha-stella/kol-radar] Run failed: Daily mailbox scan - main (c5c60c6)",
+      "body": "[chacha-stella/kol-radar] Daily mailbox scan workflow run\n\nRepository: chacha-stella/kol-radar\nWorkflow: Daily mailbox scan\nDuration: 29 minutes and 2.0 seconds\nFinished: 2026-07-24 11:54:57 UTC\n\nView results: https://github.com/chacha-stella/kol-radar/actions/runs/30089539697\n\nJobs:\n* scan failed (2 annotations)\n\n--\nYou are receiving this because you are subscribed to this thread.\nManage your GitHub Actions notifications: https://github.com/settings/notifications?email_source=notifications&email_token=CJKITTE7NLWGMVC577CKBZD5GNFCNA5CNFSNUACCM5UWIORPF5TWS5BNNB2WEL2DNBSWG22TOVUXIZKFOZSW45CON52GSZTJMNQXI2LPNYXTQMJVGM2TANBQGE2DQJJTIIYTOOBUHA4TIMBZG6THEZLBONXW5IFFMV3GK3TUWFRXGX3TMV2HI2LOM5ZV6Y3MNFRWW",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-24T11:55:20.000Z"
+    },
+    {
+      "id": "292044a29a0e1c638d3f",
+      "name": "Afluencer",
+      "email": "support@afluencer.com",
+      "subject": "How to Reach Our Influencers by Posting a Collab",
+      "body": "Afluencer Hi stella, I&rsquo;m reaching out to see if you have a compelling Collab offer that you&rsquo;d like to post in our app. We have influencers and creators spread across 75 specific product interests that actively search our Collabs daily, and apply to the ones that they like. If so, you can follow these steps to post your Collab: How To Post A Collab Pay-per-post opportunities resonate especially well with our influencers. We require high-quality content, followers and engagement rates from them, and in turn they do appreciate being paid up front when possible. Control your notifications by visiting your account here . &copy; 2026 Afluencer. All rights reserved.",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-24T16:01:11.000Z"
+    },
+    {
+      "id": "bf0a43fbf1151c0c16bd",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Category Partnership | Discovery Call (Chessnut : 37976)",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The subject explicitly identifies a partnership discovery call. Partnership and collaboration requests are routed to Stella. The limited description warrants requesting additional details rather than making assumptions. Best, Stella Business Development Manager | Chessnut\n\nOn\nFri, 24 Jul at 10:23 PM\n, Kristian Voldrich wrote:\n\nHi there,\nMy name is Kristian, and I'm the Head of Partnerships at College Life - the global club (https://collegelife.co/) with 810.000+ students, graduates and young professionals in 77 countries. At College Life, we're on a mission to make the lives of these 18-35 year-olds easier, worldwide.\nTo fulfil our mission, we work long-term with one partner per category, exclusively. This allows us to create a so-called Loyalty Loop, whereby we:\n1. Convert fast, by providing a low barrier to entry 2. Engage continuously, by sharing diverse range of use-cases 3. Advocate organically, by creating global brand ambassadors\nWe'd love to learn more about the importance of this target audience to you & what your plans are for the coming quarter.\nWhat is your availability like for a short call next week? You may also book a time that suits you best directly in my agenda: https://collegelife.club/meet\n\nSpeak soon,\nKristian Voldrich (Head of Partnerships)",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-24T16:35:04.000Z"
+    },
+    {
+      "id": "6aef0cf4a2a5bdd9d531",
+      "name": "Railway",
+      "email": "hello@news.railway.app",
+      "subject": "DNS logs, query the Railway API from the CLI",
+      "body": "It's Friday and you know what that means! Here's a summary of the stuff we shipped this week\n\nRailway\n\nPRODUCT UPDATE\n\n***************\nChangelog time!\n***************\n\nIt's Friday and you know what that means! Here's a summary of the stuff we shipped this week:\n\n•DNS logs\n\n•Query the Railway API from the CLI\n\n•Fixes and improvements\n\nRead the changelog ( https://railway.com/changelog/2026-07-24-dns-logs?utm_campaign=Changelog&utm_content=Changelog+Template&utm_medium=email_action&utm_source=customer.io )\n\nIf you have any thoughts/feedback on the changes we’re making, reach out on Central Station! ( https://station.railway.com?utm_campaign=Changelog&utm_content=Changelog+Template&utm_medium=email_action&utm_source=customer.io )\n\n- Your friends at Railway\n\nCentral Station ( https://station.railway.com?utm_campaign=Changelog&utm_content=Changelog+Template&utm_medium=email_action&utm_source=customer.io ) | X/Twitter ( https://x.com/Railway?utm_campaign=Changelog&utm_content=Changelog+Template&utm_medium=email_action&utm_source=customer.io ) | LinkedIn ( https://www.linkedin.com/company/railwayapp?utm_campaign=Changelog&utm_content=Changelog+Template&utm_medium=email_action&utm_source=customer.io ) | YouTube ( https://www.youtube.com/@railwayapp?utm_campaign=Changelog&utm_content=Changelog+Template&utm_medium=email_action&utm_source=customer.io )\n\n© 2026 Railway Corp. All rights reserved.\n\nUnsubscribe ( https://railway.com/preferences?token=ba399167-50d7-4dce-b7f3-dd059d502e31&utm_campaign=Changelog&utm_content=Changelog+Template&utm_medium=email_action&utm_source=customer.io )",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-24T22:26:21.000Z"
+    },
+    {
+      "id": "cbd4c458302135c5da00",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Chessnutech",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The customer is asking whether to submit an idea that could add value to Chessnut. This is best treated as a potential collaboration or partnership inquiry and routed to Stella. Best, Stella Business Development Manager | Chessnut\n\nOn\nSat, 25 Jul at 11:53 PM\n, ᴍʏ ɴᴀᴍᴇ ɪs ᴀʙᴅᴜʟ wrote:\n\nɪ’ᴠᴇ ɢᴏᴛ ᴀ sɪᴍᴘʟᴇ ɪᴅᴇᴀ ᴛʜᴀᴛ ᴄᴏᴜʟᴅ ᴀᴅᴅ ᴠᴀʟᴜᴇ ᴛᴏ Chessnutech. sʜᴏᴜʟᴅ ɪ sʜᴀʀᴇ ᴛʜᴇ ᴄᴏɴᴄᴇᴘᴛ ᴏᴠᴇʀ?",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-25T16:27:58.000Z"
+    },
+    {
+      "id": "0ea4fabf919a55bde43b",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Chessnutech",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The customer wants to share a concept that could add value to Chessnutech, which is a potential collaboration or partnership inquiry. Stella handles partnership and collaboration messages. Best, Stella Business Development Manager | Chessnut\n\nOn\nSat, 25 Jul at 11:53 PM\n, ᴍʏ ɴᴀᴍᴇ ɪs ᴀʙᴅᴜʟ wrote:\n\nɪ’ᴠᴇ ɢᴏᴛ ᴀ sɪᴍᴘʟᴇ ɪᴅᴇᴀ ᴛʜᴀᴛ ᴄᴏᴜʟᴅ ᴀᴅᴅ ᴠᴀʟᴜᴇ ᴛᴏ Chessnutech. sʜᴏᴜʟᴅ ɪ sʜᴀʀᴇ ᴛʜᴇ ᴄᴏɴᴄᴇᴘᴛ ᴏᴠᴇʀ?",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-25T16:28:17.000Z"
+    },
+    {
+      "id": "89b206c5289edfe9d9eb",
+      "name": "GitHub",
+      "email": "no-reply@github.com",
+      "subject": "Get started with Git – the power behind GitHub",
+      "body": "Discover the power of Git and version control. ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 )\n\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 )\n\nHi there,\n\nEver wonder what the \"Git\" in GitHub means? Git is a version control system that tracks changes and keeps your code safe.\n\n*Your challenge today: Set up your Git identity.*\n\n1️⃣ Install Git on your system ( https://github.com/git-guides/install-git?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 )\n2️⃣ Set your name and email in Git:\n\ngit config --global user.name \"Your Name\"\ngit config --global user.email \"your.email@example.com\"\n\n3️⃣ Learn the basics with this video ( https://www.youtube.com/watch?v=r8jQ9hVA2qs )\n\nGet started with Git ( https://www.youtube.com/watch?v=r8jQ9hVA2qs )\n\nHappy coding,\nThe GitHub Team\n\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 )\n\nThe world’s most widely adopted Copilot-powered developer platform\n\nUnsubscribe ( http://github.com/settings/emails/subscriptions/unsubscribe?CTID=0&amp;ECID=eqtCJXoO7I2nhcfF9jwn96HtW-7BgoAhhYe8TXGlJNM&amp;K=66d91f4e-9c23-4602-92a5-944200833a85&amp;D=639205588271968782&amp;PID=19075&amp;TID=00000000-0000-0000-0000-000000000006&amp;CMID=nurture_campaign_sync ) • Email preferences ( https://github.com/settings/emails ) • Terms ( https://help.github.com/articles/github-terms-of-service/?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 ) • Privacy ( https://help.github.com/articles/github-privacy-policy/?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 ) • Sign in to GitHub ( https://github.com/login?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 )\n\n( https://www.instagram.com/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 ) ( https://www.tiktok.com/@github?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 ) ( https://twitter.com/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 ) ( https://www.youtube.com/c/GitHub?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 ) ( https://www.twitch.tv/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 ) ( https://www.linkedin.com/company/github/?utm_source=github&utm_medium=email&utm_campaign=nux_email_3 )\n\nGitHub, Inc.\n88 Colin P Kelly Jr St.\nSan Francisco, CA 94107",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-26T04:33:21.000Z"
+    },
+    {
+      "id": "f44a3ddb894380ef8bf5",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Partnership idea: ChessAura opening prep + Chessnut Move — reducing screen-time for serious players",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-27T02:55:35.000Z"
+    },
+    {
+      "id": "7d96fc36b9e140c44e54",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: Partnership idea: ChessAura opening prep + Chessnut Move — reducing screen-time for serious players",
+      "body": "",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-27T02:55:42.000Z"
+    },
+    {
+      "id": "395625e3da0eb8b8dfd4",
+      "name": "Alec Mwali",
+      "email": "alec@afluencer.com",
+      "subject": "We'll run your influencer marketing for $499/mo",
+      "body": "Hi Stella,\n\nHere's the short version:\n\nFor $499/month, we'll find influencers who fit your brand, reach out to\nthem, onboard them, and manage the whole collaboration process — end to end.\n\nYou get a dedicated account manager and AI-powered creator matching through\nAfluencer. Agencies charge thousands for this. We don't.\n\nWe're only taking on a handful of brands right now.\n\nInterested? Reply \"Yes\" and I'll fill you in.\n\nThanks,\n\nAlec Mwali,\nAfluencer Collab Concierge\n*Influencers & Brands, Our App is LIVE -> https://app.afluencer.com/\n*\n\n*Register to Find Collabs, Influencers --> https://afluencer.com/register/\n**Check out our AI tool CreatorGPT.ai\n*",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-27T12:01:29.000Z"
+    },
+    {
+      "id": "94ad5e92c43ff5132fa3",
+      "name": "chacha-stella",
+      "email": "notifications@github.com",
+      "subject": "[chacha-stella/kol-radar] Run failed: Weekly YouTube creator recommendations - main (b202e85)",
+      "body": "[chacha-stella/kol-radar] Weekly YouTube creator recommendations workflow run\n\nRepository: chacha-stella/kol-radar\nWorkflow: Weekly YouTube creator recommendations\nDuration: 28.0 seconds\nFinished: 2026-07-27 12:44:42 UTC\n\nView results: https://github.com/chacha-stella/kol-radar/actions/runs/30267147047\n\nJobs:\n* collect failed (2 annotations)\n\n--\nYou are receiving this because you are subscribed to this thread.\nManage your GitHub Actions notifications: https://github.com/settings/notifications?email_source=notifications&email_token=CJKITTEAI7NZK4M7J4KARCD5G5FE5A5CNFSNUACCM5UWIORPF5TWS5BNNB2WEL2DNBSWG22TOVUXIZKFOZSW45CON52GSZTJMNQXI2LPNYXTQMRQGE3DSOJQHAYTIJJTIIYTOOBVGE2TMMRYGKTHEZLBONXW5IFFMV3GK3TUWFRXGX3TMV2HI2LOM5ZV6Y3MNFRWW",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-27T12:45:05.000Z"
+    },
+    {
+      "id": "b01db8abefc0a2b1b6f0",
+      "name": "contact",
+      "email": "contact@chessnutech.com",
+      "subject": "Fwd: [#126992]",
+      "body": "AI routed this ticket to Stella and forwarded a copy for visibility.\n\nReason: The customer is proposing an eCommerce marketing trial and potential collaboration, which should be handled by Stella for partnership and collaboration messages. Best, Stella Business Development Manager | Chessnut\n\nOn\nTue, 28 Jul at 12:06 AM\n, Top edge Support wrote:\n\nMost outreach is about winning contracts. Mine is a little different. I’d rather earn your trust by showing you the quality of my work first. Instead of asking you to commit to a long-term partnership, I suggest starting with a focused improvement sprint, followed by a short trial. That gives us the opportunity to review the results together and decide whether it makes sense to continue. I prefer to base decisions on measurable outcomes rather than assumptions. My goal is to make meaningful improvements first. If the results are valuable to your business, we can discuss the next steps from there. Thank you for your time. Best regards, Joseph",
+      "reason": "公司内部邮件",
+      "receivedAt": "2026-07-27T16:31:15.000Z"
+    },
+    {
+      "id": "be98a27e94e8c7089db9",
+      "name": "GitHub",
+      "email": "no-reply@github.com",
+      "subject": "Ready to code? Your first repository awaits",
+      "body": "Watch our tutorial. ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 )\n\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 )\n\nHi there,\n\n*Your next step? Create your first GitHub repository.*\n\nA repository (repo) is where your code lives. It tracks changes, stores history, and lets you collaborate with others.\n\nWatch this quick guide to learn how to ( https://youtu.be/-RZ03WHqkaY?feature=shared ) :\n\n✅ Create a repo\n✅ Choose the right license\n✅ Fork existing repos\n\nWatch the tutorial ( https://youtu.be/-RZ03WHqkaY?feature=shared )\n\n*And here’s a bonus challenge:* Fork your own copy of a game on this list ( https://gist.github.com/roachhd/d579b58148d7e36a6b72?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 ) and let your creativity run wild! 🎮\n\nHappy coding,\nThe GitHub Team\n\n( https://github.com?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 )\n\nThe world’s most widely adopted Copilot-powered developer platform\n\nUnsubscribe ( http://github.com/settings/emails/subscriptions/unsubscribe?CTID=0&amp;ECID=0PRLXZ86jostvX_S2_Nz_fmplrmJNa4_OWNaQfdi7nI&amp;K=cabfc68a-e23c-496a-b92b-6712f40d4158&amp;D=639207363264862603&amp;PID=19075&amp;TID=00000000-0000-0000-0000-000000000006&amp;CMID=nurture_campaign_sync ) • Email preferences ( https://github.com/settings/emails ) • Terms ( https://help.github.com/articles/github-terms-of-service/?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 ) • Privacy ( https://help.github.com/articles/github-privacy-policy/?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 ) • Sign in to GitHub ( https://github.com/login?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 )\n\n( https://www.instagram.com/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 ) ( https://www.tiktok.com/@github?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 ) ( https://twitter.com/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 ) ( https://www.youtube.com/c/GitHub?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 ) ( https://www.twitch.tv/github?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 ) ( https://www.linkedin.com/company/github/?utm_source=github&utm_medium=email&utm_campaign=nux_email_4 )\n\nGitHub, Inc.\n88 Colin P Kelly Jr St.\nSan Francisco, CA 94107",
+      "reason": "通知/营销/自动邮件",
+      "receivedAt": "2026-07-28T04:34:20.000Z"
     }
   ],
   "collapsedThreadCount": 28,
