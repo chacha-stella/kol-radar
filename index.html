@@ -398,7 +398,7 @@
       <section class="page is-active" id="page-home">
         <div class="page-header">
           <div><div class="page-kicker" id="todayDate"></div><h1>早上好，今日红人日报</h1><p class="page-description">邮件回复、合作推进和销售表现已经汇总完成。</p></div>
-          <div class="header-actions"><button class="btn" type="button" data-open-settings>数据源</button><button class="btn btn-primary" id="scanButton" type="button">扫描新邮件</button></div>
+          <div class="header-actions"><button class="btn" type="button" data-open-settings>数据源</button><button class="btn btn-primary" id="scanButton" type="button">立即扫描邮箱</button></div>
         </div>
         <div class="metrics">
           <article class="card metric"><div class="metric-top"><span>新增回复</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v12H8l-4 4V5Z"/></svg></span></div><div class="metric-value">0</div><div class="metric-foot">等待邮箱首次扫描</div></article>
@@ -529,7 +529,9 @@
 
   <script>
     (() => {
-      window.KOL_API_BASE = window.KOL_API_BASE || '';
+      // GitHub Pages is static, so it cannot read Railway Variables. Keep the
+      // public backend URL in the page; secrets remain server-side only.
+      window.KOL_API_BASE = window.KOL_API_BASE || 'https://kol-radar-production-4500.up.railway.app';
       const app = document.getElementById('app');
       const $ = id => document.getElementById(id);
       const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -737,7 +739,26 @@
       document.querySelectorAll('.modal-backdrop').forEach(modal => modal.addEventListener('click', event => { if (event.target === modal) closeModals(); }));
       document.addEventListener('keydown', event => { if (event.key === 'Escape') closeModals(); });
 
-      $('scanButton').addEventListener('click', () => window.open('https://github.com/chacha-stella/kol-radar/actions/workflows/daily-scan.yml', '_blank', 'noopener'));
+      $('scanButton').addEventListener('click', async () => {
+        const button = $('scanButton');
+        const apiBase = String(window.KOL_API_BASE || '').replace(/\/$/, '');
+        if (!apiBase) { showToast('尚未配置邮箱服务地址'); return; }
+        button.disabled = true;
+        const original = button.textContent;
+        button.textContent = '扫描中…';
+        try {
+          const response = await fetch(`${apiBase}/api/scan`, {method:'POST', headers:{'content-type':'application/json'}});
+          const result = await response.json();
+          if (!response.ok || result.status !== 'success') throw new Error(result.message || '扫描失败');
+          showToast(`扫描完成：保留 ${result.replyCount || 0} 个合作线程`);
+          setTimeout(() => location.reload(), 700);
+        } catch (error) {
+          showToast(`扫描失败：${error.message}`);
+        } finally {
+          button.disabled = false;
+          button.textContent = original;
+        }
+      });
       $('contentMonth').addEventListener('change', renderContentMonth);
       document.querySelectorAll('[data-brand]').forEach(btn => btn.addEventListener('click', () => { activeRecommendationBrand = btn.dataset.brand; document.querySelectorAll('[data-brand]').forEach(button => button.classList.toggle('is-active', button.dataset.brand === activeRecommendationBrand)); renderRecommendationFilters(); renderRecommendations(); }));
       ['recommendSearch','recommendTrack','recommendTier'].forEach(id => $(id).addEventListener(id === 'recommendSearch' ? 'input' : 'change', renderRecommendations));

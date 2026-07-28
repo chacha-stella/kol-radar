@@ -12,6 +12,13 @@ const user = process.env.MAIL_IMAP_USER;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
 const geminiModel = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
 const internalDomains = ['chessnutech.com'];
+// These senders are platform notices or marketing services, not creator replies.
+// Keep them out of the collaboration queue even when their copy contains words
+// such as "collab" or "influencer".
+const blockedSenderDomains = [
+  'railway.app', 'afluencer.com', 'github.com', 'google.com', 'youtube.com',
+  'aliyun.com', 'mailchimp.com', 'sendgrid.net'
+];
 let lastTranslationRequestAt = 0;
 
 const collaborationTerms = [
@@ -48,8 +55,22 @@ function scoreIntent(content) {
 }
 
 function extractQuote(content) {
-  const match = content.match(/(?:¥|￥|rmb\s*|cny\s*|\$|usd\s*)\s*([\d,]+(?:\.\d{1,2})?)/i);
-  return match ? Number(match[1].replace(/,/g, '')) : 0;
+  const value = String(content || '');
+  const parse = (raw, suffix = '') => {
+    const amount = Number(String(raw || '').replace(/,/g, ''));
+    if (!Number.isFinite(amount)) return 0;
+    return /k$/i.test(suffix) ? amount * 1000 : amount;
+  };
+  const patterns = [
+    /(?:¥|￥|rmb|cny|usd|eur|gbp)\s*[:：]?\s*([\d,]+(?:\.\d{1,2})?)\s*([kK])?/i,
+    /\$\s*([\d,]+(?:\.\d{1,2})?)\s*([kK])?/i,
+    /([\d,]+(?:\.\d{1,2})?)\s*([kK])?\s*(?:usd|eur|gbp|rmb|cny)/i
+  ];
+  for (const pattern of patterns) {
+    const match = value.match(pattern);
+    if (match) return parse(match[1], match[2]);
+  }
+  return 0;
 }
 
 function cleanContent(value, limit = 5000) {
@@ -227,7 +248,9 @@ function headerValue(raw, name) {
 function isAutomated(address, subject) {
   const email = String(address || '').toLowerCase();
   const title = String(subject || '').toLowerCase();
+  const domain = email.split('@')[1] || '';
   return automatedPrefixes.some(prefix => email.startsWith(prefix)) ||
+    blockedSenderDomains.some(value => domain === value || domain.endsWith(`.${value}`)) ||
     /(?:delivery status|undeliverable|failure notice|自动回复|out of office|vacation reply)/i.test(title);
 }
 
@@ -461,9 +484,26 @@ try {
     });
   }
 
+  // A long email thread produces one IMAP message per reply. The dashboard is
+  // an action queue, so keep only the latest incoming message per sender/thread
+  // while retaining how many messages were folded into that row.
   results.sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt));
-  const newMessages = results.filter(item => item.replyStatus === '新邮件');
-  const repliedMessages = results.filter(item => item.replyStatus === '已回复');
+  const latestByThread = new Map();
+  for (const item of results) {
+    const key = `${String(item.email || '').toLowerCase()}|${item.threadId || item.id}`;
+    const existing = latestByThread.get(key);
+    if (existing) {
+      existing.threadMessageCount = (existing.threadMessageCount || 1) + 1;
+      existing.firstIncomingAt = item.receivedAt;
+    } else {
+      item.threadMessageCount = 1;
+      item.firstIncomingAt = item.receivedAt;
+      latestByThread.set(key, item);
+    }
+  }
+  const collapsedResults = [...latestByThread.values()];
+  const newMessages = collapsedResults.filter(item => item.replyStatus === '新邮件');
+  const repliedMessages = collapsedResults.filter(item => item.replyStatus === '已回复');
     save({
     scannedAt: new Date().toISOString(),
     status: 'success',
@@ -472,21 +512,22 @@ try {
     scannedInboxCount,
     scannedSentCount,
     ignoredMessageCount,
-    replyCount: results.length,
+     replyCount: collapsedResults.length,
     newEmailCount: newMessages.length,
     repliedCount: repliedMessages.length,
-    highIntentCount: results.filter(item => item.intent >= 80).length,
-    quoteTotal: results.reduce((sum, item) => sum + item.quote, 0),
-    messages: results,
-    message: `累计扫描收件箱 ${scannedInboxCount} 封、已发送 ${scannedSentCount} 封，保留 ${results.length} 封真实外部来信；其中新邮件 ${newMessages.length} 封，已回复 ${repliedMessages.length} 封`,
+     highIntentCount: collapsedResults.filter(item => item.intent >= 80).length,
+     quoteTotal: collapsedResults.reduce((sum, item) => sum + item.quote, 0),
+     messages: collapsedResults,
+     collapsedThreadCount: results.length - collapsedResults.length,
+     message: `累计扫描收件箱 ${scannedInboxCount} 封、已发送 ${scannedSentCount} 封，保留 ${collapsedResults.length} 个合作线程；其中新邮件 ${newMessages.length} 个，已回复 ${repliedMessages.length} 个`,
     translationSummary: {
-      translated: results.filter(item => item.translationStatus === 'translated_to_chinese').length,
-      pending: results.filter(item => item.translationStatus !== 'translated_to_chinese').length,
+       translated: collapsedResults.filter(item => item.translationStatus === 'translated_to_chinese').length,
+       pending: collapsedResults.filter(item => item.translationStatus !== 'translated_to_chinese').length,
       attemptedThisRun: Number(process.env.MAX_TRANSLATIONS_PER_RUN || 3) - translationsRemaining
     }
   });
-  console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${results.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
-  for (const item of results) console.info(`[selected] ${item.email} | ${item.subject} | status=${item.replyStatus} | intent=${item.intent} | quote=${item.quote}`);
+  console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${collapsedResults.length} collapsed=${results.length - collapsedResults.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
+  for (const item of collapsedResults) console.info(`[selected] ${item.email} | ${item.subject} | status=${item.replyStatus} | intent=${item.intent} | quote=${item.quote}`);
 } catch (error) {
   save({ scannedAt: new Date().toISOString(), status: 'error', replyCount: 0, newEmailCount: 0, repliedCount: 0, highIntentCount: 0, quoteTotal: 0, messages: [], message: '邮箱扫描失败，请检查账号、安全码或邮箱文件夹权限。' });
   console.error(error?.stack || error?.message || error);

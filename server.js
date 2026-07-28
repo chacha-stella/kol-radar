@@ -2,6 +2,8 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { ImapFlow } from 'imapflow';
 import nodemailer from 'nodemailer';
 
@@ -13,6 +15,8 @@ const scanHour = Number(process.env.SCAN_HOUR || 8);
 const scanMinute = Number(process.env.SCAN_MINUTE || 30);
 const replyToken = String(process.env.KOL_REPLY_TOKEN || '').trim();
 const replyAttempts = new Map();
+const execFileAsync = promisify(execFile);
+let fullScanPromise = null;
 
 const mimeTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
 
@@ -73,6 +77,34 @@ function replyAllowed(to, subject) {
   } catch {
     return false;
   }
+}
+
+function readPersistedDigest() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'digest.json'), 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+// Use the same cumulative scanner as GitHub Actions so a manual scan from the
+// dashboard produces the same filtered, translated, thread-aware digest.
+async function runFullScanner() {
+  if (fullScanPromise) return fullScanPromise;
+  fullScanPromise = (async () => {
+    try {
+      await execFileAsync(process.execPath, [path.join(__dirname, 'scripts', 'scan-email.js')], {
+        cwd: __dirname,
+        env: process.env,
+        maxBuffer: 10 * 1024 * 1024
+      });
+      latestDigest = readPersistedDigest() || latestDigest;
+    } catch (error) {
+      latestDigest = { ...latestDigest, scannedAt: new Date().toISOString(), status: 'error', message: '邮箱扫描失败，请检查账号、安全码或翻译服务配置。', error: error.message };
+    }
+    return latestDigest;
+  })().finally(() => { fullScanPromise = null; });
+  return fullScanPromise;
 }
 
 async function scanInbox() {
@@ -143,7 +175,7 @@ function scheduleScan() {
   const now = getShanghaiTime();
   if (now.hour === scanHour && now.minute === scanMinute && lastScheduledDate !== now.date) {
     lastScheduledDate = now.date;
-    scanInbox();
+    runFullScanner();
   }
 }
 
@@ -152,16 +184,17 @@ const server = http.createServer(async (request, response) => {
   const allowedOrigin = process.env.CORS_ORIGIN || 'https://chacha-stella.github.io';
   const requestOrigin = request.headers.origin;
   if (requestOrigin === allowedOrigin) response.setHeader('Access-Control-Allow-Origin', allowedOrigin);
-  response.setHeader('Access-Control-Allow-Headers', 'content-type');
+  response.setHeader('Access-Control-Allow-Headers', 'content-type, x-kol-reply-token');
   response.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   if (request.method === 'OPTIONS') { response.writeHead(204); response.end(); return; }
   if (url.pathname === '/api/digest') {
+    latestDigest = readPersistedDigest() || latestDigest;
     response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
     response.end(JSON.stringify(latestDigest));
     return;
   }
   if (url.pathname === '/api/scan' && request.method === 'POST') {
-    const result = await scanInbox();
+    const result = await runFullScanner();
     response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
     response.end(JSON.stringify(result));
     return;
@@ -174,9 +207,16 @@ const server = http.createServer(async (request, response) => {
       const payload = JSON.parse(raw || '{}');
       const to = text(payload.to);
       const subject = text(payload.subject);
+      const messageId = text(payload.messageId);
       const body = String(payload.body || '').trim();
       if (!to || !subject || !body) throw new Error('缺少收件人、主题或正文');
-      if (!replyAllowed(to, subject)) throw new Error('只能回复日报中已识别的邮件联系人');
+      if (messageId) {
+        const digest = readPersistedDigest();
+        const allowed = (digest?.messages || []).some(item => String(item.id || '') === messageId && String(item.email || '').toLowerCase() === to.toLowerCase());
+        if (!allowed) throw new Error('只能回复日报中已识别的邮件联系人');
+      } else if (!replyAllowed(to, subject)) {
+        throw new Error('只能回复日报中已识别的邮件联系人');
+      }
       if (body.length > 20000) throw new Error('回复正文不能超过 20000 个字符');
       const ip = String(request.headers['x-forwarded-for'] || request.socket.remoteAddress || 'unknown').split(',')[0].trim();
       const now = Date.now();
@@ -214,7 +254,8 @@ const server = http.createServer(async (request, response) => {
 
 server.listen(port, () => {
   console.log(`KOL Radar listening on port ${port}. Scheduled scan: ${scanHour}:${String(scanMinute).padStart(2, '0')} ${timezone}`);
-  scanInbox();
+  latestDigest = readPersistedDigest() || latestDigest;
+  runFullScanner();
 });
 
 setInterval(scheduleScan, 30 * 1000);

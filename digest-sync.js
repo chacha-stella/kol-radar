@@ -1,6 +1,7 @@
 (() => {
-  const apiBase = window.KOL_API_BASE || '';
-  const replyTokenKey = 'kolReplyToken';
+  const apiBase = String(window.KOL_API_BASE || 'https://kol-radar-production-4500.up.railway.app').replace(/\/$/, '');
+  // Keep the reply token in memory only; it is never written to browser storage.
+  let replyToken = '';
   const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = value => Number(value || 0) ? '¥' + Number(value).toLocaleString('zh-CN') : '暂无';
   const dateLabel = value => value ? new Date(value).toLocaleDateString('zh-CN') : '暂无';
@@ -66,7 +67,8 @@
           : item.translationStatus === 'translation_not_configured'
             ? '未配置翻译密钥，暂显示原文'
             : '中文翻译排队中，当前先显示原文；下一次扫描会继续重试';
-        body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="badge ${Number(item.intent || 0) >= 80 ? 'badge-green' : Number(item.intent || 0) >= 60 ? 'badge-orange' : 'badge-red'}">意向度 ${safe(item.intent ?? 0)} · ${safe(item.intentLevel || '待确认')}</span><span class="tag">品牌：${safe(item.brand || '待识别')}</span>${reasons.map(reason => `<span class="tag">${safe(reason)}</span>`).join('')}</div><div class="muted" style="margin-bottom:8px">${safe(translationNote)}</div><div class="mail-detail" id="emailPrimaryBody">${safe(primary)}</div><div class="muted" style="margin-top:10px">原始邮件保存在系统中；上方显示完整中文内容。</div>`;
+        const threadCount = Number(item.threadMessageCount || 1);
+        body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="badge ${Number(item.intent || 0) >= 80 ? 'badge-green' : Number(item.intent || 0) >= 60 ? 'badge-orange' : 'badge-red'}">意向度 ${safe(item.intent ?? 0)} · ${safe(item.intentLevel || '待确认')}</span><span class="tag">品牌：${safe(item.brand || '待识别')}</span><span class="tag">线程邮件：${threadCount} 封</span>${reasons.map(reason => `<span class="tag">${safe(reason)}</span>`).join('')}</div><div class="muted" style="margin-bottom:8px">${safe(translationNote)}</div><div class="mail-detail" id="emailPrimaryBody">${safe(primary)}</div><div class="muted" style="margin-top:10px">原始邮件保存在系统中；上方显示最新一封来信内容。</div>`;
       }
       document.querySelector('#emailModal')?.classList.add('is-open');
     }));
@@ -91,8 +93,19 @@
       : '<li class="action-item"><span class="action-index">1</span><div><div class="action-title">暂无未回复的真实合作邮件</div><div class="action-detail">收到新的外部合作来信后，这里会显示需要优先处理的动作。</div></div></li>';
   }
 
-  fetch('./data/digest.json?ts=' + Date.now(), { cache: 'no-store' })
-    .then(response => response.ok ? response.json() : null)
+  const digestSources = apiBase
+    ? [`${apiBase}/api/digest?ts=${Date.now()}`, `./data/digest.json?ts=${Date.now()}`]
+    : [`./data/digest.json?ts=${Date.now()}`];
+  const loadDigest = async () => {
+    for (const source of digestSources) {
+      try {
+        const response = await fetch(source, { cache: 'no-store' });
+        if (response.ok) return response.json();
+      } catch { /* Try the static GitHub Pages copy next. */ }
+    }
+    return null;
+  };
+  loadDigest()
     .then(value => {
       digest = value;
       if (!digest) return;
@@ -134,10 +147,10 @@
     const button = document.querySelector('#sendReplyButton');
     button.disabled = true;
     try {
-      const token = localStorage.getItem(replyTokenKey) || prompt('请输入 Railway 中设置的 KOL_REPLY_TOKEN：');
+      const token = replyToken || prompt('请输入 Railway 中设置的 KOL_REPLY_TOKEN：');
       if (!token) throw new Error('未提供回复令牌');
-      localStorage.setItem(replyTokenKey, token);
-      const response = await fetch(`${apiBase}/api/reply`, { method: 'POST', headers: {'content-type': 'application/json', 'x-kol-reply-token': token}, body: JSON.stringify({to: replyItem.email, subject: replyItem.subject, body}) });
+      replyToken = token;
+      const response = await fetch(`${apiBase}/api/reply`, { method: 'POST', headers: {'content-type': 'application/json', 'x-kol-reply-token': token}, body: JSON.stringify({to: replyItem.email, subject: replyItem.subject, body, messageId: replyItem.id}) });
       const result = await response.json();
       if (!response.ok || result.status !== 'sent') throw new Error(result.message || '发送失败');
       document.querySelector('#replyModal')?.classList.remove('is-open');
