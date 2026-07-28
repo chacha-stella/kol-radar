@@ -100,13 +100,21 @@ async function runFullScanner() {
       });
       latestDigest = readPersistedDigest() || latestDigest;
     } catch (error) {
-      latestDigest = {
-        ...latestDigest,
-        scannedAt: new Date().toISOString(),
-        status: 'error',
-        message: '邮箱扫描失败，请检查账号、安全码或邮箱文件夹权限。',
-        error: [error.message, error.stderr, error.stdout].filter(Boolean).join('\n').slice(0, 2000)
-      };
+      const persisted = readPersistedDigest();
+      const diagnostic = [error.message, error.stderr, error.stdout].filter(Boolean).join('\n').slice(0, 2000);
+      // The IMAP server can close the connection after all messages were read.
+      // Keep a completed persisted scan instead of replacing it with a stale error.
+      if (persisted && Number(persisted.scannedMessageCount || 0) > 0 && Array.isArray(persisted.messages) && persisted.messages.length > 0) {
+        latestDigest = { ...persisted, status: 'success', scanWarning: diagnostic };
+      } else {
+        latestDigest = {
+          ...(persisted || latestDigest),
+          scannedAt: new Date().toISOString(),
+          status: 'error',
+          message: '邮箱扫描失败，请检查账号、安全码或邮箱文件夹权限。',
+          error: diagnostic
+        };
+      }
     }
     return latestDigest;
   })().finally(() => { fullScanPromise = null; });

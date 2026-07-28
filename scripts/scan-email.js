@@ -547,18 +547,24 @@ try {
   console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${collapsedResults.length} collapsed=${results.length - collapsedResults.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
   for (const item of collapsedResults) console.info(`[selected] ${item.email} | ${item.subject} | status=${item.replyStatus} | intent=${item.intent} | quote=${item.quote}`);
 } catch (error) {
-  save({
-    scannedAt: new Date().toISOString(),
-    status: 'error',
-    replyCount: 0,
-    newEmailCount: 0,
-    repliedCount: 0,
-    highIntentCount: 0,
-    quoteTotal: 0,
-    messages: [],
-    message: '邮箱扫描失败，请检查账号、安全码或邮箱文件夹权限。',
-    error: String(error?.message || error).slice(0, 1200)
-  });
+  const diagnostic = String(error?.message || error).slice(0, 1200);
+  // Preserve a prior real digest when Aliyun closes IMAP after data was read.
+  if (previousDigest?.messages?.length && Number(previousDigest.scannedMessageCount || 0) > 0) {
+    save({ ...previousDigest, status: 'success', scanWarning: diagnostic });
+  } else {
+    save({
+      scannedAt: new Date().toISOString(),
+      status: 'error',
+      replyCount: 0,
+      newEmailCount: 0,
+      repliedCount: 0,
+      highIntentCount: 0,
+      quoteTotal: 0,
+      messages: [],
+      message: '邮箱扫描失败，请检查账号、安全码或邮箱文件夹权限。',
+      error: diagnostic
+    });
+  }
   console.error(error?.stack || error?.message || error);
   process.exitCode = 1;
 } finally {
