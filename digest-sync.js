@@ -9,6 +9,7 @@
   let digest = null;
   let showClosed = false;
   let replyItem = null;
+  let otherMailItems = [];
   let closedIds = new Set();
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -93,6 +94,26 @@
       : '<li class="action-item"><span class="action-index">1</span><div><div class="action-title">暂无未回复的真实合作邮件</div><div class="action-detail">收到新的外部合作来信后，这里会显示需要优先处理的动作。</div></div></li>';
   }
 
+  function renderOtherMails() {
+    const rows = document.querySelector('#otherMailRows');
+    if (!rows) return;
+    const term = String(document.querySelector('#otherMailSearch')?.value || '').trim().toLowerCase();
+    const reason = document.querySelector('#otherMailReason')?.value || 'all';
+    const list = otherMailItems.filter(item => (reason === 'all' || item.reason === reason) && (!term || [item.name, item.email, item.subject, item.reason].join(' ').toLowerCase().includes(term)));
+    const count = document.querySelector('#otherMailCount');
+    if (count) count.textContent = `${otherMailItems.length} 封`;
+    rows.innerHTML = list.length ? list.map(item => `<tr><td><div class="person"><span class="avatar">${safe((item.name || item.email || '邮件').slice(0, 2))}</span><div><div class="person-name">${safe(item.name || '未知发件人')}</div><div class="person-email">${safe(item.email || '')}</div></div></div></td><td><button class="btn btn-quiet mail-subject" type="button" data-other-mail-view="${safe(item.id)}">${safe(item.subject || '无标题')}</button></td><td><span class="badge badge-gray">${safe(item.reason || '其他邮件')}</span></td><td class="nowrap">${safe(dateLabel(item.receivedAt))}</td><td><button class="btn btn-quiet" type="button" data-other-mail-view="${safe(item.id)}">查看全文</button></td></tr>`).join('') : '<tr><td colspan="5"><div class="empty">暂无符合条件的其他邮件</div></td></tr>';
+    rows.querySelectorAll('[data-other-mail-view]').forEach(button => button.addEventListener('click', () => {
+      const item = otherMailItems.find(value => String(value.id) === String(button.dataset.otherMailView));
+      if (!item) return;
+      const title = document.querySelector('#emailModalTitle');
+      const body = document.querySelector('#emailDetailBody');
+      if (title) title.textContent = item.subject || '其他邮件';
+      if (body) body.innerHTML = `<div class="muted">${safe(item.name || item.email || '')} · ${safe(item.email || '')}</div><div class="intent-reasons"><span class="tag">分类：${safe(item.reason || '其他邮件')}</span><span class="tag">日期：${safe(dateLabel(item.receivedAt))}</span></div><div class="mail-detail">${safe(item.body || '暂无可解析正文')}</div>`;
+      document.querySelector('#emailModal')?.classList.add('is-open');
+    }));
+  }
+
   const digestSources = apiBase
     ? [`${apiBase}/api/digest?ts=${Date.now()}`, `./data/digest.json?ts=${Date.now()}`]
     : [`./data/digest.json?ts=${Date.now()}`];
@@ -109,6 +130,7 @@
     .then(value => {
       digest = value;
       if (!digest) return;
+      otherMailItems = Array.isArray(digest.otherMessages) ? digest.otherMessages : [];
       const values = document.querySelectorAll('#page-home .metric-value');
       if (values[0]) values[0].textContent = digest.newEmailCount ?? digest.replyCount ?? 0;
       if (values[1]) values[1].textContent = digest.highIntentCount ?? 0;
@@ -129,6 +151,9 @@
         ? `中文 ${digest.translationSummary.translated || 0} / 待翻译 ${digest.translationSummary.pending || 0}`
         : (digest.status === 'success' ? '真实数据' : '等待扫描');
       renderMessages();
+      const otherUpdated = document.querySelector('#otherMailUpdated');
+      if (otherUpdated) otherUpdated.textContent = digest.scannedAt ? `更新于 ${new Date(digest.scannedAt).toLocaleString('zh-CN')}` : '等待扫描';
+      renderOtherMails();
     })
     .catch(() => {});
 
@@ -136,6 +161,8 @@
     showClosed = !showClosed;
     renderMessages();
   });
+  document.querySelector('#otherMailSearch')?.addEventListener('input', renderOtherMails);
+  document.querySelector('#otherMailReason')?.addEventListener('change', renderOtherMails);
   document.querySelector('#sendReplyButton')?.addEventListener('click', async () => {
     if (!replyItem) return;
     if (!apiBase) {

@@ -403,6 +403,7 @@ try {
   }
 
   const results = [];
+  const otherMessages = [];
   let scannedInboxCount = 0;
   let ignoredMessageCount = 0;
   const seenIds = new Set();
@@ -428,9 +429,25 @@ try {
       const id = stableId(folder, message, rawSource, ids);
       if (seenIds.has(id)) return;
       seenIds.add(id);
-      if (!effectiveSender || isAutomated(effectiveSender, subject) ||
-        (isInternalAddress(sender.address) && !externalSender) || !isLikelyCreatorReply(combined, effectiveSender, subject, forwarded)) {
+      const automated = isAutomated(effectiveSender, subject);
+      const internalOnly = isInternalAddress(sender.address) && !externalSender;
+      const creatorLike = isLikelyCreatorReply(combined, effectiveSender, subject, forwarded);
+      if (!effectiveSender || automated || internalOnly || !creatorLike) {
         ignoredMessageCount += 1;
+        const reason = automated
+          ? '通知/营销/自动邮件'
+          : internalOnly
+            ? '公司内部邮件'
+            : '普通邮件/未识别为合作';
+        otherMessages.push({
+          id,
+          name: original?.name || sender.name || effectiveSender || '未知发件人',
+          email: effectiveSender || sender.address || '',
+          subject: repairMojibake(decodeMimeHeader(subject)),
+          body: bodyText(extractMimeText(rawSource)),
+          reason,
+          receivedAt: receivedAt.toISOString()
+        });
         return;
       }
       const thread = normalizeSubject(subject);
@@ -518,6 +535,7 @@ try {
      highIntentCount: collapsedResults.filter(item => item.intent >= 80).length,
      quoteTotal: collapsedResults.reduce((sum, item) => sum + item.quote, 0),
      messages: collapsedResults,
+     otherMessages,
      collapsedThreadCount: results.length - collapsedResults.length,
      message: `累计扫描收件箱 ${scannedInboxCount} 封、已发送 ${scannedSentCount} 封，保留 ${collapsedResults.length} 个合作线程；其中新邮件 ${newMessages.length} 个，已回复 ${repliedMessages.length} 个`,
     translationSummary: {

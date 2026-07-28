@@ -384,6 +384,9 @@
         <button class="nav-button" type="button" data-page="recommendations">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg><span>红人推荐</span>
         </button>
+        <button class="nav-button" type="button" data-page="other-mails">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="m4 7 8 6 8-6"/></svg><span>其他邮件</span>
+        </button>
       </nav>
       <div class="sidebar-bottom">
         <div class="sync-card">
@@ -488,10 +491,23 @@
           <aside class="card recommendation-card"><div class="card-head"><h2>本周队列</h2><span class="badge badge-purple">每周更新</span></div><div class="weekly-kpis"><div class="weekly-kpi"><div class="weekly-kpi-label">候选红人</div><div class="weekly-kpi-value" id="recommendTotal">0</div><div class="weekly-kpi-note">本周真实数据</div></div><div class="weekly-kpi"><div class="weekly-kpi-label">小而美 / 中腰部</div><div class="weekly-kpi-value" id="recommendBoutique">0</div><div class="weekly-kpi-note">高质量细分影响力</div></div><div class="weekly-kpi"><div class="weekly-kpi-label">大型 KOL</div><div class="weekly-kpi-value" id="recommendLarge">0</div><div class="weekly-kpi-note">扩大内容覆盖</div></div></div></aside>
         </div>
         <section class="card table-card"><div class="table-card-head"><div><h2 id="recommendationTitle">dartsnut · 本周候选</h2><p class="page-description" id="recommendationSubtitle">等待首次真实数据采集</p></div><span class="badge badge-green">下次更新：下周一</span></div><div class="filters"><div class="search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input class="field" id="recommendSearch" type="search" placeholder="搜索红人、平台或赛道"></div><select class="field" id="recommendTrack"><option value="all">全部赛道</option></select><select class="field" id="recommendTier"><option value="all">全部量级</option><option value="小而美">小而美</option><option value="中腰部">中腰部</option><option value="大型 KOL">大型 KOL</option></select></div><div class="table-wrap"><table><thead><tr><th>候选红人</th><th>平台</th><th>主赛道</th><th>量级</th><th>粉丝量</th><th>平均播放</th><th>互动率</th><th></th></tr></thead><tbody id="recommendationRows"></tbody></table></div><div class="foot"><span>只显示采集到的真实公开账号</span><span id="recommendationCount"></span></div></section>
-      </section>
-    </main>
+       </section>
 
-    <nav class="mobile-nav" aria-label="移动端主菜单">
+       <section class="page" id="page-other-mails">
+         <div class="page-header">
+           <div><div class="page-kicker">OTHER MAIL</div><h1>其他邮件</h1><p class="page-description">扫描到但未识别为红人合作的邮件会保存在这里，不会移动或删除原邮箱邮件。</p></div>
+           <div class="header-actions"><span class="badge badge-orange" id="otherMailCount">0 封</span></div>
+         </div>
+         <section class="card table-card">
+           <div class="table-card-head"><div><h2>已忽略邮件</h2><p class="page-description">通知、营销、公司内部和普通邮件均可查看。</p></div><span class="badge badge-blue" id="otherMailUpdated">等待扫描</span></div>
+           <div class="filters"><div class="search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input class="field" id="otherMailSearch" type="search" placeholder="搜索发件人、标题或原因"></div><select class="field" id="otherMailReason"><option value="all">全部类型</option><option>通知/营销/自动邮件</option><option>公司内部邮件</option><option>普通邮件/未识别为合作</option></select></div>
+           <div class="table-wrap"><table><thead><tr><th>发件人</th><th>邮件标题</th><th>分类原因</th><th>日期</th><th>操作</th></tr></thead><tbody id="otherMailRows"></tbody></table></div>
+         </section>
+       </section>
+     </main>
+
+     <nav class="mobile-nav" aria-label="移动端主菜单">
+       <button class="nav-button" type="button" data-page="other-mails"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="m4 7 8 6 8-6"/></svg><span>其他</span></button>
       <button class="nav-button is-active" type="button" data-page="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-8Z"/></svg><span>日报</span></button>
       <button class="nav-button" type="button" data-page="collaborators"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="4"/><path d="M16 21v-2a6 6 0 0 0-6-6H7a5 5 0 0 0-5 5v3M19 8v6M22 11h-6"/></svg><span>红人库</span></button>
       <button class="nav-button" type="button" data-page="content"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 9 5 3-5 3V9Z"/></svg><span>内容</span></button>
@@ -783,7 +799,7 @@
       $('todayDate').textContent = new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'long'}).format(new Date());
       renderCollabFilters(); renderMonthBar(); renderCollaborators(); renderContent(); renderContentMonth(); renderRecommendationFilters(); renderRecommendations(); renderSales(); loadRecommendations();
       const initial = location.hash.replace('#','');
-      if (['home','collaborators','content','sales','recommendations'].includes(initial)) showPage(initial);
+      if (['home','collaborators','content','sales','recommendations','other-mails'].includes(initial)) showPage(initial);
     })();
   </script>
   <script src="digest-sync.js"></script>
