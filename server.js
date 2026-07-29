@@ -135,7 +135,7 @@ function brandForContent(value) {
 
 function inferContentModel(value, requested = '') {
   const supplied = String(requested || '').trim();
-  if (supplied && supplied !== '未指定型号') return supplied;
+  if (supplied && supplied !== '未指定型号' && supplied !== '自动识别') return supplied;
   const match = String(value || '').match(/\b(?:chessnut|dartsnut)\s+([a-z][a-z0-9 -]{1,30})/i);
   if (match?.[1]) return `${brandForContent(value)} ${match[1].trim()}`;
   const product = String(value || '').match(/\b(move|e-one|air|pro|go|smart board|automatic chessboard)\b/i);
