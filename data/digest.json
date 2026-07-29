@@ -1,10 +1,10 @@
 {
-  "scannedAt": "2026-07-29T09:38:39.388Z",
+  "scannedAt": "2026-07-29T10:19:37.001Z",
   "status": "success",
   "scanMode": "cumulative",
-  "scannedMessageCount": 227,
+  "scannedMessageCount": 228,
   "scannedInboxCount": 137,
-  "scannedSentCount": 90,
+  "scannedSentCount": 91,
   "ignoredMessageCount": 66,
   "replyCount": 38,
   "newEmailCount": 15,
@@ -1691,7 +1691,7 @@
     }
   ],
   "collapsedThreadCount": 33,
-  "message": "累计扫描收件箱 137 封、已发送 90 封，保留 38 个合作线程；其中新邮件 15 个，已回复 23 个",
+  "message": "累计扫描收件箱 137 封、已发送 91 封，保留 38 个合作线程；其中新邮件 15 个，已回复 23 个",
   "translationSummary": {
     "translated": 0,
     "pending": 38,
