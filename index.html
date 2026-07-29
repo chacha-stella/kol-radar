@@ -225,6 +225,14 @@
     .video-thumb { width: 104px; height: 74px; flex: 0 0 104px; border-radius: 15px; display: grid; place-items: center; color: #fff; background: linear-gradient(145deg,#3d72f2,#7b5ee1); box-shadow: inset 0 1px rgba(255,255,255,.3); }
     .video-thumb svg { width: 24px; height: 24px; }
     .video-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+    .video-actions { display: flex; gap: 7px; align-items: center; margin-top: 12px; }
+    .video-detail { margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); }
+    .video-detail-title { font-size: 12px; font-weight: 600; line-height: 1.45; }
+    .video-detail-copy { margin-top: 5px; color: var(--text-2); font-size: 11px; line-height: 1.55; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+    .video-detail-meta { margin-top: 8px; color: var(--text-2); font-size: 10px; }
+    .video-detail-more { margin-top: 7px; color: var(--blue); font-size: 11px; }
+    .video-detail-more summary { cursor: pointer; }
+    .video-detail-more .video-detail-copy { display: block; -webkit-line-clamp: unset; }
     .video-info { min-width: 0; flex: 1; }
     .video-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .video-meta { margin-top: 5px; color: var(--text-2); font-size: 11px; }
@@ -651,7 +659,17 @@
       }
 
       function renderContent() {
-      $('contentGrid').innerHTML = contents.length ? contents.map(item => `<article class="card video-card"><div class="video-top"><div class="video-thumb">${item.thumbnail ? `<img src="${safe(item.thumbnail)}" alt="" loading="lazy">` : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7 8 5-8 5V7Z"/></svg>'}</div><div class="video-info"><div class="inline-actions"><span class="badge badge-blue">${safe(item.platform)}</span><span class="badge">${safe(item.brand || item.model)}</span></div><div class="video-name" style="margin-top:9px">${safe(item.name)}</div><div class="video-meta">发布于 ${safe(item.date)}</div><a class="video-url" href="${safe(item.url)}" target="_blank" rel="noopener">${safe(item.url)}</a></div></div><div class="video-stats"><div><div class="video-stat-label">播放</div><div class="video-stat-value">${formatCount(item.views)}</div></div><div><div class="video-stat-label">点赞</div><div class="video-stat-value">${formatCount(item.likes)}</div></div><div><div class="video-stat-label">评论</div><div class="video-stat-value">${formatCount(item.comments)}</div></div><div><div class="video-stat-label">互动率</div><div class="video-stat-value">${safe(item.engagement || '待抓取')}</div></div></div><div class="evaluation"><div><h3>效果评估</h3><div class="evaluation-copy">${safe(item.note || '暂无真实分析')}</div></div><div class="evaluation-score">${safe(item.score ?? '--')}</div></div></article>`).join('') : '<div class="card empty">暂无真实内容数据。粘贴链接并完成平台授权后，这里才会显示抓取结果。</div>';
+        $('contentGrid').innerHTML = contents.length ? contents.map(item => `<article class="card video-card"><div class="video-top"><div class="video-thumb">${item.thumbnail ? `<img src="${safe(item.thumbnail)}" alt="" loading="lazy">` : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7 8 5-8 5V7Z"/></svg>'}</div><div class="video-info"><div class="inline-actions"><span class="badge badge-blue">${safe(item.platform)}</span><span class="badge">${safe(item.brand || '待识别品牌')}</span><span class="badge">${safe(item.model || '未指定型号')}</span></div><div class="video-name" style="margin-top:9px">${safe(item.name || '待匹配红人')}</div><div class="video-meta">发布时间：${safe(item.date || '未获取')}</div><a class="video-url" href="${safe(item.url)}" target="_blank" rel="noopener">打开原链接</a><div class="video-actions">${item.creatorUrl ? `<a class="btn btn-quiet" href="${safe(item.creatorUrl)}" target="_blank" rel="noopener">红人主页</a>` : ''}<button class="btn btn-quiet" type="button" data-delete-content="${safe(item.id)}">删除</button></div></div></div><div class="video-stats"><div><div class="video-stat-label">播放</div><div class="video-stat-value">${formatCount(item.views)}</div></div><div><div class="video-stat-label">点赞</div><div class="video-stat-value">${formatCount(item.likes)}</div></div><div><div class="video-stat-label">评论</div><div class="video-stat-value">${formatCount(item.comments)}</div></div><div><div class="video-stat-label">互动率</div><div class="video-stat-value">${safe(item.engagement || '待抓取')}</div></div></div><div class="video-detail">${item.title ? `<div class="video-detail-title">${safe(item.title)}</div>` : ''}${item.caption ? `<details class="video-detail-more"><summary>查看完整文案</summary><div class="video-detail-copy">${safe(item.caption)}</div></details>` : '<div class="video-detail-copy">暂无公开文案</div>'}<div class="video-detail-meta">数据来源：${safe(item.source || item.platform)}${item.publishedAt ? ` · 原始时间：${safe(new Date(item.publishedAt).toLocaleString('zh-CN'))}` : ''}</div></div><div class="evaluation"><div><h3>效果评估</h3><div class="evaluation-copy">${safe(item.note || '暂无真实分析')}</div></div><div class="evaluation-score">${safe(item.score ?? '--')}</div></div></article>`).join('') : '<div class="card empty">暂无真实内容数据。粘贴链接并完成平台授权后，这里才会显示抓取结果。</div>';
+        document.querySelectorAll('[data-delete-content]').forEach(button => button.addEventListener('click', () => {
+          const item = contents.find(value => String(value.id) === String(button.dataset.deleteContent));
+          if (!item) return;
+          if (!window.confirm(`确定删除“${item.name || '这条内容'}”吗？`)) return;
+          contents = contents.filter(value => String(value.id) !== String(item.id));
+          localStorage.setItem('kolContents', JSON.stringify(contents));
+          renderContent();
+          renderContentMonth();
+          showToast('已删除这条内容记录');
+        }));
       }
 
       function renderContentMonth() {

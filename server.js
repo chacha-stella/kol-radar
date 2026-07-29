@@ -115,6 +115,42 @@ function firstNumber(html, patterns) {
   return null;
 }
 
+function parseInstagramDate(value) {
+  const source = String(value || '');
+  const timestamp = source.match(/["'](?:taken_at_timestamp|datePublished)["']\s*[:=]\s*["']?(\d{10,13})/i);
+  if (timestamp) {
+    const milliseconds = timestamp[1].length === 10 ? Number(timestamp[1]) * 1000 : Number(timestamp[1]);
+    return new Date(milliseconds).toISOString();
+  }
+  const iso = source.match(/["']datePublished["']\s*[:=]\s*["'](20\d{2}-\d{2}-\d{2}(?:T[^"']*)?)["']/i);
+  if (iso) {
+    const parsed = new Date(iso[1]);
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+  }
+  const human = source.match(/(?:\bon\s+|发布于\s*)(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+20\d{2}/i);
+  if (human) {
+    const parsed = new Date(human[0].replace(/^on\s+/i, ''));
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+  }
+  return '';
+}
+
+function instagramCaption(value) {
+  let caption = decodeHtml(value || '');
+  caption = caption.replace(/^\s*\d[\d,.]*\s+likes?,\s*\d[\d,.]*\s+comments?\s*-\s*[^:]{1,120}:\s*/i, '');
+  return caption.replace(/^['"]|['"]$/g, '').trim();
+}
+
+function instagramUsername(value) {
+  const source = decodeHtml(value || '');
+  const explicit = source.match(/["'](?:username|owner_username)["']\s*:\s*["']([^"']+)/i);
+  if (explicit?.[1]) return explicit[1];
+  const description = source.match(/\d[\d,.]*\s+likes?,\s*\d[\d,.]*\s+comments?\s*-\s*([A-Za-z0-9._]+)\s+on\s+/i);
+  if (description?.[1]) return description[1];
+  const handle = source.match(/@([A-Za-z0-9._]{2,50})/);
+  return handle?.[1] || '';
+}
+
 function identifyPlatform(value) {
   const host = new URL(value).hostname.toLowerCase();
   if (host.includes('instagram')) return 'Instagram';
@@ -189,7 +225,10 @@ async function analyzeInstagram(url, model) {
       brand: '待识别',
       model: model || '未指定型号',
       url: canonical.toString(),
-      date: '今天',
+      date: '未获取',
+      publishedAt: '',
+      creatorUrl: '',
+      source: canonical.toString(),
       views: null,
       likes: null,
       comments: null,
@@ -205,6 +244,7 @@ async function analyzeInstagram(url, model) {
   const description = metaContent(html, 'og:description');
   const image = metaContent(html, 'og:image');
   const combined = `${title} ${description} ${html}`;
+  const canonicalLink = metaContent(html, 'og:url') || canonical.toString();
   const likes = firstNumber(combined, [
     /["']like_count["']\s*:\s*(\d+)/i,
     /["']edge_media_preview_like["'][^\d]{0,80}["']count["']\s*:\s*(\d+)/i,
@@ -220,10 +260,10 @@ async function analyzeInstagram(url, model) {
     /["']video_view_count["']\s*:\s*(\d+)/i,
     /["']view_count["']\s*:\s*(\d+)/i
   ]);
-  const username = (combined.match(/["'](?:username|owner_username)["']\s*:\s*["']([^"']+)/i) || [])[1] || (canonical.pathname.match(/(?:reel|p)\/([^/]+)/i) || [])[1] || '待匹配红人';
-  const textContent = decodeHtml(description || title || '');
+  const username = instagramUsername(`${title} ${description} ${html}`) || '待匹配红人';
+  const textContent = instagramCaption(description || title || '');
   const evaluation = evaluateContent({ views, likes, comments });
-  const takenAt = combined.match(/["']taken_at_timestamp["']\s*:\s*(\d+)/i);
+  const publishedAt = parseInstagramDate(combined);
   const unavailable = !response.ok || /post (?:is )?unavailable|page isn't available|链接可能已损坏|post无法访问/i.test(combined);
   return {
     id: `content-${Date.now()}`,
@@ -232,14 +272,18 @@ async function analyzeInstagram(url, model) {
     platform: 'Instagram',
     brand: brandForContent(combined),
     model: model || '未指定型号',
-    url: canonical.toString(),
-    date: takenAt?.[1] ? new Date(Number(takenAt[1]) * 1000).toISOString().slice(0, 10) : '今天',
+    url: canonicalLink,
+    date: publishedAt ? publishedAt.slice(0, 10) : '未获取',
+    publishedAt,
+    creatorUrl: username !== '待匹配红人' ? `https://www.instagram.com/${encodeURIComponent(username)}/` : '',
+    source: response.url || canonical.toString(),
     views, likes, comments,
     engagement: evaluation.engagement,
     score: evaluation.score,
     note: unavailable ? 'Instagram 返回内容不可用或需要登录，未写入任何虚构指标。' : `${evaluation.note}${textContent ? ` 内容摘要：${textContent.slice(0, 280)}` : ''}`,
     title: title || '',
     caption: textContent,
+    description,
     thumbnail: image || ''
   };
 }
@@ -271,14 +315,14 @@ async function analyzeYouTube(url, model) {
   const likes = stats.likeCount == null ? null : Number(stats.likeCount);
   const comments = stats.commentCount == null ? null : Number(stats.commentCount);
   const evaluation = evaluateContent({ views, likes, comments });
-  return { id: `content-${Date.now()}`, status: item ? 'success' : 'unavailable', name: item?.snippet?.channelTitle || '待匹配红人', platform: 'YouTube', brand: brandForContent(`${item?.snippet?.title || ''} ${item?.snippet?.description || ''}`), model: model || '未指定型号', url, date: item?.snippet?.publishedAt?.slice(0, 10) || '今天', views, likes, comments, engagement: evaluation.engagement, score: evaluation.score, note: item ? `${evaluation.note} 内容摘要：${String(item.snippet?.title || '').slice(0, 280)}` : '未获取到 YouTube 公开数据。', title: item?.snippet?.title || '', caption: item?.snippet?.description || '', thumbnail: item?.snippet?.thumbnails?.high?.url || item?.thumbnail_url || '' };
+  return { id: `content-${Date.now()}`, status: item ? 'success' : 'unavailable', name: item?.snippet?.channelTitle || '待匹配红人', platform: 'YouTube', brand: brandForContent(`${item?.snippet?.title || ''} ${item?.snippet?.description || ''}`), model: model || '未指定型号', url, date: item?.snippet?.publishedAt?.slice(0, 10) || '未获取', publishedAt: item?.snippet?.publishedAt || '', creatorUrl: item?.snippet?.channelId ? `https://www.youtube.com/channel/${item.snippet.channelId}` : '', source: url, views, likes, comments, engagement: evaluation.engagement, score: evaluation.score, note: item ? `${evaluation.note} 内容摘要：${String(item.snippet?.title || '').slice(0, 280)}` : '未获取到 YouTube 公开数据。', title: item?.snippet?.title || '', caption: item?.snippet?.description || '', thumbnail: item?.snippet?.thumbnails?.high?.url || item?.thumbnail_url || '' };
 }
 
 async function analyzeContentUrl(url, model) {
   const platform = identifyPlatform(url);
   if (platform === 'Instagram') return analyzeInstagram(url, model);
   if (platform === 'YouTube') return analyzeYouTube(url, model);
-  return { id: `content-${Date.now()}`, status: 'unsupported', name: '待匹配红人', platform, brand: '待识别', model: model || '未指定型号', url, date: '今天', views: null, likes: null, comments: null, engagement: '待抓取', score: '--', note: `${platform} 暂未接入可验证的数据接口，已收录链接但未填充虚构数据。` };
+  return { id: `content-${Date.now()}`, status: 'unsupported', name: '待匹配红人', platform, brand: '待识别', model: model || '未指定型号', url, date: '未获取', publishedAt: '', creatorUrl: '', source: url, views: null, likes: null, comments: null, engagement: '待抓取', score: '--', note: `${platform} 暂未接入可验证的数据接口，已收录链接但未填充虚构数据。` };
 }
 
 // Use the same cumulative scanner as GitHub Actions so a manual scan from the
