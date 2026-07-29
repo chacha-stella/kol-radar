@@ -87,6 +87,200 @@ function readPersistedDigest() {
   }
 }
 
+function decodeHtml(value = '') {
+  return String(value)
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#x27;/gi, "'")
+    .replace(/&#x2F;/gi, '/').replace(/\s+/g, ' ').trim();
+}
+
+function metaContent(html, key) {
+  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const patterns = [
+    new RegExp(`<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=["']([^"']*)["']`, 'i'),
+    new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+(?:property|name)=["']${escaped}["']`, 'i')
+  ];
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match?.[1]) return decodeHtml(match[1]);
+  }
+  return '';
+}
+
+function firstNumber(html, patterns) {
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match?.[1] != null) return Number(String(match[1]).replace(/,/g, ''));
+  }
+  return null;
+}
+
+function identifyPlatform(value) {
+  const host = new URL(value).hostname.toLowerCase();
+  if (host.includes('instagram')) return 'Instagram';
+  if (host.includes('youtube') || host === 'youtu.be') return 'YouTube';
+  if (host.includes('tiktok')) return 'TikTok';
+  if (host.includes('bilibili')) return 'Bilibili';
+  if (host.includes('xiaohongshu')) return '小红书';
+  if (host.includes('douyin')) return '抖音';
+  return '未知平台';
+}
+
+function brandForContent(value) {
+  const haystack = String(value || '').toLowerCase();
+  if (haystack.includes('dartsnut')) return 'Dartsnut';
+  if (haystack.includes('chessnut')) return 'Chessnut';
+  return '待识别';
+}
+
+function inferContentModel(value, requested = '') {
+  const supplied = String(requested || '').trim();
+  if (supplied && supplied !== '未指定型号') return supplied;
+  const match = String(value || '').match(/\b(?:chessnut|dartsnut)\s+([a-z][a-z0-9 -]{1,30})/i);
+  if (match?.[1]) return `${brandForContent(value)} ${match[1].trim()}`;
+  const product = String(value || '').match(/\b(move|e-one|air|pro|go|smart board|automatic chessboard)\b/i);
+  return product?.[1] ? product[1].replace(/\b\w/g, c => c.toUpperCase()) : '未指定型号';
+}
+
+function evaluateContent({ views, likes, comments }) {
+  const knownLikes = Number.isFinite(likes) ? likes : null;
+  const knownComments = Number.isFinite(comments) ? comments : null;
+  const knownViews = Number.isFinite(views) ? views : null;
+  if (knownViews && knownViews > 0) {
+    const rate = ((knownLikes || 0) + (knownComments || 0)) / knownViews * 100;
+    const score = Math.max(0, Math.min(100, Math.round(Math.min(rate / 0.08, 1) * 100)));
+    return { engagement: `${rate.toFixed(2)}%`, score, note: `已抓取真实数据：${knownViews.toLocaleString()} 播放、${(knownLikes || 0).toLocaleString()} 点赞、${(knownComments || 0).toLocaleString()} 评论。互动率按公开数据计算。` };
+  }
+  if (knownLikes != null || knownComments != null) {
+    return { engagement: '待获取播放量', score: '--', note: `已抓取部分真实数据：${knownLikes == null ? '点赞未知' : `${knownLikes.toLocaleString()} 点赞`}、${knownComments == null ? '评论未知' : `${knownComments.toLocaleString()} 评论`}。平台未公开播放量，暂不能计算互动率。` };
+  }
+  return { engagement: '待抓取', score: '--', note: '平台暂未返回可验证的公开数据，没有使用虚构数值。' };
+}
+
+async function fetchPublicPage(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      redirect: 'follow',
+      headers: { 'user-agent': 'Mozilla/5.0 (compatible; KOL-Radar/1.0)', accept: 'text/html,application/xhtml+xml' }
+    });
+    const html = await response.text();
+    return { response, html };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function analyzeInstagram(url, model) {
+  const canonical = new URL(url);
+  canonical.search = '';
+  let response;
+  let html = '';
+  try {
+    ({ response, html } = await fetchPublicPage(canonical.toString()));
+  } catch {
+    return {
+      id: `content-${Date.now()}`,
+      status: 'unavailable',
+      name: '待匹配红人',
+      platform: 'Instagram',
+      brand: '待识别',
+      model: model || '未指定型号',
+      url: canonical.toString(),
+      date: '今天',
+      views: null,
+      likes: null,
+      comments: null,
+      engagement: '待抓取',
+      score: '--',
+      note: '服务器当前无法访问 Instagram，已收录链接但没有填充虚构数据。',
+      title: '',
+      caption: '',
+      thumbnail: ''
+    };
+  }
+  const title = metaContent(html, 'og:title');
+  const description = metaContent(html, 'og:description');
+  const image = metaContent(html, 'og:image');
+  const combined = `${title} ${description} ${html}`;
+  const likes = firstNumber(combined, [
+    /["']like_count["']\s*:\s*(\d+)/i,
+    /["']edge_media_preview_like["'][^\d]{0,80}["']count["']\s*:\s*(\d+)/i,
+    /([\d,]+)\s+likes?/i
+  ]);
+  const comments = firstNumber(combined, [
+    /["']comment_count["']\s*:\s*(\d+)/i,
+    /["']edge_media_to_comment["'][^\d]{0,80}["']count["']\s*:\s*(\d+)/i,
+    /([\d,]+)\s+comments?/i
+  ]);
+  const views = firstNumber(combined, [
+    /["']play_count["']\s*:\s*(\d+)/i,
+    /["']video_view_count["']\s*:\s*(\d+)/i,
+    /["']view_count["']\s*:\s*(\d+)/i
+  ]);
+  const username = (combined.match(/["'](?:username|owner_username)["']\s*:\s*["']([^"']+)/i) || [])[1] || (canonical.pathname.match(/(?:reel|p)\/([^/]+)/i) || [])[1] || '待匹配红人';
+  const textContent = decodeHtml(description || title || '');
+  const evaluation = evaluateContent({ views, likes, comments });
+  const takenAt = combined.match(/["']taken_at_timestamp["']\s*:\s*(\d+)/i);
+  const unavailable = !response.ok || /post (?:is )?unavailable|page isn't available|链接可能已损坏|post无法访问/i.test(combined);
+  return {
+    id: `content-${Date.now()}`,
+    status: unavailable ? 'unavailable' : 'success',
+    name: username,
+    platform: 'Instagram',
+    brand: brandForContent(combined),
+    model: model || '未指定型号',
+    url: canonical.toString(),
+    date: takenAt?.[1] ? new Date(Number(takenAt[1]) * 1000).toISOString().slice(0, 10) : '今天',
+    views, likes, comments,
+    engagement: evaluation.engagement,
+    score: evaluation.score,
+    note: unavailable ? 'Instagram 返回内容不可用或需要登录，未写入任何虚构指标。' : `${evaluation.note}${textContent ? ` 内容摘要：${textContent.slice(0, 280)}` : ''}`,
+    title: title || '',
+    caption: textContent,
+    thumbnail: image || ''
+  };
+}
+
+function youtubeVideoId(url) {
+  const parsed = new URL(url);
+  if (parsed.hostname === 'youtu.be') return parsed.pathname.slice(1);
+  return parsed.searchParams.get('v') || (parsed.pathname.match(/\/(?:shorts|embed|live)\/([^/]+)/) || [])[1] || '';
+}
+
+async function analyzeYouTube(url, model) {
+  const id = youtubeVideoId(url);
+  if (!id) throw new Error('无法识别 YouTube 视频链接');
+  const key = process.env.YOUTUBE_API_KEY || process.env.KOL_YOUTUBE_API_KEY;
+  let item = null;
+  if (key) {
+    const endpoint = new URL('https://www.googleapis.com/youtube/v3/videos');
+    endpoint.search = new URLSearchParams({ part: 'snippet,statistics', id, key }).toString();
+    const response = await fetch(endpoint);
+    const payload = await response.json();
+    item = payload.items?.[0];
+  }
+  if (!item) {
+    const { html } = await fetchPublicPage(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
+    try { item = JSON.parse(html); } catch { item = null; }
+  }
+  const stats = item?.statistics || {};
+  const views = stats.viewCount == null ? null : Number(stats.viewCount);
+  const likes = stats.likeCount == null ? null : Number(stats.likeCount);
+  const comments = stats.commentCount == null ? null : Number(stats.commentCount);
+  const evaluation = evaluateContent({ views, likes, comments });
+  return { id: `content-${Date.now()}`, status: item ? 'success' : 'unavailable', name: item?.snippet?.channelTitle || '待匹配红人', platform: 'YouTube', brand: brandForContent(`${item?.snippet?.title || ''} ${item?.snippet?.description || ''}`), model: model || '未指定型号', url, date: item?.snippet?.publishedAt?.slice(0, 10) || '今天', views, likes, comments, engagement: evaluation.engagement, score: evaluation.score, note: item ? `${evaluation.note} 内容摘要：${String(item.snippet?.title || '').slice(0, 280)}` : '未获取到 YouTube 公开数据。', title: item?.snippet?.title || '', caption: item?.snippet?.description || '', thumbnail: item?.snippet?.thumbnails?.high?.url || item?.thumbnail_url || '' };
+}
+
+async function analyzeContentUrl(url, model) {
+  const platform = identifyPlatform(url);
+  if (platform === 'Instagram') return analyzeInstagram(url, model);
+  if (platform === 'YouTube') return analyzeYouTube(url, model);
+  return { id: `content-${Date.now()}`, status: 'unsupported', name: '待匹配红人', platform, brand: '待识别', model: model || '未指定型号', url, date: '今天', views: null, likes: null, comments: null, engagement: '待抓取', score: '--', note: `${platform} 暂未接入可验证的数据接口，已收录链接但未填充虚构数据。` };
+}
+
 // Use the same cumulative scanner as GitHub Actions so a manual scan from the
 // dashboard produces the same filtered, translated, thread-aware digest.
 async function runFullScanner() {
@@ -220,6 +414,24 @@ const server = http.createServer(async (request, response) => {
     latestDigest = readPersistedDigest() || latestDigest;
     response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
     response.end(JSON.stringify(latestDigest));
+    return;
+  }
+  if (url.pathname === '/api/content/analyze' && request.method === 'POST') {
+    let raw = '';
+    for await (const chunk of request) raw += chunk;
+    try {
+      const payload = JSON.parse(raw || '{}');
+      const target = text(payload.url);
+      const model = text(payload.model) || '未指定型号';
+      if (!target) throw new Error('请提供内容链接');
+      if (target.length > 2000) throw new Error('链接过长');
+      const result = await analyzeContentUrl(target, model);
+      response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+      response.end(JSON.stringify(result));
+    } catch (error) {
+      response.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+      response.end(JSON.stringify({ status: 'error', message: error.message || '内容分析失败' }));
+    }
     return;
   }
   if (url.pathname === '/api/scan' && request.method === 'POST') {

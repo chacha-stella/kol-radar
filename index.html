@@ -224,6 +224,7 @@
     .video-top { display: flex; align-items: flex-start; gap: 13px; }
     .video-thumb { width: 104px; height: 74px; flex: 0 0 104px; border-radius: 15px; display: grid; place-items: center; color: #fff; background: linear-gradient(145deg,#3d72f2,#7b5ee1); box-shadow: inset 0 1px rgba(255,255,255,.3); }
     .video-thumb svg { width: 24px; height: 24px; }
+    .video-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
     .video-info { min-width: 0; flex: 1; }
     .video-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .video-meta { margin-top: 5px; color: var(--text-2); font-size: 11px; }
@@ -650,7 +651,7 @@
       }
 
       function renderContent() {
-        $('contentGrid').innerHTML = contents.length ? contents.map(item => `<article class="card video-card"><div class="video-top"><div class="video-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7 8 5-8 5V7Z"/></svg></div><div class="video-info"><div class="inline-actions"><span class="badge badge-blue">${safe(item.platform)}</span><span class="badge">${safe(item.model)}</span></div><div class="video-name" style="margin-top:9px">${safe(item.name)}</div><div class="video-meta">发布于 ${safe(item.date)}</div><div class="video-url">${safe(item.url)}</div></div></div><div class="video-stats"><div><div class="video-stat-label">播放</div><div class="video-stat-value">${formatCount(item.views)}</div></div><div><div class="video-stat-label">点赞</div><div class="video-stat-value">${formatCount(item.likes)}</div></div><div><div class="video-stat-label">评论</div><div class="video-stat-value">${formatCount(item.comments)}</div></div><div><div class="video-stat-label">互动率</div><div class="video-stat-value">${safe(item.engagement || '待抓取')}</div></div></div><div class="evaluation"><div><h3>效果评估</h3><div class="evaluation-copy">${safe(item.note || '暂无真实分析')}</div></div><div class="evaluation-score">${safe(item.score ?? '--')}</div></div></article>`).join('') : '<div class="card empty">暂无真实内容数据。粘贴链接并完成平台授权后，这里才会显示抓取结果。</div>';
+      $('contentGrid').innerHTML = contents.length ? contents.map(item => `<article class="card video-card"><div class="video-top"><div class="video-thumb">${item.thumbnail ? `<img src="${safe(item.thumbnail)}" alt="" loading="lazy">` : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7 8 5-8 5V7Z"/></svg>'}</div><div class="video-info"><div class="inline-actions"><span class="badge badge-blue">${safe(item.platform)}</span><span class="badge">${safe(item.brand || item.model)}</span></div><div class="video-name" style="margin-top:9px">${safe(item.name)}</div><div class="video-meta">发布于 ${safe(item.date)}</div><a class="video-url" href="${safe(item.url)}" target="_blank" rel="noopener">${safe(item.url)}</a></div></div><div class="video-stats"><div><div class="video-stat-label">播放</div><div class="video-stat-value">${formatCount(item.views)}</div></div><div><div class="video-stat-label">点赞</div><div class="video-stat-value">${formatCount(item.likes)}</div></div><div><div class="video-stat-label">评论</div><div class="video-stat-value">${formatCount(item.comments)}</div></div><div><div class="video-stat-label">互动率</div><div class="video-stat-value">${safe(item.engagement || '待抓取')}</div></div></div><div class="evaluation"><div><h3>效果评估</h3><div class="evaluation-copy">${safe(item.note || '暂无真实分析')}</div></div><div class="evaluation-score">${safe(item.score ?? '--')}</div></div></article>`).join('') : '<div class="card empty">暂无真实内容数据。粘贴链接并完成平台授权后，这里才会显示抓取结果。</div>';
       }
 
       function renderContentMonth() {
@@ -734,7 +735,7 @@
         document.querySelectorAll('[data-creator-id]').forEach(btn => btn.addEventListener('click', () => openCreatorProfile(btn.dataset.creatorId)));
       }
 
-      function formatCount(value) { return value >= 10000 ? (value/10000).toFixed(value >= 100000 ? 1 : 2) + '万' : Number(value).toLocaleString('zh-CN'); }
+      function formatCount(value) { if (value === null || value === undefined || value === '' || Number.isNaN(Number(value))) return '暂无'; return value >= 10000 ? (value/10000).toFixed(value >= 100000 ? 1 : 2) + '万' : Number(value).toLocaleString('zh-CN'); }
 
       function renderSales() {
         if (!chartData.length) $('salesChart').innerHTML = '<div class="empty">暂无真实销售数据</div>';
@@ -789,11 +790,20 @@
       $('importButton').addEventListener('click', () => $('csvInput').click());
       $('csvInput').addEventListener('change', event => { const file=event.target.files[0]; if (!file) return; const reader=new FileReader(); reader.onload=() => { const imported=parseCsv(reader.result); imported.forEach(item => { const idx=collaborators.findIndex(v => v.email && v.email===item.email); if (idx>=0) collaborators[idx]={...collaborators[idx],...item}; else collaborators.push(item); }); localStorage.setItem('kolCollaborators',JSON.stringify(collaborators)); activeMonth='2026-06'; renderCollabFilters(); renderMonthBar(); renderCollaborators(); showToast(`已导入 ${imported.length} 位红人，统一归档至 2026 年 6 月`); }; reader.readAsText(file,'UTF-8'); event.target.value=''; });
       ['collabSearch','collabBrand','collabPlatform','collabModel'].forEach(id => $(id).addEventListener(id==='collabSearch'?'input':'change',renderCollaborators));
-      $('analyzeButton').addEventListener('click', () => {
+      $('analyzeButton').addEventListener('click', async () => {
         const url=$('contentUrl').value.trim(); if (!url) { showToast('请先粘贴红人发布链接'); return; }
-        const platform = url.includes('tiktok')?'TikTok':url.includes('youtube')||url.includes('youtu.be')?'YouTube':url.includes('instagram')?'Instagram':url.includes('xiaohongshu')?'小红书':url.includes('bilibili')?'Bilibili':url.includes('douyin')?'抖音':'待识别平台';
-        const item={id:Date.now(),name:'待匹配红人',platform,model:$('contentModel').value,url,date:'今天',views:0,likes:0,comments:0,engagement:'待抓取',score:'--',note:'链接已收录。完成对应平台 API 授权后，将自动抓取视频数据并生成效果评估。'};
-        contents.unshift(item); localStorage.setItem('kolContents',JSON.stringify(contents)); renderContent(); $('contentUrl').value=''; showToast('链接已收录，平台授权完成后会自动抓取并分析');
+        let parsed; try { parsed = new URL(url); } catch { showToast('链接格式不正确'); return; }
+        const button = $('analyzeButton'); const apiBase = String(window.KOL_API_BASE || '').replace(/\/$/, '');
+        if (!apiBase) { showToast('尚未配置分析服务地址'); return; }
+        button.disabled = true; button.textContent = '正在分析…';
+        try {
+          const response = await fetch(`${apiBase}/api/content/analyze`, {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({url:parsed.toString(), model:$('contentModel').value})});
+          const payload = await response.json();
+          if (!response.ok || payload.status === 'error') throw new Error(payload.message || '分析失败');
+          contents = contents.filter(item => item.url !== payload.url);
+          contents.unshift(payload); localStorage.setItem('kolContents',JSON.stringify(contents)); renderContent(); renderContentMonth(); $('contentUrl').value=''; showToast(payload.status === 'success' ? '已完成真实数据分析' : '已收录，但平台未返回完整数据');
+        } catch (error) { showToast(`分析失败：${error.message}`); }
+        finally { button.disabled = false; button.textContent = '收录并分析'; }
       });
 
       $('todayDate').textContent = new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric',weekday:'long'}).format(new Date());
