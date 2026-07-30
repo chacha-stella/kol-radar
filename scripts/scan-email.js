@@ -27,6 +27,12 @@ const collaborationTerms = [
   'brand deal', 'interested', 'available', 'partnership', 'proposal', 'campaign', 'deliverables',
   'timeline', 'fee', 'price', 'pricing', 'usd', 'eur', 'sure', 'yes', 'okay', 'accept'
 ];
+const nonCreatorTerms = [
+  'seo', 'website audit', 'website optimization', 'google ranking', 'search engine',
+  'exhibition', 'trade show', 'conference', 'event sponsorship', 'vendor', 'supplier',
+  'wholesale', 'factory', 'manufacturing', 'bag vendor', 'web design', 'link building',
+  'newsletter', 'marketing platform'
+];
 const automatedPrefixes = ['noreply@', 'no-reply@', 'mailer-daemon@', 'postmaster@', 'notifications@', 'notification@'];
 
 function scoreIntent(content) {
@@ -48,7 +54,10 @@ function scoreIntent(content) {
   const high = highSignals.filter(pattern => pattern.test(value)).length;
   const medium = mediumSignals.filter(pattern => pattern.test(value)).length;
   const negative = negativeSignals.some(pattern => pattern.test(value));
+  const creatorSignals = /\b(creator|influencer|tiktok|instagram|youtube|reel|shorts|followers|audience|media kit|rate card)\b/i.test(value);
   if (negative && high === 0) return { score: 10, level: '低意向', reasons: ['系统/通知类邮件'] };
+  if (creatorSignals && high >= 2) return { score: 85, level: '高意向', reasons: ['明确提到红人/内容合作', '涉及档期、报价或交付'] };
+  if (creatorSignals && high >= 1) return { score: 75, level: '较高意向', reasons: ['提到红人内容合作', '已出现合作推进信号'] };
   if (high >= 2 || (high >= 1 && medium >= 1)) return { score: 85, level: '高意向', reasons: ['出现明确合作动作', '涉及档期、报价或交付'] };
   if (high === 1 || medium >= 2) return { score: 60, level: '中意向', reasons: ['提到合作或产品评测', '尚未出现明确报价/档期'] };
   return { score: 35, level: '待确认', reasons: ['只有泛合作词或上下文不足'] };
@@ -286,7 +295,10 @@ function isLikelyCreatorReply(content, senderAddress, subject, forwarded) {
   const sender = String(senderAddress || '').toLowerCase();
   if (!sender || sender === user.toLowerCase() || isAutomated(sender, content)) return false;
   const hasTerms = collaborationTerms.some(term => value.includes(term.toLowerCase()));
+  const nonCreator = nonCreatorTerms.some(term => value.includes(term.toLowerCase()));
+  const creatorContext = /\b(creator|influencer|tiktok|instagram|youtube|reel|shorts|followers|audience|media kit|rate card)\b/i.test(value);
   const replyMarker = /(?:^|\s)(?:re|回复|答复|fwd|转发)\s*:/i.test(String(subject || ''));
+  if (nonCreator && !creatorContext) return false;
   return hasTerms || (forwarded && (replyMarker || value.length > 20)) || replyMarker;
 }
 

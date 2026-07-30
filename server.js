@@ -8,57 +8,72 @@ import { ImapFlow } from 'imapflow';
 import nodemailer from 'nodemailer';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dashboardPath = path.join(__dirname, 'index.html');
 const port = Number(process.env.PORT || 3000);
 const timezone = process.env.APP_TIMEZONE || 'Asia/Shanghai';
 const scanHour = Number(process.env.SCAN_HOUR || 8);
 const scanMinute = Number(process.env.SCAN_MINUTE || 30);
+const graphVersion = process.env.META_GRAPH_VERSION || 'v22.0';
 const replyToken = String(process.env.KOL_REPLY_TOKEN || '').trim();
-const replyAttempts = new Map();
+const adminToken = String(process.env.KOL_ADMIN_TOKEN || replyToken).trim();
 const execFileAsync = promisify(execFile);
+const replyAttempts = new Map();
 let fullScanPromise = null;
+let lastScheduledDate = '';
 
-const mimeTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
+const mimeTypes = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.svg': 'image/svg+xml'
+};
 
 let latestDigest = {
   scannedAt: null,
   status: 'waiting_for_credentials',
-  message: '等待在 Railway Variables 中配置邮箱安全码。',
-  emails: [],
-  quoteTotal: 0,
-  highIntentCount: 0
+  message: '等待邮箱首次扫描。',
+  messages: [],
+  otherMessages: [],
+  replyCount: 0,
+  newEmailCount: 0,
+  repliedCount: 0,
+  highIntentCount: 0,
+  quoteTotal: 0
 };
-let lastScheduledDate = '';
+
+function digestPath() {
+  return path.join(__dirname, 'data', 'digest.json');
+}
+
+function readPersistedDigest() {
+  try { return JSON.parse(fs.readFileSync(digestPath(), 'utf8')); } catch { return null; }
+}
 
 function text(value = '') {
   return String(value).replace(/\s+/g, ' ').trim();
 }
 
-function scoreIntent(content) {
-  const high = ['合作', '档期', '可以', '接受', '确认', '报价单', '预算', 'contract', 'available', 'interested'];
-  const medium = ['考虑', '了解', '资料', 'proposal', 'rate card', 'media kit'];
-  const haystack = content.toLowerCase();
-  if (high.some(word => haystack.includes(word.toLowerCase()))) return 85;
-  if (medium.some(word => haystack.includes(word.toLowerCase()))) return 60;
-  return 35;
+function json(response, status, payload) {
+  response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+  response.end(JSON.stringify(payload));
 }
 
-function extractQuote(content) {
-  const match = content.match(/(?:¥|￥|rmb\s*|cny\s*|usd\s*\$|\$)\s*([\d,]+(?:\.\d{1,2})?)/i);
-  return match ? Number(match[1].replace(/,/g, '')) : 0;
+async function readBody(request) {
+  let raw = '';
+  for await (const chunk of request) raw += chunk;
+  if (raw.length > 25 * 1024 * 1024) throw new Error('请求内容过大');
+  try { return JSON.parse(raw || '{}'); } catch { throw new Error('请求格式必须是 JSON'); }
 }
 
 function getMailConfig() {
-  const password = process.env.MAIL_IMAP_PASSWORD;
-  if (!password) return null;
+  const user = String(process.env.MAIL_IMAP_USER || '').trim();
+  const password = String(process.env.MAIL_IMAP_PASSWORD || '');
+  if (!user || !password) return null;
   return {
     host: process.env.MAIL_IMAP_HOST || 'imap.qiye.aliyun.com',
     port: Number(process.env.MAIL_IMAP_PORT || 993),
     secure: String(process.env.MAIL_IMAP_TLS || 'true').toLowerCase() !== 'false',
-    auth: {
-      user: process.env.MAIL_IMAP_USER,
-      pass: password
-    }
+    auth: { user, pass: password }
   };
 }
 
@@ -66,272 +81,19 @@ function getSmtpTransport() {
   const user = process.env.MAIL_SMTP_USER || process.env.MAIL_IMAP_USER;
   const pass = process.env.MAIL_SMTP_PASSWORD || process.env.MAIL_IMAP_PASSWORD;
   if (!user || !pass) return null;
-  return nodemailer.createTransport({ host: process.env.MAIL_SMTP_HOST || 'smtp.qiye.aliyun.com', port: Number(process.env.MAIL_SMTP_PORT || 465), secure: true, auth: { user, pass } });
+  return nodemailer.createTransport({
+    host: process.env.MAIL_SMTP_HOST || 'smtp.qiye.aliyun.com',
+    port: Number(process.env.MAIL_SMTP_PORT || 465),
+    secure: true,
+    auth: { user, pass }
+  });
 }
 
-function replyAllowed(to, subject) {
-  try {
-    const digestPath = path.join(__dirname, 'data', 'digest.json');
-    const digest = JSON.parse(fs.readFileSync(digestPath, 'utf8'));
-    return (digest.messages || []).some(item => String(item.email || '').toLowerCase() === to.toLowerCase() && String(item.subject || '') === subject);
-  } catch {
-    return false;
-  }
+function replyAllowed(to, messageId) {
+  const digest = readPersistedDigest() || latestDigest;
+  return (digest.messages || []).some(item => String(item.id || '') === String(messageId || '') && String(item.email || '').toLowerCase() === String(to || '').toLowerCase());
 }
 
-function readPersistedDigest() {
-  try {
-    return JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'digest.json'), 'utf8'));
-  } catch {
-    return null;
-  }
-}
-
-function decodeHtml(value = '') {
-  let decoded = String(value);
-  for (let pass = 0; pass < 3; pass += 1) {
-    decoded = decoded
-      .replace(/&amp;/gi, '&').replace(/&quot;/gi, '"').replace(/&#39;|&apos;/gi, "'")
-      .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
-      .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
-      .replace(/&#(\d+);/g, (_, decimal) => String.fromCodePoint(Number(decimal)));
-  }
-  return decoded.replace(/\s+/g, ' ').trim();
-}
-
-function metaContent(html, key) {
-  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const patterns = [
-    new RegExp(`<meta[^>]+(?:property|name)=["']${escaped}["'][^>]+content=["']([^"']*)["']`, 'i'),
-    new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+(?:property|name)=["']${escaped}["']`, 'i')
-  ];
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match?.[1]) return decodeHtml(match[1]);
-  }
-  return '';
-}
-
-function firstNumber(html, patterns) {
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match?.[1] != null) return Number(String(match[1]).replace(/,/g, ''));
-  }
-  return null;
-}
-
-function parseInstagramDate(value) {
-  const source = decodeHtml(value || '');
-  const timestamp = source.match(/["'](?:taken_at_timestamp|datePublished)["']\s*[:=]\s*["']?(\d{10,13})/i);
-  if (timestamp) {
-    const milliseconds = timestamp[1].length === 10 ? Number(timestamp[1]) * 1000 : Number(timestamp[1]);
-    return new Date(milliseconds).toISOString();
-  }
-  const iso = source.match(/["']datePublished["']\s*[:=]\s*["'](20\d{2}-\d{2}-\d{2}(?:T[^"']*)?)["']/i);
-  if (iso) {
-    const parsed = new Date(iso[1]);
-    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
-  }
-  const human = source.match(/(?:\bon\s+|发布于\s*)(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+20\d{2}/i);
-  if (human) {
-    const parsed = new Date(human[0].replace(/^on\s+/i, ''));
-    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
-  }
-  return '';
-}
-
-function instagramCaption(value) {
-  let caption = decodeHtml(value || '');
-  caption = caption.replace(/^\s*\d[\d,.]*\s+likes?,\s*\d[\d,.]*\s+comments?\s*-\s*[^:]{1,120}:\s*/i, '');
-  return caption.replace(/^['"]|['"]$/g, '').trim();
-}
-
-function instagramUsername(value) {
-  const source = decodeHtml(value || '');
-  const explicit = source.match(/["'](?:username|owner_username)["']\s*:\s*["']([^"']+)/i);
-  if (explicit?.[1]) return explicit[1];
-  const description = source.match(/\d[\d,.]*\s+likes?,\s*\d[\d,.]*\s+comments?\s*-\s*([A-Za-z0-9._]+)\s+on\s+/i);
-  if (description?.[1]) return description[1];
-  const handle = source.match(/@([A-Za-z0-9._]{2,50})/);
-  return handle?.[1] || '';
-}
-
-function identifyPlatform(value) {
-  const host = new URL(value).hostname.toLowerCase();
-  if (host.includes('instagram')) return 'Instagram';
-  if (host.includes('youtube') || host === 'youtu.be') return 'YouTube';
-  if (host.includes('tiktok')) return 'TikTok';
-  if (host.includes('bilibili')) return 'Bilibili';
-  if (host.includes('xiaohongshu')) return '小红书';
-  if (host.includes('douyin')) return '抖音';
-  return '未知平台';
-}
-
-function brandForContent(value) {
-  const haystack = String(value || '').toLowerCase();
-  if (haystack.includes('dartsnut')) return 'Dartsnut';
-  if (haystack.includes('chessnut')) return 'Chessnut';
-  return '待识别';
-}
-
-function inferContentModel(value, requested = '') {
-  const supplied = String(requested || '').trim();
-  if (supplied && supplied !== '未指定型号' && supplied !== '自动识别') return supplied;
-  const match = String(value || '').match(/\b(?:chessnut|dartsnut)\s+([a-z][a-z0-9 -]{1,30})/i);
-  if (match?.[1]) return `${brandForContent(value)} ${match[1].trim()}`;
-  const product = String(value || '').match(/\b(move|e-one|air|pro|go|smart board|automatic chessboard)\b/i);
-  return product?.[1] ? product[1].replace(/\b\w/g, c => c.toUpperCase()) : '未指定型号';
-}
-
-function evaluateContent({ views, likes, comments }) {
-  const knownLikes = Number.isFinite(likes) ? likes : null;
-  const knownComments = Number.isFinite(comments) ? comments : null;
-  const knownViews = Number.isFinite(views) ? views : null;
-  if (knownViews && knownViews > 0) {
-    const rate = ((knownLikes || 0) + (knownComments || 0)) / knownViews * 100;
-    const score = Math.max(0, Math.min(100, Math.round(Math.min(rate / 0.08, 1) * 100)));
-    return { engagement: `${rate.toFixed(2)}%`, score, note: `已抓取真实数据：${knownViews.toLocaleString()} 播放、${(knownLikes || 0).toLocaleString()} 点赞、${(knownComments || 0).toLocaleString()} 评论。互动率按公开数据计算。` };
-  }
-  if (knownLikes != null || knownComments != null) {
-    return { engagement: '待获取播放量', score: '--', note: `已抓取部分真实数据：${knownLikes == null ? '点赞未知' : `${knownLikes.toLocaleString()} 点赞`}、${knownComments == null ? '评论未知' : `${knownComments.toLocaleString()} 评论`}。平台未公开播放量，暂不能计算互动率。` };
-  }
-  return { engagement: '待抓取', score: '--', note: '平台暂未返回可验证的公开数据，没有使用虚构数值。' };
-}
-
-async function fetchPublicPage(url) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      redirect: 'follow',
-      headers: { 'user-agent': 'Mozilla/5.0 (compatible; KOL-Radar/1.0)', accept: 'text/html,application/xhtml+xml' }
-    });
-    const html = await response.text();
-    return { response, html };
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-async function analyzeInstagram(url, model) {
-  const canonical = new URL(url);
-  canonical.search = '';
-  let response;
-  let html = '';
-  try {
-    ({ response, html } = await fetchPublicPage(canonical.toString()));
-  } catch {
-    return {
-      id: `content-${Date.now()}`,
-      status: 'unavailable',
-      name: '待匹配红人',
-      platform: 'Instagram',
-      brand: '待识别',
-      model: model || '未指定型号',
-      url: canonical.toString(),
-      date: '未获取',
-      publishedAt: '',
-      creatorUrl: '',
-      source: canonical.toString(),
-      views: null,
-      likes: null,
-      comments: null,
-      engagement: '待抓取',
-      score: '--',
-      note: '服务器当前无法访问 Instagram，已收录链接但没有填充虚构数据。',
-      title: '',
-      caption: '',
-      thumbnail: ''
-    };
-  }
-  const title = metaContent(html, 'og:title');
-  const description = metaContent(html, 'og:description');
-  const image = metaContent(html, 'og:image');
-  const combined = `${title} ${description} ${html}`;
-  const canonicalLink = metaContent(html, 'og:url') || canonical.toString();
-  const likes = firstNumber(combined, [
-    /["']like_count["']\s*:\s*(\d+)/i,
-    /["']edge_media_preview_like["'][^\d]{0,80}["']count["']\s*:\s*(\d+)/i,
-    /([\d,]+)\s+likes?/i
-  ]);
-  const comments = firstNumber(combined, [
-    /["']comment_count["']\s*:\s*(\d+)/i,
-    /["']edge_media_to_comment["'][^\d]{0,80}["']count["']\s*:\s*(\d+)/i,
-    /([\d,]+)\s+comments?/i
-  ]);
-  const views = firstNumber(combined, [
-    /["']play_count["']\s*:\s*(\d+)/i,
-    /["']video_view_count["']\s*:\s*(\d+)/i,
-    /["']view_count["']\s*:\s*(\d+)/i
-  ]);
-  const username = instagramUsername(`${title} ${description} ${html}`) || '待匹配红人';
-  const textContent = instagramCaption(description || title || '');
-  const evaluation = evaluateContent({ views, likes, comments });
-  const publishedAt = parseInstagramDate(combined);
-  const unavailable = !response.ok || /post (?:is )?unavailable|page isn't available|链接可能已损坏|post无法访问/i.test(combined);
-  return {
-    id: `content-${Date.now()}`,
-    status: unavailable ? 'unavailable' : 'success',
-    name: username,
-    platform: 'Instagram',
-    brand: brandForContent(combined),
-    model: model || '未指定型号',
-    url: canonicalLink,
-    date: publishedAt ? publishedAt.slice(0, 10) : '未获取',
-    publishedAt,
-    creatorUrl: username !== '待匹配红人' ? `https://www.instagram.com/${encodeURIComponent(username)}/` : '',
-    source: response.url || canonical.toString(),
-    views, likes, comments,
-    engagement: evaluation.engagement,
-    score: evaluation.score,
-    note: unavailable ? 'Instagram 返回内容不可用或需要登录，未写入任何虚构指标。' : `${evaluation.note}${textContent ? ` 内容摘要：${textContent.slice(0, 280)}` : ''}`,
-    title: title || '',
-    caption: textContent,
-    description,
-    thumbnail: image || ''
-  };
-}
-
-function youtubeVideoId(url) {
-  const parsed = new URL(url);
-  if (parsed.hostname === 'youtu.be') return parsed.pathname.slice(1);
-  return parsed.searchParams.get('v') || (parsed.pathname.match(/\/(?:shorts|embed|live)\/([^/]+)/) || [])[1] || '';
-}
-
-async function analyzeYouTube(url, model) {
-  const id = youtubeVideoId(url);
-  if (!id) throw new Error('无法识别 YouTube 视频链接');
-  const key = process.env.YOUTUBE_API_KEY || process.env.KOL_YOUTUBE_API_KEY;
-  let item = null;
-  if (key) {
-    const endpoint = new URL('https://www.googleapis.com/youtube/v3/videos');
-    endpoint.search = new URLSearchParams({ part: 'snippet,statistics', id, key }).toString();
-    const response = await fetch(endpoint);
-    const payload = await response.json();
-    item = payload.items?.[0];
-  }
-  if (!item) {
-    const { html } = await fetchPublicPage(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
-    try { item = JSON.parse(html); } catch { item = null; }
-  }
-  const stats = item?.statistics || {};
-  const views = stats.viewCount == null ? null : Number(stats.viewCount);
-  const likes = stats.likeCount == null ? null : Number(stats.likeCount);
-  const comments = stats.commentCount == null ? null : Number(stats.commentCount);
-  const evaluation = evaluateContent({ views, likes, comments });
-  return { id: `content-${Date.now()}`, status: item ? 'success' : 'unavailable', name: item?.snippet?.channelTitle || '待匹配红人', platform: 'YouTube', brand: brandForContent(`${item?.snippet?.title || ''} ${item?.snippet?.description || ''}`), model: model || '未指定型号', url, date: item?.snippet?.publishedAt?.slice(0, 10) || '未获取', publishedAt: item?.snippet?.publishedAt || '', creatorUrl: item?.snippet?.channelId ? `https://www.youtube.com/channel/${item.snippet.channelId}` : '', source: url, views, likes, comments, engagement: evaluation.engagement, score: evaluation.score, note: item ? `${evaluation.note} 内容摘要：${String(item.snippet?.title || '').slice(0, 280)}` : '未获取到 YouTube 公开数据。', title: item?.snippet?.title || '', caption: item?.snippet?.description || '', thumbnail: item?.snippet?.thumbnails?.high?.url || item?.thumbnail_url || '' };
-}
-
-async function analyzeContentUrl(url, model) {
-  const platform = identifyPlatform(url);
-  if (platform === 'Instagram') return analyzeInstagram(url, model);
-  if (platform === 'YouTube') return analyzeYouTube(url, model);
-  return { id: `content-${Date.now()}`, status: 'unsupported', name: '待匹配红人', platform, brand: '待识别', model: model || '未指定型号', url, date: '未获取', publishedAt: '', creatorUrl: '', source: url, views: null, likes: null, comments: null, engagement: '待抓取', score: '--', note: `${platform} 暂未接入可验证的数据接口，已收录链接但未填充虚构数据。` };
-}
-
-// Use the same cumulative scanner as GitHub Actions so a manual scan from the
-// dashboard produces the same filtered, translated, thread-aware digest.
 async function runFullScanner() {
   if (fullScanPromise) return fullScanPromise;
   fullScanPromise = (async () => {
@@ -339,92 +101,26 @@ async function runFullScanner() {
       await execFileAsync(process.execPath, [path.join(__dirname, 'scripts', 'scan-email.js')], {
         cwd: __dirname,
         env: process.env,
-        maxBuffer: 10 * 1024 * 1024
+        maxBuffer: 20 * 1024 * 1024
       });
       latestDigest = readPersistedDigest() || latestDigest;
     } catch (error) {
       const persisted = readPersistedDigest();
       const diagnostic = [error.message, error.stderr, error.stdout].filter(Boolean).join('\n').slice(0, 2000);
-      // The IMAP server can close the connection after all messages were read.
-      // Keep a completed persisted scan instead of replacing it with a stale error.
-      if (persisted && Number(persisted.scannedMessageCount || 0) > 0 && Array.isArray(persisted.messages) && persisted.messages.length > 0) {
-        latestDigest = { ...persisted, status: 'success', scanWarning: diagnostic };
-      } else {
-        latestDigest = {
-          ...(persisted || latestDigest),
-          scannedAt: new Date().toISOString(),
-          status: 'error',
-          message: '邮箱扫描失败，请检查账号、安全码或邮箱文件夹权限。',
-          error: diagnostic
-        };
-      }
+      latestDigest = persisted?.messages?.length
+        ? { ...persisted, status: 'success', scanWarning: diagnostic }
+        : { ...latestDigest, scannedAt: new Date().toISOString(), status: 'error', message: '邮箱扫描失败，请检查 IMAP 账号和安全码。', error: diagnostic };
     }
     return latestDigest;
   })().finally(() => { fullScanPromise = null; });
   return fullScanPromise;
 }
 
-async function scanInbox() {
-  const config = getMailConfig();
-  if (!config || !config.auth.user) {
-    latestDigest = { ...latestDigest, status: 'waiting_for_credentials', message: '请在 Railway Variables 填写 MAIL_IMAP_USER 和 MAIL_IMAP_PASSWORD。' };
-    return latestDigest;
-  }
-
-  const client = new ImapFlow({
-    ...config,
-    logger: false,
-    auth: config.auth
-  });
-
-  try {
-    await client.connect();
-    const lock = await client.getMailboxLock('INBOX');
-    try {
-      const emails = [];
-      const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      for await (const message of client.fetch({ since }, { envelope: true, source: true, internalDate: true })) {
-        const source = message.source?.toString('utf8') || '';
-        const subject = text(message.envelope?.subject || '无主题');
-        const from = message.envelope?.from?.[0];
-        const sender = from?.address || from?.name || '未知发件人';
-        const preview = text(source.replace(/<[^>]*>/g, ' ').slice(0, 700));
-        const quote = extractQuote(`${subject} ${preview}`);
-        const intent = scoreIntent(`${subject} ${preview}`);
-        emails.push({ sender, subject, preview, receivedAt: message.internalDate?.toISOString() || new Date().toISOString(), quote, intent });
-      }
-      const quoteTotal = emails.reduce((sum, email) => sum + email.quote, 0);
-      latestDigest = {
-        scannedAt: new Date().toISOString(),
-        status: 'success',
-        message: `已分析 ${emails.length} 封过去 24 小时的邮件。`,
-        emails: emails.sort((a, b) => b.intent - a.intent),
-        quoteTotal,
-        highIntentCount: emails.filter(email => email.intent >= 80).length
-      };
-    } finally {
-      lock.release();
-    }
-  } catch (error) {
-    latestDigest = {
-      ...latestDigest,
-      scannedAt: new Date().toISOString(),
-      status: 'error',
-      message: '邮箱扫描失败：请检查 Railway Variables 中的邮箱地址与新安全码。',
-      error: error.message
-    };
-    console.error('Mailbox scan failed:', error.message);
-  } finally {
-    try { await client.logout(); } catch { /* Connection may not have completed. */ }
-  }
-  return latestDigest;
-}
-
 function getShanghaiTime() {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: timezone,
     year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
-  }).formatToParts(new Date()).reduce((value, part) => ({ ...value, [part.type]: part.value }), {});
+  }).formatToParts(new Date()).reduce((out, part) => ({ ...out, [part.type]: part.value }), {});
   return { date: `${parts.year}-${parts.month}-${parts.day}`, hour: Number(parts.hour), minute: Number(parts.minute) };
 }
 
@@ -432,120 +128,245 @@ function scheduleScan() {
   const now = getShanghaiTime();
   if (now.hour === scanHour && now.minute === scanMinute && lastScheduledDate !== now.date) {
     lastScheduledDate = now.date;
-    runFullScanner();
+    runFullScanner().catch(() => {});
   }
 }
 
-const server = http.createServer(async (request, response) => {
-  const url = new URL(request.url, `http://${request.headers.host}`);
-  const allowedOrigin = process.env.CORS_ORIGIN || 'https://chacha-stella.github.io';
-  const requestOrigin = request.headers.origin;
-  if (requestOrigin === allowedOrigin) response.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+function youtubeVideoId(value) {
+  const parsed = new URL(value);
+  if (parsed.hostname === 'youtu.be') return parsed.pathname.slice(1);
+  return parsed.searchParams.get('v') || (parsed.pathname.match(/\/(?:shorts|embed|live)\/([^/]+)/) || [])[1] || '';
+}
+
+function youtubeKey() {
+  return String(process.env.YOUTUBE_API_KEY || process.env.KOL_YOUTUBE_API_KEY || '').trim();
+}
+
+async function googleAccessToken() {
+  const direct = String(process.env.YOUTUBE_ACCESS_TOKEN || '').trim();
+  if (direct) return direct;
+  const refresh = String(process.env.YOUTUBE_REFRESH_TOKEN || '').trim();
+  const clientId = String(process.env.YOUTUBE_CLIENT_ID || '').trim();
+  const clientSecret = String(process.env.YOUTUBE_CLIENT_SECRET || '').trim();
+  if (!refresh || !clientId || !clientSecret) return '';
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, refresh_token: refresh, grant_type: 'refresh_token' })
+  });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error_description || `Google OAuth ${response.status}`);
+  return payload.access_token || '';
+}
+
+async function youtubeApi(endpoint, params = {}, options = {}) {
+  const url = new URL(`https://www.googleapis.com/youtube/v3/${endpoint}`);
+  Object.entries(params).forEach(([key, value]) => { if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, value); });
+  if (!options.accessToken) {
+    const key = youtubeKey();
+    if (!key) throw new Error('未配置 YOUTUBE_API_KEY');
+    url.searchParams.set('key', key);
+  }
+  const response = await fetch(url, {
+    method: options.method || 'GET',
+    headers: { ...(options.accessToken ? { authorization: `Bearer ${options.accessToken}` } : {}), ...(options.headers || {}) },
+    body: options.body
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error?.message || `YouTube API ${response.status}`);
+  return payload;
+}
+
+async function graphApi(pathname, params = {}, options = {}) {
+  const token = String(process.env.INSTAGRAM_ACCESS_TOKEN || '').trim();
+  if (!token) throw new Error('未配置 INSTAGRAM_ACCESS_TOKEN');
+  const url = new URL(`https://graph.facebook.com/${graphVersion}/${pathname.replace(/^\//, '')}`);
+  Object.entries(params).forEach(([key, value]) => { if (value !== undefined && value !== null && value !== '') url.searchParams.set(key, value); });
+  if (options.method === 'POST') {
+    const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ ...params, access_token: token }) });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || payload.error) throw new Error(payload.error?.message || `Meta API ${response.status}`);
+    return payload;
+  }
+  url.searchParams.set('access_token', token);
+  const response = await fetch(url);
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || payload.error) throw new Error(payload.error?.message || `Meta API ${response.status}`);
+  return payload;
+}
+
+function checkAllowedOrigin(request, response) {
+  const allowed = process.env.CORS_ORIGIN || 'https://chacha-stella.github.io';
+  if (request.headers.origin === allowed) response.setHeader('Access-Control-Allow-Origin', allowed);
   response.setHeader('Access-Control-Allow-Headers', 'content-type, x-kol-reply-token');
   response.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+}
+
+function requireAdmin(request) {
+  if (!adminToken || request.headers['x-kol-reply-token'] !== adminToken) throw new Error('未授权：请输入后台管理令牌');
+}
+
+async function handleRequest(request, response) {
+  checkAllowedOrigin(request, response);
+  const url = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
   if (request.method === 'OPTIONS') { response.writeHead(204); response.end(); return; }
+
   if (url.pathname === '/api/status' && request.method === 'GET') {
-    // Report configuration health without exposing any credential values.
-    const mailConfigured = Boolean(getMailConfig()?.auth?.user && process.env.MAIL_IMAP_PASSWORD);
-    const smtpConfigured = Boolean(getSmtpTransport());
-    response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-    response.end(JSON.stringify({
+    return json(response, 200, {
       status: 'ok',
+      imapConfigured: Boolean(getMailConfig()),
+      smtpConfigured: Boolean(getSmtpTransport()),
       replyTokenConfigured: Boolean(replyToken),
-      imapConfigured: mailConfigured,
-      smtpConfigured,
-      startedAt: process.env.RAILWAY_DEPLOYMENT_ID ? undefined : new Date().toISOString(),
+      adminTokenConfigured: Boolean(adminToken),
+      youtubeReadConfigured: Boolean(youtubeKey()),
+      youtubeWriteConfigured: Boolean(process.env.YOUTUBE_ACCESS_TOKEN || (process.env.YOUTUBE_REFRESH_TOKEN && process.env.YOUTUBE_CLIENT_ID && process.env.YOUTUBE_CLIENT_SECRET)),
+      instagramConfigured: Boolean(process.env.INSTAGRAM_ACCESS_TOKEN && process.env.INSTAGRAM_USER_ID),
       deploymentId: process.env.RAILWAY_DEPLOYMENT_ID || null
-    }));
-    return;
+    });
   }
-  if (url.pathname === '/api/digest') {
-    latestDigest = readPersistedDigest() || latestDigest;
-    response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-    response.end(JSON.stringify(latestDigest));
-    return;
-  }
-  if (url.pathname === '/api/content/analyze' && request.method === 'POST') {
-    let raw = '';
-    for await (const chunk of request) raw += chunk;
-    try {
-      const payload = JSON.parse(raw || '{}');
-      const target = text(payload.url);
-      const model = text(payload.model) || '未指定型号';
-      if (!target) throw new Error('请提供内容链接');
-      if (target.length > 2000) throw new Error('链接过长');
-      const result = await analyzeContentUrl(target, model);
-      response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-      response.end(JSON.stringify(result));
-    } catch (error) {
-      response.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-      response.end(JSON.stringify({ status: 'error', message: error.message || '内容分析失败' }));
-    }
-    return;
-  }
-  if (url.pathname === '/api/scan' && request.method === 'POST') {
-    const result = await runFullScanner();
-    response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
-    response.end(JSON.stringify(result));
-    return;
-  }
+
+  if (url.pathname === '/api/digest' && request.method === 'GET') return json(response, 200, readPersistedDigest() || latestDigest);
+  if (url.pathname === '/api/scan' && request.method === 'POST') return json(response, 200, await runFullScanner());
+
   if (url.pathname === '/api/reply' && request.method === 'POST') {
-    let raw = '';
-    for await (const chunk of request) raw += chunk;
     try {
       if (!replyToken || request.headers['x-kol-reply-token'] !== replyToken) throw new Error('回复令牌无效或未配置');
-      const payload = JSON.parse(raw || '{}');
+      const payload = await readBody(request);
       const to = text(payload.to);
       const subject = text(payload.subject);
-      const messageId = text(payload.messageId);
       const body = String(payload.body || '').trim();
       if (!to || !subject || !body) throw new Error('缺少收件人、主题或正文');
-      if (messageId) {
-        const digest = readPersistedDigest();
-        const allowed = (digest?.messages || []).some(item => String(item.id || '') === messageId && String(item.email || '').toLowerCase() === to.toLowerCase());
-        if (!allowed) throw new Error('只能回复日报中已识别的邮件联系人');
-      } else if (!replyAllowed(to, subject)) {
-        throw new Error('只能回复日报中已识别的邮件联系人');
-      }
-      if (body.length > 20000) throw new Error('回复正文不能超过 20000 个字符');
-      const ip = String(request.headers['x-forwarded-for'] || request.socket.remoteAddress || 'unknown').split(',')[0].trim();
-      const now = Date.now();
-      const recent = (replyAttempts.get(ip) || []).filter(timestamp => now - timestamp < 60 * 60 * 1000);
-      if (recent.length >= 10) throw new Error('发送过于频繁，请一小时后再试');
-      recent.push(now);
-      replyAttempts.set(ip, recent);
+      if (!replyAllowed(to, payload.messageId)) throw new Error('只能回复日报中已识别的邮件');
+      const ip = String(request.headers['x-forwarded-for'] || request.socket.remoteAddress || 'unknown').split(',')[0];
+      const recent = (replyAttempts.get(ip) || []).filter(value => Date.now() - value < 3600000);
+      if (recent.length >= 10) throw new Error('发送过于频繁，请稍后再试');
+      recent.push(Date.now()); replyAttempts.set(ip, recent);
       const transporter = getSmtpTransport();
-      if (!transporter) throw new Error('未配置 MAIL_SMTP_USER / MAIL_SMTP_PASSWORD');
+      if (!transporter) throw new Error('未配置 SMTP 发信变量');
       const info = await transporter.sendMail({ from: process.env.MAIL_SMTP_USER || process.env.MAIL_IMAP_USER, to, subject: subject.startsWith('Re:') ? subject : `Re: ${subject}`, text: body });
-      response.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-      response.end(JSON.stringify({ status: 'sent', messageId: info.messageId }));
-    } catch (error) {
-      response.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
-      response.end(JSON.stringify({ status: 'error', message: error.message }));
-    }
-    return;
+      return json(response, 200, { status: 'sent', messageId: info.messageId });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
   }
+
+  if (url.pathname === '/api/youtube/status' && request.method === 'GET') {
+    return json(response, 200, { read: Boolean(youtubeKey()), write: Boolean(process.env.YOUTUBE_ACCESS_TOKEN || process.env.YOUTUBE_REFRESH_TOKEN), message: youtubeKey() ? 'YouTube 读取接口已配置' : '请配置 YOUTUBE_API_KEY' });
+  }
+  if (url.pathname === '/api/youtube/video' && request.method === 'GET') {
+    try {
+      const id = youtubeVideoId(url.searchParams.get('url') || '');
+      if (!id) throw new Error('无法识别 YouTube 链接');
+      const payload = await youtubeApi('videos', { part: 'snippet,statistics,status', id });
+      return json(response, 200, { status: 'success', item: payload.items?.[0] || null });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
+  }
+  if (url.pathname === '/api/youtube/comments' && request.method === 'GET') {
+    try {
+      const videoId = text(url.searchParams.get('videoId'));
+      if (!videoId) throw new Error('缺少 videoId');
+      const payload = await youtubeApi('commentThreads', { part: 'snippet,replies', videoId, maxResults: 100, order: 'time' });
+      return json(response, 200, { status: 'success', items: payload.items || [], nextPageToken: payload.nextPageToken || '' });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
+  }
+  if (url.pathname === '/api/youtube/comment/reply' && request.method === 'POST') {
+    try {
+      requireAdmin(request);
+      const accessToken = await googleAccessToken();
+      if (!accessToken) throw new Error('未配置 YouTube 写入授权');
+      const payload = await readBody(request);
+      if (!payload.parentId || !payload.text) throw new Error('缺少评论 ID 或回复内容');
+      const result = await youtubeApi('comments', { part: 'snippet' }, { method: 'POST', accessToken, headers: { 'content-type': 'application/json' }, body: JSON.stringify({ snippet: { parentId: payload.parentId, textOriginal: String(payload.text).slice(0, 10000) } }) });
+      return json(response, 200, { status: 'sent', item: result });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
+  }
+  if (url.pathname === '/api/youtube/publish' && request.method === 'POST') {
+    try {
+      requireAdmin(request);
+      const accessToken = await googleAccessToken();
+      if (!accessToken) throw new Error('未配置 YouTube 写入授权');
+      const payload = await readBody(request);
+      if (!payload.videoUrl || !payload.title) throw new Error('需要公开视频 URL 和标题');
+      const download = await fetch(payload.videoUrl);
+      if (!download.ok) throw new Error(`视频下载失败：${download.status}`);
+      const bytes = await download.arrayBuffer();
+      if (bytes.byteLength > 200 * 1024 * 1024) throw new Error('视频超过 200MB');
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify({ snippet: { title: String(payload.title).slice(0, 100), description: String(payload.description || '').slice(0, 5000), tags: Array.isArray(payload.tags) ? payload.tags.slice(0, 20) : [] }, status: { privacyStatus: payload.privacyStatus || 'private' } })], { type: 'application/json' }), 'metadata.json');
+      form.append('video', new Blob([bytes], { type: download.headers.get('content-type') || 'video/mp4' }), 'video.mp4');
+      const responseUpload = await fetch('https://www.googleapis.com/upload/youtube/v3/videos?uploadType=multipart&part=snippet,status', { method: 'POST', headers: { authorization: `Bearer ${accessToken}` }, body: form });
+      const result = await responseUpload.json().catch(() => ({}));
+      if (!responseUpload.ok) throw new Error(result.error?.message || `YouTube 发布失败：${responseUpload.status}`);
+      return json(response, 200, { status: 'published', item: result });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
+  }
+
+  if (url.pathname === '/api/instagram/status' && request.method === 'GET') {
+    return json(response, 200, { configured: Boolean(process.env.INSTAGRAM_ACCESS_TOKEN && process.env.INSTAGRAM_USER_ID), message: process.env.INSTAGRAM_ACCESS_TOKEN && process.env.INSTAGRAM_USER_ID ? 'Instagram Graph API 已配置' : '请配置 Instagram 企业/创作者账号的 Graph API 授权' });
+  }
+  if (url.pathname === '/api/instagram/media' && request.method === 'GET') {
+    try {
+      const userId = text(process.env.INSTAGRAM_USER_ID);
+      if (!userId) throw new Error('未配置 INSTAGRAM_USER_ID');
+      const payload = await graphApi(`${userId}/media`, { fields: 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count', limit: Math.min(50, Number(url.searchParams.get('limit') || 25)) });
+      return json(response, 200, { status: 'success', items: payload.data || [], next: payload.paging?.next || '' });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
+  }
+  if (url.pathname === '/api/instagram/comments' && request.method === 'GET') {
+    try {
+      const mediaId = text(url.searchParams.get('mediaId'));
+      if (!mediaId) throw new Error('缺少 mediaId');
+      const payload = await graphApi(`${mediaId}/comments`, { fields: 'id,text,username,timestamp', limit: 100 });
+      return json(response, 200, { status: 'success', items: payload.data || [] });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
+  }
+  if (url.pathname === '/api/instagram/comment/reply' && request.method === 'POST') {
+    try {
+      requireAdmin(request);
+      const payload = await readBody(request);
+      if (!payload.commentId || !payload.text) throw new Error('缺少评论 ID 或回复内容');
+      const result = await graphApi(`${payload.commentId}/replies`, { message: String(payload.text).slice(0, 1000) }, { method: 'POST' });
+      return json(response, 200, { status: 'sent', item: result });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
+  }
+  if (url.pathname === '/api/instagram/publish' && request.method === 'POST') {
+    try {
+      requireAdmin(request);
+      const userId = text(process.env.INSTAGRAM_USER_ID);
+      const payload = await readBody(request);
+      if (!userId || !payload.caption || (!payload.imageUrl && !payload.videoUrl)) throw new Error('需要账号、文案和公开媒体 URL');
+      const isVideo = Boolean(payload.videoUrl);
+      const container = await graphApi(`${userId}/media`, isVideo
+        ? { media_type: 'REELS', video_url: payload.videoUrl, caption: payload.caption }
+        : { image_url: payload.imageUrl, caption: payload.caption }, { method: 'POST' });
+      const published = await graphApi(`${userId}/media_publish`, { creation_id: container.id }, { method: 'POST' });
+      return json(response, 200, { status: 'published', item: published });
+    } catch (error) { return json(response, 400, { status: 'error', message: error.message }); }
+  }
+
   if (url.pathname === '/' || url.pathname === '/index.html') {
     response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
-    fs.createReadStream(dashboardPath).pipe(response);
+    fs.createReadStream(path.join(__dirname, 'index.html')).pipe(response);
     return;
   }
-  const relativePath = decodeURIComponent(url.pathname.replace(/^\/+/, ''));
-  const staticPath = path.resolve(__dirname, relativePath);
-  if (staticPath.startsWith(__dirname) && fs.existsSync(staticPath) && fs.statSync(staticPath).isFile()) {
-    const extension = path.extname(staticPath).toLowerCase();
+  const relative = decodeURIComponent(url.pathname.replace(/^\/+/, ''));
+  const filePath = path.resolve(__dirname, relative);
+  if (filePath.startsWith(__dirname) && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    const extension = path.extname(filePath).toLowerCase();
     response.writeHead(200, { 'Content-Type': mimeTypes[extension] || 'application/octet-stream', 'Cache-Control': extension === '.json' ? 'no-store' : 'public, max-age=300' });
-    fs.createReadStream(staticPath).pipe(response);
+    fs.createReadStream(filePath).pipe(response);
     return;
   }
   response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
   response.end('Not found');
+}
+
+const server = http.createServer((request, response) => {
+  handleRequest(request, response).catch(error => json(response, 500, { status: 'error', message: error.message || '服务器错误' }));
 });
 
 server.listen(port, () => {
-  console.log(`KOL Radar listening on port ${port}. Scheduled scan: ${scanHour}:${String(scanMinute).padStart(2, '0')} ${timezone}`);
   latestDigest = readPersistedDigest() || latestDigest;
-  runFullScanner();
+  console.log(`KOL Radar listening on port ${port}; daily scan ${scanHour}:${String(scanMinute).padStart(2, '0')} ${timezone}`);
+  runFullScanner().catch(() => {});
 });
 
-setInterval(scheduleScan, 30 * 1000);
+setInterval(scheduleScan, 30000);
