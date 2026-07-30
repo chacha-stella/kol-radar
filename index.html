@@ -559,6 +559,27 @@
       window.KOL_API_BASE = window.KOL_API_BASE || 'https://kol-radar-production-4500.up.railway.app';
       const app = document.getElementById('app');
       const $ = id => document.getElementById(id);
+      const decodeHtmlEntities = value => {
+        let text = String(value ?? '');
+        if (!text.includes('&')) return text;
+        const decoder = document.createElement('textarea');
+        for (let pass = 0; pass < 3; pass += 1) {
+          decoder.innerHTML = text;
+          const decoded = decoder.value;
+          if (decoded === text) break;
+          text = decoded;
+        }
+        return text;
+      };
+      const normalizeContent = item => ({...item,
+        name: decodeHtmlEntities(item?.name),
+        title: decodeHtmlEntities(item?.title),
+        caption: decodeHtmlEntities(item?.caption),
+        note: decodeHtmlEntities(item?.note),
+        brand: decodeHtmlEntities(item?.brand),
+        model: decodeHtmlEntities(item?.model),
+        date: decodeHtmlEntities(item?.date)
+      });
       const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       const money = value => '¥' + Number(value || 0).toLocaleString('zh-CN');
       const initials = name => String(name).replace(/[^A-Za-z\u4e00-\u9fa5]/g,'').slice(0,2).toUpperCase();
@@ -579,7 +600,7 @@
       collaborators = collaborators.map(item => ({...item, brand: item.brand || 'Chessnut'}));
       const savedContents = JSON.parse(localStorage.getItem('kolContents') || '[]');
       const demoContentNames = new Set(['Kiki Goes Global','周末去哪儿','科技阿远','Nora Studio']);
-      let contents = Array.isArray(savedContents) ? savedContents.filter(item => item && !demoContentNames.has(item.name) && !String(item.url || '').includes('/demo')) : [];
+      let contents = Array.isArray(savedContents) ? savedContents.filter(item => item && !demoContentNames.has(item.name) && !String(item.url || '').includes('/demo')).map(normalizeContent) : [];
       let activeMonth = '2026-06';
       let activeRecommendationBrand = 'dartsnut';
 
@@ -660,7 +681,7 @@
 
       function renderContent() {
         // Re-analyze old local records on the next scan; legacy records may have placeholder dates or encoded text.
-        contents = contents.map(item => ({...item, date: item.date === '今天' ? '未获取' : item.date}));
+        contents = contents.map(item => normalizeContent({...item, date: item.date === '今天' ? '未获取' : item.date}));
       $('contentGrid').innerHTML = contents.length ? contents.map(item => `<article class="card video-card"><div class="video-top"><div class="video-thumb">${item.thumbnail ? `<img src="${safe(item.thumbnail)}" alt="" loading="lazy">` : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 7 8 5-8 5V7Z"/></svg>'}</div><div class="video-info"><div class="inline-actions"><span class="badge badge-blue">${safe(item.platform)}</span><span class="badge">${safe(item.brand || '待识别品牌')}</span><span class="badge">${safe(item.model || '未指定型号')}</span></div><div class="video-name" style="margin-top:9px">${safe(item.name || '待匹配红人')}</div><div class="video-meta">发布时间：${safe(item.date || '未获取')}</div><a class="video-url" href="${safe(item.url)}" target="_blank" rel="noopener">打开原链接</a><div class="video-actions">${item.creatorUrl ? `<a class="btn btn-quiet" href="${safe(item.creatorUrl)}" target="_blank" rel="noopener">红人主页</a>` : ''}<button class="btn btn-quiet" type="button" data-delete-content="${safe(item.id)}">删除</button></div></div></div><div class="video-stats"><div><div class="video-stat-label">播放</div><div class="video-stat-value">${formatCount(item.views)}</div></div><div><div class="video-stat-label">点赞</div><div class="video-stat-value">${formatCount(item.likes)}</div></div><div><div class="video-stat-label">评论</div><div class="video-stat-value">${formatCount(item.comments)}</div></div><div><div class="video-stat-label">互动率</div><div class="video-stat-value">${safe(item.engagement || '待抓取')}</div></div></div><div class="video-detail">${item.title ? `<div class="video-detail-title">${safe(item.title)}</div>` : ''}${item.caption ? `<details class="video-detail-more"><summary>查看完整文案</summary><div class="video-detail-copy">${safe(item.caption)}</div></details>` : '<div class="video-detail-copy">暂无公开文案</div>'}<div class="video-detail-meta">数据来源：${safe(item.source || item.platform)}${item.publishedAt ? ` · 原始时间：${safe(new Date(item.publishedAt).toLocaleString('zh-CN'))}` : ''}</div></div><div class="evaluation"><div><h3>效果评估</h3><div class="evaluation-copy">${safe(item.note || '暂无真实分析')}</div></div><div class="evaluation-score">${safe(item.score ?? '--')}</div></div></article>`).join('') : '<div class="card empty">暂无真实内容数据。粘贴链接并完成平台授权后，这里才会显示抓取结果。</div>';
         document.querySelectorAll('[data-delete-content]').forEach(button => button.addEventListener('click', () => {
           const item = contents.find(value => String(value.id) === String(button.dataset.deleteContent));
@@ -821,7 +842,7 @@
           const payload = await response.json();
           if (!response.ok || payload.status === 'error') throw new Error(payload.message || '分析失败');
           contents = contents.filter(item => item.url !== payload.url);
-          contents.unshift(payload); localStorage.setItem('kolContents',JSON.stringify(contents)); renderContent(); renderContentMonth(); $('contentUrl').value=''; showToast(payload.status === 'success' ? '已完成真实数据分析' : '已收录，但平台未返回完整数据');
+          contents.unshift(normalizeContent(payload)); localStorage.setItem('kolContents',JSON.stringify(contents)); renderContent(); renderContentMonth(); $('contentUrl').value=''; showToast(payload.status === 'success' ? '已完成真实数据分析' : '已收录，但平台未返回完整数据');
         } catch (error) { showToast(`分析失败：${error.message}`); }
         finally { button.disabled = false; button.textContent = '收录并分析'; }
       });
