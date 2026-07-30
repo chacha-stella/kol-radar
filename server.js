@@ -88,10 +88,15 @@ function readPersistedDigest() {
 }
 
 function decodeHtml(value = '') {
-  return String(value)
-    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
-    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#x27;/gi, "'")
-    .replace(/&#x2F;/gi, '/').replace(/\s+/g, ' ').trim();
+  let decoded = String(value);
+  for (let pass = 0; pass < 3; pass += 1) {
+    decoded = decoded
+      .replace(/&amp;/gi, '&').replace(/&quot;/gi, '"').replace(/&#39;|&apos;/gi, "'")
+      .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+      .replace(/&#(\d+);/g, (_, decimal) => String.fromCodePoint(Number(decimal)));
+  }
+  return decoded.replace(/\s+/g, ' ').trim();
 }
 
 function metaContent(html, key) {
@@ -116,7 +121,7 @@ function firstNumber(html, patterns) {
 }
 
 function parseInstagramDate(value) {
-  const source = String(value || '');
+  const source = decodeHtml(value || '');
   const timestamp = source.match(/["'](?:taken_at_timestamp|datePublished)["']\s*[:=]\s*["']?(\d{10,13})/i);
   if (timestamp) {
     const milliseconds = timestamp[1].length === 10 ? Number(timestamp[1]) * 1000 : Number(timestamp[1]);
