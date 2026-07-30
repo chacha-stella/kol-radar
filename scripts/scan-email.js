@@ -6,11 +6,12 @@ import { ImapFlow } from 'imapflow';
 const output = path.resolve('data/digest.json');
 let previousDigest = null;
 try { previousDigest = JSON.parse(fs.readFileSync(output, 'utf8')); } catch { /* First scan has no cache. */ }
-let translationsRemaining = Number(process.env.MAX_TRANSLATIONS_PER_RUN || 3);
+let translationsRemaining = Number(process.env.MAX_TRANSLATIONS_PER_RUN || 100);
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
-const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
-const geminiModel = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
+const libreTranslateUrl = String(process.env.LIBRETRANSLATE_URL || '').trim().replace(/\/$/, '');
+const libreTranslateApiKey = String(process.env.LIBRETRANSLATE_API_KEY || '').trim();
+const libreTranslateTimeoutMs = Number(process.env.LIBRETRANSLATE_TIMEOUT_MS || 30000);
 const internalDomains = ['chessnutech.com'];
 // These senders are platform notices or marketing services, not creator replies.
 // Keep them out of the collaboration queue even when their copy contains words
@@ -26,6 +27,12 @@ const collaborationTerms = [
   'media kit', 'rate card', 'sponsor', 'sponsored', 'collab', 'collaboration', 'review',
   'brand deal', 'interested', 'available', 'partnership', 'proposal', 'campaign', 'deliverables',
   'timeline', 'fee', 'price', 'pricing', 'usd', 'eur', 'sure', 'yes', 'okay', 'accept'
+];
+const nonCreatorTerms = [
+  'seo', 'website audit', 'website optimization', 'google ranking', 'search engine',
+  'exhibition', 'trade show', 'conference', 'event sponsorship', 'vendor', 'supplier',
+  'wholesale', 'factory', 'manufacturing', 'bag vendor', 'web design', 'link building',
+  'newsletter', 'marketing platform'
 ];
 const automatedPrefixes = ['noreply@', 'no-reply@', 'mailer-daemon@', 'postmaster@', 'notifications@', 'notification@'];
 
@@ -48,7 +55,10 @@ function scoreIntent(content) {
   const high = highSignals.filter(pattern => pattern.test(value)).length;
   const medium = mediumSignals.filter(pattern => pattern.test(value)).length;
   const negative = negativeSignals.some(pattern => pattern.test(value));
+  const creatorSignals = /\b(creator|influencer|tiktok|instagram|youtube|reel|shorts|followers|audience|media kit|rate card)\b/i.test(value);
   if (negative && high === 0) return { score: 10, level: '低意向', reasons: ['系统/通知类邮件'] };
+  if (creatorSignals && high >= 2) return { score: 85, level: '高意向', reasons: ['明确提到红人/内容合作', '涉及档期、报价或交付'] };
+  if (creatorSignals && high >= 1) return { score: 75, level: '较高意向', reasons: ['提到红人内容合作', '已出现合作推进信号'] };
   if (high >= 2 || (high >= 1 && medium >= 1)) return { score: 85, level: '高意向', reasons: ['出现明确合作动作', '涉及档期、报价或交付'] };
   if (high === 1 || medium >= 2) return { score: 60, level: '中意向', reasons: ['提到合作或产品评测', '尚未出现明确报价/档期'] };
   return { score: 35, level: '待确认', reasons: ['只有泛合作词或上下文不足'] };
@@ -125,38 +135,36 @@ function hasCjk(value) {
   return /[\u3400-\u9fff]/.test(String(value || ''));
 }
 
-async function translateChunk(value, label = '正文') {
+async function translateChunkLegacy(value, label = '正文') {
   const text = repairMojibake(String(value || '').trim());
   if (!text) return '';
   if (hasCjk(text) && !/[A-Za-z]{4,}/.test(text)) return text;
-  const wait = Math.max(0, 4300 - (Date.now() - lastTranslationRequestAt));
+  if (!libreTranslateUrl) throw new Error('translation_not_configured');
+  const wait = Math.max(0, 250 - (Date.now() - lastTranslationRequestAt));
   if (wait) await new Promise(resolve => setTimeout(resolve, wait));
   lastTranslationRequestAt = Date.now();
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
+  const response = await fetch(`${libreTranslateUrl}/translate`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: `把下面邮件${label}完整翻译成自然、准确的简体中文。不得删减、总结或改写。保留人名、邮箱、网址、产品名、数字、金额和原有段落。只返回翻译后的${label}纯文本，不要 Markdown，不要解释。\n\n${text}` }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 8192 }
-      })
+      body: JSON.stringify({ q: text, source: 'auto', target: 'zh', format: 'text', ...(libreTranslateApiKey ? { api_key: libreTranslateApiKey } : {}) })
   });
   if (!response.ok) throw new Error(`translation_${response.status}`);
-  const payload = await response.json();
-  return payload.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim() || '';
+  const payload = await response.json().catch(() => ({}));
+  return String(payload.translatedText || '').trim();
 }
 
 async function translateEmailToChinese(subject, body) {
   const title = repairMojibake(String(subject || '').trim());
   const value = repairMojibake(String(body || '').trim());
   if (!title && !value) return { subject: '', text: '', status: 'empty' };
-  if (!geminiApiKey) return { subject: title, text: value, status: 'translation_not_configured' };
+  if (!libreTranslateUrl) return { subject: title, text: value, status: 'translation_not_configured' };
   try {
-    const translatedSubject = await translateChunk(title, '标题');
+    const translatedSubject = await translateLibreChunk(title, 'zh');
     // Translate in bounded chunks so long threads are never silently truncated.
     const chunks = [];
     for (let offset = 0; offset < value.length; offset += 3000) chunks.push(value.slice(offset, offset + 3000));
     const translatedChunks = [];
-    for (const chunk of chunks) translatedChunks.push(await translateChunk(chunk, '正文'));
+    for (const chunk of chunks) translatedChunks.push(await translateLibreChunk(chunk, 'zh'));
     return {
       subject: translatedSubject || title,
       text: translatedChunks.join('\n\n') || value,
@@ -286,8 +294,38 @@ function isLikelyCreatorReply(content, senderAddress, subject, forwarded) {
   const sender = String(senderAddress || '').toLowerCase();
   if (!sender || sender === user.toLowerCase() || isAutomated(sender, content)) return false;
   const hasTerms = collaborationTerms.some(term => value.includes(term.toLowerCase()));
+  const nonCreator = nonCreatorTerms.some(term => value.includes(term.toLowerCase()));
+  const creatorContext = /\b(creator|influencer|tiktok|instagram|youtube|reel|shorts|followers|audience|media kit|rate card)\b/i.test(value);
   const replyMarker = /(?:^|\s)(?:re|回复|答复|fwd|转发)\s*:/i.test(String(subject || ''));
+  if (nonCreator && !creatorContext) return false;
   return hasTerms || (forwarded && (replyMarker || value.length > 20)) || replyMarker;
+}
+
+async function translateLibreChunk(value, target = 'zh') {
+  const text = repairMojibake(String(value || '').trim());
+  if (!text) return '';
+  if (hasCjk(text) && !/[A-Za-z]{4,}/.test(text)) return text;
+  if (!libreTranslateUrl) throw new Error('translation_not_configured');
+  const wait = Math.max(0, 250 - (Date.now() - lastTranslationRequestAt));
+  if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+  lastTranslationRequestAt = Date.now();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), libreTranslateTimeoutMs);
+  try {
+    const response = await fetch(`${libreTranslateUrl}/translate`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ q: text, source: 'auto', target, format: 'text', ...(libreTranslateApiKey ? { api_key: libreTranslateApiKey } : {}) }),
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error(`translation_${response.status}`);
+    const payload = await response.json().catch(() => ({}));
+    const translated = String(payload.translatedText || '').trim();
+    if (!translated) throw new Error('translation_empty');
+    return translated;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function progressFor(intent, replied) {
@@ -461,7 +499,7 @@ try {
       let translatedBody;
       if (cached) {
         translatedBody = { subject: cached.subject, text: cached.bodyChinese || '', status: 'translated_to_chinese' };
-      } else if (geminiApiKey && translationsRemaining > 0) {
+      } else if (libreTranslateUrl && translationsRemaining > 0) {
         translationsRemaining -= 1;
         try {
           translatedBody = await translateEmailToChinese(subject, originalBody);
@@ -469,7 +507,7 @@ try {
           translatedBody = { subject, text: originalBody, status: `translation_deferred_${error.message || 'error'}` };
         }
       } else {
-        translatedBody = { subject, text: originalBody, status: geminiApiKey ? 'translation_deferred' : 'translation_not_configured' };
+        translatedBody = { subject, text: originalBody, status: libreTranslateUrl ? 'translation_deferred' : 'translation_not_configured' };
       }
       const brand = brandFor(`${subject} ${originalBody}`);
       results.push({
@@ -477,9 +515,8 @@ try {
         threadId: thread || ids.messageId || id,
         name: original?.name || sender.name || effectiveSender || '未知发件人',
         email: effectiveSender || '',
-        subject: translatedBody.status === 'translated_to_chinese'
-          ? (translatedBody.subject || repairMojibake(decodeMimeHeader(subject)))
-          : repairMojibake(decodeMimeHeader(subject)),
+        subject: repairMojibake(decodeMimeHeader(subject)),
+        subjectChinese: translatedBody.status === 'translated_to_chinese' ? (translatedBody.subject || '') : '',
         summary: summarize(extractMimeText(rawSource), subject),
         body: originalBody,
         bodyChinese: translatedBody.status === 'translated_to_chinese' ? translatedBody.text : '',
@@ -541,7 +578,9 @@ try {
     translationSummary: {
        translated: collapsedResults.filter(item => item.translationStatus === 'translated_to_chinese').length,
        pending: collapsedResults.filter(item => item.translationStatus !== 'translated_to_chinese').length,
-      attemptedThisRun: Number(process.env.MAX_TRANSLATIONS_PER_RUN || 3) - translationsRemaining
+      attemptedThisRun: Number(process.env.MAX_TRANSLATIONS_PER_RUN || 100) - translationsRemaining,
+      service: 'LibreTranslate',
+      configured: Boolean(libreTranslateUrl)
     }
   });
   console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${collapsedResults.length} collapsed=${results.length - collapsedResults.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
