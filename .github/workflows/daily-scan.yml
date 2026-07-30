@@ -7,7 +7,8 @@ on:
     paths-ignore:
       - "data/digest.json"
   schedule:
-    - cron: '30 0 * * *'
+    # 10:00 and 14:00 Beijing time (UTC 02:00 and 06:00).
+    - cron: '0 2,6 * * *'
 
 permissions:
   contents: read
@@ -26,14 +27,27 @@ jobs:
           node-version: 20
       - name: Install mail client
         run: npm install --no-audit --no-fund
+      - name: Install Argos Translate
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install argostranslate
+          python scripts/setup-argos.py
+      - name: Start local translation bridge
+        run: |
+          nohup python scripts/argos-server.py > "$RUNNER_TEMP/argos-translate.log" 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:5000/languages > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat "$RUNNER_TEMP/argos-translate.log"
+          exit 1
       - name: Scan Aliyun Enterprise Mail
         env:
           MAIL_IMAP_HOST: imap.qiye.aliyun.com
           MAIL_IMAP_PORT: 993
           MAIL_IMAP_USER: ${{ secrets.MAIL_IMAP_USER }}
           MAIL_IMAP_PASSWORD: ${{ secrets.MAIL_IMAP_PASSWORD }}
-          LIBRETRANSLATE_URL: ${{ secrets.LIBRETRANSLATE_URL }}
-          LIBRETRANSLATE_API_KEY: ${{ secrets.LIBRETRANSLATE_API_KEY }}
+          LIBRETRANSLATE_URL: http://127.0.0.1:5000
           LIBRETRANSLATE_TIMEOUT_MS: 30000
           MAX_TRANSLATIONS_PER_RUN: 100
         run: |
@@ -45,3 +59,18 @@ jobs:
       - name: Verify scan output without publishing private mail
         run: |
           node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('data/digest.json','utf8')); console.log(JSON.stringify({status:d.status, scannedInboxCount:d.scannedInboxCount, replyCount:d.replyCount, newEmailCount:d.newEmailCount, highIntentCount:d.highIntentCount, translationSummary:d.translationSummary}, null, 2))"
+      - name: Upload private digest to Railway
+        if: success()
+        env:
+          KOL_API_BASE: ${{ secrets.KOL_API_BASE }}
+          KOL_SCAN_TOKEN: ${{ secrets.KOL_SCAN_TOKEN }}
+        run: |
+          if [ -z "$KOL_API_BASE" ] || [ -z "$KOL_SCAN_TOKEN" ]; then
+            echo "KOL_API_BASE or KOL_SCAN_TOKEN is not configured; keeping the digest only in this private runner."
+            exit 0
+          fi
+          curl --fail --silent --show-error \
+            -X POST "$KOL_API_BASE/api/digest" \
+            -H "content-type: application/json" \
+            -H "x-kol-scan-token: $KOL_SCAN_TOKEN" \
+            --data-binary @data/digest.json

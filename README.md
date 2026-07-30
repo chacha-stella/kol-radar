@@ -9,12 +9,13 @@ This project provides a focused workspace for Aliyun Enterprise Mail, YouTube, a
 3. Set `MAIL_IMAP_PASSWORD` to the Aliyun Enterprise Mail app password. Do not put secrets in GitHub or the browser.
 4. Set `KOL_ADMIN_TOKEN` to a long random value. The browser prompts for it only for write actions.
 5. Put the generated service URL into the dashboard's **连接设置** page.
+6. For GitHub Actions to update the private dashboard digest, add `KOL_API_BASE` and `KOL_SCAN_TOKEN` to GitHub Secrets. Set the same random `KOL_SCAN_TOKEN` in Railway Variables.
 
-### Mail translation with LibreTranslate
+### Mail translation with Argos Translate
 
-The mailbox scanner uses self-hosted [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) and no longer calls Gemini. Start it locally with `docker compose -f docker-compose.libretranslate.yml up -d`, or deploy the same container on a server. Put its public base URL in `LIBRETRANSLATE_URL` and, if enabled, its key in `LIBRETRANSLATE_API_KEY`. The scanner stores the original English in `body` and the Chinese result in `bodyChinese`; translation errors are kept in `translationStatus` instead of being replaced with invented text.
+The GitHub Actions mailbox job installs the open-source [Argos Translate](https://github.com/argosopentech/argos-translate) English/Chinese models and starts a temporary local HTTP bridge. No 24-hour translation server or extra Railway service is required. The scheduled scans run at 10:00 and 14:00 Beijing time (02:00 and 06:00 UTC). The scanner stores the original English in `body` and the Chinese result in `bodyChinese`; translation errors are kept in `translationStatus` instead of being replaced with invented text.
 
-The server checks the mailbox at `SCAN_HOUR`:`SCAN_MINUTE` in `APP_TIMEZONE`, and exposes the most recent scan at `/api/digest`.
+The GitHub Actions workflow scans at 10:00 and 14:00 Beijing time and uploads the private result to Railway through a token-protected endpoint. The server's optional in-process scan uses `SCAN_HOUR` and `SCAN_MINUTE`.
 
 ### YouTube
 

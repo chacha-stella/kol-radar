@@ -15,6 +15,7 @@ const scanMinute = Number(process.env.SCAN_MINUTE || 30);
 const graphVersion = process.env.META_GRAPH_VERSION || 'v22.0';
 const replyToken = String(process.env.KOL_REPLY_TOKEN || '').trim();
 const adminToken = String(process.env.KOL_ADMIN_TOKEN || replyToken).trim();
+const scanToken = String(process.env.KOL_SCAN_TOKEN || '').trim();
 const execFileAsync = promisify(execFile);
 const replyAttempts = new Map();
 let fullScanPromise = null;
@@ -118,6 +119,12 @@ async function translateWithLibreTranslate(value, target = 'zh') {
 function replyAllowed(to, messageId) {
   const digest = readPersistedDigest() || latestDigest;
   return (digest.messages || []).some(item => String(item.id || '') === String(messageId || '') && String(item.email || '').toLowerCase() === String(to || '').toLowerCase());
+}
+
+function requireScanToken(request) {
+  if (!scanToken || request.headers['x-kol-scan-token'] !== scanToken) {
+    throw new Error('扫描上传令牌无效或未配置');
+  }
 }
 
 async function runFullScanner() {
@@ -276,6 +283,20 @@ async function handleRequest(request, response) {
   }
 
   if (url.pathname === '/api/digest' && request.method === 'GET') return json(response, 200, readPersistedDigest() || latestDigest);
+  if (url.pathname === '/api/digest' && request.method === 'POST') {
+    try {
+      requireScanToken(request);
+      const payload = await readBody(request);
+      if (payload?.status !== 'success') throw new Error('只接受成功的邮箱扫描结果');
+      if (!Array.isArray(payload.messages)) throw new Error('日报格式无效');
+      fs.mkdirSync(path.dirname(digestPath()), { recursive: true });
+      fs.writeFileSync(digestPath(), JSON.stringify(payload, null, 2) + '\n', 'utf8');
+      latestDigest = payload;
+      return json(response, 200, { status: 'stored', scannedAt: payload.scannedAt || null, messageCount: payload.messages.length });
+    } catch (error) {
+      return json(response, 400, { status: 'error', message: error.message });
+    }
+  }
   if (url.pathname === '/api/scan' && request.method === 'POST') return json(response, 200, await runFullScanner());
 
   if (url.pathname === '/api/reply' && request.method === 'POST') {
