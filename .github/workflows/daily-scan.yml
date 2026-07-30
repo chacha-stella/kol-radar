@@ -50,6 +50,7 @@ jobs:
           LIBRETRANSLATE_URL: http://127.0.0.1:5000
           LIBRETRANSLATE_TIMEOUT_MS: 30000
           MAX_TRANSLATIONS_PER_RUN: 100
+          MAX_MAIL_MESSAGES: 250
         run: |
           if [ "$MAIL_IMAP_USER" != "stella.zhuang@chessnutech.com" ]; then
             echo "MAIL_IMAP_USER is not the configured stella.zhuang@chessnutech.com account. Update the GitHub secret." >&2

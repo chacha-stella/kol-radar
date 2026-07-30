@@ -7,6 +7,8 @@ const output = path.resolve('data/digest.json');
 let previousDigest = null;
 try { previousDigest = JSON.parse(fs.readFileSync(output, 'utf8')); } catch { /* First scan has no cache. */ }
 let translationsRemaining = Number(process.env.MAX_TRANSLATIONS_PER_RUN || 100);
+// Limit each run to recent messages so large mailboxes cannot time out.
+const maxMailMessages = Math.max(20, Number(process.env.MAX_MAIL_MESSAGES || 250));
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
 const libreTranslateUrl = String(process.env.LIBRETRANSLATE_URL || '').trim().replace(/\/$/, '');
@@ -402,7 +404,10 @@ async function readMailbox(pathname, callback) {
   let lock;
   try {
     lock = await client.getMailboxLock(pathname);
-    for await (const message of client.fetch('1:*', { envelope: true, source: true, internalDate: true })) {
+    const status = await client.status(pathname, { messages: true });
+    const total = Number(status?.messages || 0);
+    const start = total > maxMailMessages ? total - maxMailMessages + 1 : 1;
+    for await (const message of client.fetch(`${start}:*`, { envelope: true, source: true, internalDate: true })) {
       await callback(message, pathname);
     }
   } finally {
@@ -555,7 +560,10 @@ try {
       latestByThread.set(key, item);
     }
   }
-  const collapsedResults = [...latestByThread.values()];
+  // Merge the recent scan with the previous digest so the dashboard stays cumulative.
+  const mergedById = new Map((previousDigest?.messages || []).map(item => [String(item.id || ''), item]));
+  for (const item of latestByThread.values()) mergedById.set(String(item.id || ''), item);
+  const collapsedResults = [...mergedById.values()].sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt));
   const newMessages = collapsedResults.filter(item => item.replyStatus === '新邮件');
   const repliedMessages = collapsedResults.filter(item => item.replyStatus === '已回复');
     save({
