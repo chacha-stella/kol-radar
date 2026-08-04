@@ -379,8 +379,13 @@ const client = new ImapFlow({
 });
 
 async function listMailboxes() {
-  const listed = await client.list();
-  return Array.isArray(listed) ? listed : [];
+  try {
+    const listed = await client.list();
+    return Array.isArray(listed) ? listed : [];
+  } catch (error) {
+    console.warn(`[scan] IMAP LIST failed; falling back to INBOX: ${String(error?.message || error).slice(0, 300)}`);
+    return [];
+  }
 }
 
 function mailboxPath(mailbox) {
@@ -404,8 +409,15 @@ async function readMailbox(pathname, callback) {
   let lock;
   try {
     lock = await client.getMailboxLock(pathname);
-    const status = await client.status(pathname, { messages: true });
-    const total = Number(status?.messages || 0);
+    let total = Number(client.mailbox?.exists || 0);
+    if (!total) {
+      try {
+        const status = await client.status(pathname, { messages: true });
+        total = Number(status?.messages || 0);
+      } catch (error) {
+        console.warn(`[scan] IMAP STATUS failed for ${pathname}: ${String(error?.message || error).slice(0, 300)}`);
+      }
+    }
     const start = total > maxMailMessages ? total - maxMailMessages + 1 : 1;
     const batchSize = Math.max(10, Number(process.env.IMAP_FETCH_BATCH_SIZE || 25));
     for (let batchStart = start; batchStart <= total; batchStart += batchSize) {
