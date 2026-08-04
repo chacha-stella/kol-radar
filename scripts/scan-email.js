@@ -8,7 +8,7 @@ let previousDigest = null;
 try { previousDigest = JSON.parse(fs.readFileSync(output, 'utf8')); } catch { /* First scan has no cache. */ }
 let translationsRemaining = Number(process.env.MAX_TRANSLATIONS_PER_RUN || 100);
 // Limit each run to recent messages so large mailboxes cannot time out.
-const maxMailMessages = Math.max(20, Number(process.env.MAX_MAIL_MESSAGES || 250));
+const maxMailMessages = Math.max(20, Number(process.env.MAX_MAIL_MESSAGES || 80));
 const password = process.env.MAIL_IMAP_PASSWORD;
 const user = process.env.MAIL_IMAP_USER;
 const libreTranslateUrl = String(process.env.LIBRETRANSLATE_URL || '').trim().replace(/\/$/, '');
@@ -407,8 +407,12 @@ async function readMailbox(pathname, callback) {
     const status = await client.status(pathname, { messages: true });
     const total = Number(status?.messages || 0);
     const start = total > maxMailMessages ? total - maxMailMessages + 1 : 1;
-    for await (const message of client.fetch(`${start}:*`, { envelope: true, source: true, internalDate: true })) {
-      await callback(message, pathname);
+    const batchSize = Math.max(10, Number(process.env.IMAP_FETCH_BATCH_SIZE || 25));
+    for (let batchStart = start; batchStart <= total; batchStart += batchSize) {
+      const batchEnd = Math.min(total, batchStart + batchSize - 1);
+      for await (const message of client.fetch(`${batchStart}:${batchEnd}`, { envelope: true, source: true, internalDate: true })) {
+        await callback(message, pathname);
+      }
     }
   } finally {
     lock?.release();
