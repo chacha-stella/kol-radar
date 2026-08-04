@@ -427,9 +427,11 @@ try {
 
   const sentReferenceIds = new Set();
   const repliedThreads = new Map();
+  const scanWarnings = [];
   let scannedSentCount = 0;
   for (const folder of sentFolders) {
-    await readMailbox(folder, async (message) => {
+    try {
+      await readMailbox(folder, async (message) => {
       scannedSentCount += 1;
       const rawSource = message.source?.toString('utf8') || '';
       const ids = messageIdentifiers(message, rawSource);
@@ -442,7 +444,14 @@ try {
         const previous = repliedThreads.get(thread);
         if (!previous || date > previous) repliedThreads.set(thread, date);
       }
-    });
+      });
+    } catch (error) {
+      scanWarnings.push(`sent folder ${folder} failed: ${String(error?.message || error).slice(0, 500)}`);
+      try { await client.logout(); } catch { /* Ignore closed IMAP sessions. */ }
+      try { await client.connect(); } catch (reconnectError) {
+        scanWarnings.push(`IMAP reconnect failed: ${String(reconnectError?.message || reconnectError).slice(0, 500)}`);
+      }
+    }
   }
 
   const results = [];
@@ -451,7 +460,8 @@ try {
   let ignoredMessageCount = 0;
   const seenIds = new Set();
   for (const folder of inboxes) {
-    await readMailbox(folder, async (message) => {
+    try {
+      await readMailbox(folder, async (message) => {
       scannedInboxCount += 1;
       const rawSource = message.source?.toString('utf8') || '';
       const source = cleanContent(extractMimeText(rawSource));
@@ -540,7 +550,14 @@ try {
         receivedAt: receivedAt.toISOString(),
         lastIncomingAt: receivedAt.toISOString()
       });
-    });
+      });
+    } catch (error) {
+      scanWarnings.push(`inbox folder ${folder} failed: ${String(error?.message || error).slice(0, 500)}`);
+      try { await client.logout(); } catch { /* Ignore closed IMAP sessions. */ }
+      try { await client.connect(); } catch (reconnectError) {
+        scanWarnings.push(`IMAP reconnect failed: ${String(reconnectError?.message || reconnectError).slice(0, 500)}`);
+      }
+    }
   }
 
   // A long email thread produces one IMAP message per reply. The dashboard is
@@ -579,9 +596,10 @@ try {
     repliedCount: repliedMessages.length,
      highIntentCount: collapsedResults.filter(item => item.intent >= 80).length,
      quoteTotal: collapsedResults.reduce((sum, item) => sum + item.quote, 0),
-     messages: collapsedResults,
-     otherMessages,
-     collapsedThreadCount: results.length - collapsedResults.length,
+      messages: collapsedResults,
+      otherMessages,
+      scanWarnings,
+      collapsedThreadCount: results.length - collapsedResults.length,
      message: `累计扫描收件箱 ${scannedInboxCount} 封、已发送 ${scannedSentCount} 封，保留 ${collapsedResults.length} 个合作线程；其中新邮件 ${newMessages.length} 个，已回复 ${repliedMessages.length} 个`,
     translationSummary: {
        translated: collapsedResults.filter(item => item.translationStatus === 'translated_to_chinese').length,
