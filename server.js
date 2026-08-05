@@ -139,7 +139,7 @@ async function runFullScanner() {
       latestDigest = readPersistedDigest() || latestDigest;
     } catch (error) {
       const persisted = readPersistedDigest();
-      const diagnostic = [error.message, error.stderr, error.stdout].filter(Boolean).join('\n').slice(0, 2000);
+      const diagnostic = [error.message, error.responseText, error.executedCommand, error.stderr, error.stdout].filter(Boolean).join('\n').slice(0, 4000);
       latestDigest = persisted?.messages?.length
         ? { ...persisted, status: 'success', scanWarning: diagnostic }
         : { ...latestDigest, scannedAt: new Date().toISOString(), status: 'error', message: '邮箱扫描失败，请检查 IMAP 账号和安全码。', error: diagnostic };

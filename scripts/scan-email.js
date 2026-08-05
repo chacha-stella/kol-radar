@@ -628,7 +628,7 @@ try {
   console.info(`[scan] mode=cumulative inbox=${scannedInboxCount} sent=${scannedSentCount} selected=${collapsedResults.length} collapsed=${results.length - collapsedResults.length} new=${newMessages.length} replied=${repliedMessages.length} ignored=${ignoredMessageCount}`);
   for (const item of collapsedResults) console.info(`[selected] ${item.email} | ${item.subject} | status=${item.replyStatus} | intent=${item.intent} | quote=${item.quote}`);
 } catch (error) {
-  const diagnostic = String(error?.message || error).slice(0, 1200);
+  const diagnostic = [error?.message, error?.responseText, error?.executedCommand].filter(Boolean).join(' | ').slice(0, 2000);
   // Preserve a prior real digest when Aliyun closes IMAP after data was read.
   if (previousDigest?.messages?.length && Number(previousDigest.scannedMessageCount || 0) > 0) {
     save({ ...previousDigest, status: 'success', scanWarning: diagnostic });
